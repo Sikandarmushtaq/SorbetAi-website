@@ -1,0 +1,102 @@
+
+/* Features Section Heading */
+.features-title {
+  padding: 6vh 5vw 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 5.4rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  max-width: 900px;
+}
+
+/* Horizontal Feature Cards Container */
+.features-rail {
+  display: flex;
+  gap: 22px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding: 4vh 5vw 8vh;
+
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  scrollbar-width: auto;
+}
+
+/* Individual Feature Card */
+.feature-card {
+  flex: 0 0 min(340px, 80vw);
+  height: 400px;
+
+  border-radius: 200px 200px 40px 40px;
+  padding: 80px 32px 32px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+
+  transition: transform 0.5s;
+}
+
+/* Card Hover Animation */
+.feature-card:hover {
+  transform: translateY(-14px);
+}
+
+/* Feature Title */
+.feature-card h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-bottom: 10px;
+}
+
+/* Feature Description */
+.feature-card small {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+/* Mobile Responsive */
+@media (max-width: 760px) {
+  .features-title {
+    padding: 5vh 5vw 0;
+    font-size: clamp(2.4rem, 10vw, 4rem);
+  }
+
+  .features-rail {
+    gap: 16px;
+    padding: 4vh 5vw 7vh;
+  }
+
+  .feature-card {
+    flex: 0 0 min(340px, 80vw);
+    height: 370px;
+  }
+
+  .feature-card:hover {
+    transform: none;
+  }
+}
+
+/* Small Mobile Screens */
+@media (max-width: 400px) {
+  .features-card {
+    flex-basis: 85vw;
+  }
+
+  .features-rail {
+    gap: 14px;
+  }
+}

@@ -1,0 +1,501 @@
+
+/* Main Section */
+.power-conversations-section {
+  position: relative;
+  padding: 8vh 5vw 10vh;
+  overflow: hidden;
+}
+
+.pc-container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* Section Heading */
+.pc-heading {
+  max-width: 1000px;
+}
+
+.pc-heading h2 {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.pc-heading h2 span {
+  color: var(--coral);
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+/* Feature Tabs */
+.pc-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+  padding: 5px 0 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+}
+
+.pc-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.pc-tab {
+  flex: 0 0 auto;
+  padding: 12px 21px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--white);
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.pc-tab:hover {
+  transform: translateY(-3px);
+}
+
+.pc-tab.active {
+  background: var(--coral);
+  color: var(--green);
+}
+
+/* Main Showcase Layout */
+.pc-showcase {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: center;
+  gap: 5vw;
+  margin-top: 35px;
+}
+
+/* Left Content */
+.pc-content {
+  position: relative;
+  z-index: 2;
+}
+
+.pc-brand {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 17px;
+  margin-bottom: 22px;
+  border-radius: 99px;
+  background: var(--yellow);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pc-content h3 {
+  margin-bottom: 20px;
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.pc-description {
+  max-width: 490px;
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+/* 2:14 AM Scenario */
+.pc-scenario {
+  max-width: 490px;
+  margin-top: 30px;
+  padding: 23px;
+  border-radius: 28px 28px 28px 7px;
+  background: var(--white);
+  box-shadow: 0 14px 30px #10372a12;
+}
+
+.pc-scenario-time {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  color: var(--coral);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+}
+
+.pc-scenario p {
+  color: var(--green);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pc-live-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #64ae7b;
+}
+
+/* Right Visual */
+.pc-visual {
+  position: relative;
+  min-height: 500px;
+  display: grid;
+  place-items: center;
+  padding: 60px 30px 75px;
+  border-radius: 48px 48px 48px 8px;
+  background: var(--lavender);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Organic Blobs */
+.pc-orb {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+}
+
+.pc-orb-lavender {
+  width: 300px;
+  height: 300px;
+  top: -130px;
+  right: -80px;
+  background: var(--coral);
+  opacity: 0.7;
+}
+
+.pc-orb-yellow {
+  width: 240px;
+  height: 240px;
+  bottom: -105px;
+  left: -80px;
+  background: var(--yellow);
+}
+
+/* Floating Channel Chips */
+.pc-floating-chip {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 17px;
+  border-radius: 99px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 14px 30px #10372a18;
+  pointer-events: none;
+}
+
+.pc-floating-chip i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.pc-chip-whatsapp {
+  top: 35px;
+  right: 35px;
+  background: var(--coral);
+}
+
+.pc-chip-instagram {
+  bottom: 120px;
+  left: 20px;
+  background: var(--white);
+}
+
+.pc-chip-messenger {
+  bottom: 55px;
+  right: 20px;
+  background: var(--yellow);
+}
+
+/* Chat Window */
+.pc-chat-window {
+  position: relative;
+  z-index: 2;
+  width: min(430px, 100%);
+  background: var(--white);
+  border-radius: 34px 34px 34px 8px;
+  box-shadow: 0 30px 60px #10372a25;
+  overflow: hidden;
+}
+
+.pc-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid #10372a12;
+}
+
+.pc-avatar {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--green);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.pc-chat-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pc-chat-identity strong {
+  color: var(--green);
+  font-size: 15px;
+}
+
+.pc-chat-identity span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #648173;
+  font-size: 11px;
+}
+
+.pc-chat-identity span i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #64ae7b;
+}
+
+.pc-chat-status {
+  margin-left: auto;
+  padding: 7px 12px;
+  border-radius: 99px;
+  background: #bfe0c8;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Chat Messages */
+.pc-chat-body {
+  padding: 25px 20px;
+}
+
+.pc-chat-date {
+  margin-bottom: 25px;
+  color: #87948c;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+.pc-chat-message {
+  width: fit-content;
+  max-width: 85%;
+  margin-bottom: 15px;
+  padding: 13px 16px;
+  border-radius: 20px;
+}
+
+.pc-chat-message span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.pc-chat-message p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pc-chat-message.incoming {
+  background: #efe6d3;
+  color: var(--green);
+  border-radius: 20px 20px 20px 5px;
+}
+
+.pc-chat-message.outgoing {
+  margin-left: auto;
+  background: var(--green);
+  color: var(--white);
+  border-radius: 20px 20px 5px 20px;
+}
+
+.pc-chat-message small {
+  display: block;
+  margin-top: 8px;
+  color: #cdbdff;
+  font-size: 10px;
+}
+
+.pc-chat-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #10372a12;
+  color: #648173;
+  font-size: 11px;
+}
+
+/* Channel Footer */
+.pc-channel-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.pc-channel-footer span {
+  padding: 7px 13px;
+  border-radius: 99px;
+  background: #fffaf0;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+  .pc-showcase {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .pc-visual {
+    min-height: 440px;
+    padding: 55px 20px 75px;
+  }
+
+  .pc-floating-chip {
+    font-size: 11px;
+    padding: 10px 13px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+  .power-conversations-section {
+    padding: 6vh 5vw 8vh;
+  }
+
+  .pc-heading h2 {
+    font-size: clamp(2.7rem, 10vw, 4.5rem);
+  }
+
+  .pc-tabs {
+    margin-top: 27px;
+    gap: 9px;
+  }
+
+  .pc-tab {
+    padding: 11px 17px;
+    font-size: 13px;
+  }
+
+  .pc-showcase {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 25px;
+  }
+
+  .pc-content h3 {
+    font-size: clamp(2.8rem, 11vw, 4.5rem);
+  }
+
+  .pc-description {
+    font-size: 16px;
+  }
+
+  .pc-scenario {
+    padding: 19px;
+  }
+
+  .pc-visual {
+    min-height: 430px;
+    padding: 55px 18px 75px;
+    border-radius: 38px 38px 38px 8px;
+  }
+
+  .pc-chat-window {
+    width: 100%;
+  }
+
+  .pc-chip-whatsapp {
+    top: 18px;
+    right: 14px;
+  }
+
+  .pc-chip-instagram {
+    bottom: 105px;
+    left: 9px;
+  }
+
+  .pc-chip-messenger {
+    bottom: 45px;
+    right: 9px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 400px) {
+  .pc-visual {
+    min-height: 400px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .pc-chat-header {
+    padding: 15px;
+  }
+
+  .pc-chat-body {
+    padding: 20px 15px;
+  }
+
+  .pc-floating-chip {
+    padding: 8px 11px;
+    font-size: 10px;
+  }
+}

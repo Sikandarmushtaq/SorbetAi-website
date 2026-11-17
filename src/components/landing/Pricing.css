@@ -1,0 +1,550 @@
+
+/* =========================================
+   PRICING SECTION
+========================================= */
+
+.pricing-section {
+  position: relative;
+  padding: 7vh 5vw 9vh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.pricing-container {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.pricing-blob {
+  position: absolute;
+  z-index: -1;
+  top: -100px;
+  right: -90px;
+  width: 250px;
+  height: 250px;
+  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+  background: var(--lavender);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+
+/* =========================================
+   HEADING
+========================================= */
+
+.pricing-heading {
+  max-width: 850px;
+  margin-bottom: 34px;
+}
+
+.pricing-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.pricing-eyebrow > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.pricing-heading h2 {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.6rem, 5.5vw, 4.8rem);
+  font-weight: 800;
+  line-height: 0.96;
+  letter-spacing: -0.06em;
+}
+
+.pricing-heading h2 span {
+  color: var(--coral);
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.pricing-heading > p {
+  max-width: 570px;
+  margin-top: 15px;
+  color: var(--green);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+
+/* =========================================
+   PRICING GRID
+========================================= */
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: stretch;
+  gap: 17px;
+}
+
+.pricing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 27px;
+  border-radius: 30px;
+  color: var(--green);
+}
+
+
+/* =========================================
+   ALL IN ONE CARD
+========================================= */
+
+.pricing-main-card {
+  background: var(--white);
+  border: 1px solid rgba(16, 55, 42, 0.14);
+  box-shadow: 0 15px 40px rgba(16, 55, 42, 0.06);
+}
+
+.pricing-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+
+.pricing-plan-label {
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.pricing-popular {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 99px;
+  background: var(--coral);
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.pricing-card h3 {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.pricing-card-description {
+  max-width: 440px;
+  margin-top: 9px;
+  color: var(--green);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+
+/* =========================================
+   PRICE
+========================================= */
+
+.pricing-price {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 23px;
+}
+
+.pricing-price > strong {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(4rem, 7vw, 5.5rem);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.075em;
+}
+
+.pricing-price > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pricing-price > div > span {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pricing-price > div > small {
+  color: var(--coral);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pricing-billing {
+  max-width: 480px;
+  margin-top: 11px;
+  color: var(--green);
+  font-size: 11px;
+  line-height: 1.55;
+  opacity: 0.75;
+}
+
+
+/* =========================================
+   EARLY BIRD
+========================================= */
+
+.pricing-early-bird {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  padding: 11px 14px;
+  border-radius: 13px;
+  background: #ff7a5920;
+  color: var(--green);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.pricing-early-bird svg {
+  flex-shrink: 0;
+  color: var(--coral);
+}
+
+.pricing-early-bird strong {
+  font-weight: 800;
+}
+
+
+/* =========================================
+   INCLUDED FEATURES
+========================================= */
+
+.pricing-included {
+  margin-top: 22px;
+}
+
+.pricing-included h4 {
+  margin-bottom: 12px;
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.pricing-included ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 11px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.pricing-included li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  color: var(--green);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.pricing-included li > span {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--green);
+}
+
+
+/* =========================================
+   ALL IN ONE BUTTON
+========================================= */
+
+.pricing-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  width: 100%;
+  padding: 13px 19px;
+  margin-top: 23px;
+
+  border: 2px solid transparent;
+  border-radius: 99px;
+
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.pricing-button:hover {
+  transform: translateY(-3px);
+}
+
+.pricing-button-primary {
+  background: var(--coral);
+  color: var(--green);
+}
+
+.pricing-button-primary:hover {
+  background: var(--green);
+  color: var(--white);
+}
+
+.pricing-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 12px;
+  color: var(--green);
+  font-size: 10px;
+}
+
+.pricing-footer-note i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+
+/* =========================================
+   CUSTOM PLAN
+========================================= */
+
+.pricing-custom-card {
+  background: var(--lavender);
+  border: 1px solid rgba(16, 55, 42, 0.12);
+}
+
+.pricing-custom-card .pricing-plan-label {
+  color: var(--green);
+}
+
+.pricing-custom-mark {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--green);
+  font-size: 18px;
+}
+
+.pricing-custom-price {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 28px;
+}
+
+.pricing-custom-price strong {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.6rem, 4vw, 3.7rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.pricing-custom-price span {
+  color: var(--green);
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* Custom Divider */
+.pricing-custom-divider {
+  width: 100%;
+  height: 1px;
+  margin-top: 21px;
+  background: rgba(16, 55, 42, 0.2);
+}
+
+.pricing-custom-card .pricing-included {
+  margin-top: 21px;
+}
+
+.pricing-custom-card .pricing-included ul {
+  grid-template-columns: 1fr;
+  row-gap: 13px;
+}
+
+.pricing-custom-card .pricing-included li > span {
+  background: var(--white);
+}
+
+/* Custom Button */
+.pricing-button-outline {
+  margin-top: auto;
+  background: transparent;
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.pricing-button-outline:hover {
+  background: var(--green);
+  color: var(--white);
+}
+
+.pricing-custom-note {
+  margin-top: 12px;
+  color: var(--green);
+  font-size: 10px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1000px) {
+  .pricing-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 13px;
+  }
+
+  .pricing-card {
+    padding: 22px;
+  }
+
+  .pricing-price > strong {
+    font-size: 4.5rem;
+  }
+
+  .pricing-included ul {
+    column-gap: 10px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 760px) {
+  .pricing-section {
+    padding: 7vh 5vw 8vh;
+  }
+
+  .pricing-heading {
+    margin-bottom: 27px;
+  }
+
+  .pricing-heading h2 {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .pricing-heading > p {
+    font-size: 13px;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .pricing-card {
+    padding: 23px 19px;
+    border-radius: 26px;
+  }
+
+  .pricing-price > strong {
+    font-size: 5rem;
+  }
+
+  .pricing-custom-price strong {
+    font-size: 3.4rem;
+  }
+
+  .pricing-included ul {
+    column-gap: 13px;
+    row-gap: 12px;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 430px) {
+  .pricing-card {
+    padding: 20px 16px;
+    border-radius: 23px;
+  }
+
+  .pricing-card-header {
+    align-items: center;
+  }
+
+  .pricing-plan-label {
+    font-size: 9px;
+  }
+
+  .pricing-popular {
+    padding: 7px 9px;
+    font-size: 8px;
+  }
+
+  .pricing-card h3 {
+    font-size: 24px;
+  }
+
+  .pricing-price > strong {
+    font-size: 4.5rem;
+  }
+
+  .pricing-included ul {
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+  }
+
+  .pricing-included li {
+    font-size: 12px;
+  }
+
+  .pricing-button {
+    padding: 13px 15px;
+  }
+}

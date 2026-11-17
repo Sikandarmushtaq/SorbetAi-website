@@ -1,0 +1,725 @@
+
+/* =========================================
+   MAIN SECTION
+========================================= */
+
+.business-capabilities-section {
+  position: relative;
+  padding: 8vh 5vw 10vh;
+  overflow: hidden;
+}
+
+.bc-container {
+  position: relative;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+
+/* =========================================
+   SECTION HEADING
+========================================= */
+
+.bc-heading {
+  max-width: 950px;
+}
+
+.bc-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 18px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.bc-eyebrow > span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.bc-heading h2 {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.7rem, 6.5vw, 5.5rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.bc-heading h2 span {
+  color: var(--coral);
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+
+/* =========================================
+   CAPABILITY TABS
+========================================= */
+
+.bc-capability-list {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 32px;
+  padding: 5px 0 12px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.bc-capability-list::-webkit-scrollbar {
+  display: none;
+}
+
+.bc-capability-pill {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 19px;
+  border: 0;
+  border-radius: 99px;
+
+  background: var(--white);
+  color: var(--green);
+
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  cursor: pointer;
+  scroll-snap-align: start;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.bc-capability-pill:hover {
+  transform: translateY(-3px);
+}
+
+.bc-capability-pill.active {
+  background: var(--coral);
+  color: var(--green);
+}
+
+.bc-capability-pill:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 4px;
+}
+
+
+/* =========================================
+   MAIN SHOWCASE
+========================================= */
+
+.bc-showcase {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: center;
+  gap: 5vw;
+  margin-top: 30px;
+  min-width: 0;
+}
+
+
+/* =========================================
+   LEFT CONTENT
+========================================= */
+
+.bc-content {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.bc-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 16px;
+  margin-bottom: 23px;
+
+  border-radius: 99px;
+  background: var(--yellow);
+  color: var(--green);
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.bc-brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.bc-content h3 {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.bc-description {
+  max-width: 470px;
+  margin-top: 20px;
+
+  color: var(--green);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   BENEFITS
+========================================= */
+
+.bc-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.bc-benefits > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bc-benefits > div > span {
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+  background: #bfe0c8;
+  color: var(--green);
+}
+
+.bc-benefits p {
+  color: var(--green);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   CTA LINK
+========================================= */
+
+.bc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 34px;
+  padding: 13px 21px;
+
+  border: 2px solid var(--green);
+  border-radius: 99px;
+
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.bc-link:hover {
+  transform: translateY(-3px);
+  background: var(--green);
+  color: var(--white);
+}
+
+.bc-link svg {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.bc-link:hover svg {
+  transform: translate(3px, -3px);
+}
+
+
+/* =========================================
+   RIGHT VISUAL
+========================================= */
+
+.bc-visual {
+  position: relative;
+  isolation: isolate;
+
+  min-width: 0;
+  min-height: 480px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 55px 28px 70px;
+
+  border-radius: 48px 48px 48px 8px;
+  background: var(--lavender);
+
+  overflow: hidden;
+}
+
+
+/* =========================================
+   ORGANIC BLOBS
+========================================= */
+
+.bc-blob-coral,
+.bc-blob-lavender {
+  position: absolute;
+  z-index: -1;
+
+  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+
+  pointer-events: none;
+}
+
+.bc-blob-coral {
+  width: 320px;
+  height: 320px;
+  top: -150px;
+  right: -100px;
+
+  background: var(--yellow);
+}
+
+.bc-blob-lavender {
+  width: 240px;
+  height: 240px;
+  bottom: -120px;
+  left: -70px;
+
+  background: var(--coral);
+  opacity: 0.8;
+}
+
+
+/* =========================================
+   FLOATING LABELS
+========================================= */
+
+.bc-floating-label {
+  position: absolute;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 11px 16px;
+  border-radius: 99px;
+
+  background: var(--white);
+  color: var(--green);
+
+  font-size: 11px;
+  font-weight: 700;
+
+  box-shadow: 0 14px 30px #10372a18;
+  pointer-events: none;
+}
+
+.bc-floating-label svg {
+  flex-shrink: 0;
+}
+
+.bc-floating-one {
+  top: 27px;
+  left: 18px;
+}
+
+.bc-floating-two {
+  right: 17px;
+  bottom: 45px;
+  background: var(--coral);
+}
+
+
+/* =========================================
+   CHAT WINDOW
+========================================= */
+
+.bc-chat-window {
+  position: relative;
+  z-index: 2;
+
+  width: min(440px, 100%);
+  min-width: 0;
+
+  border-radius: 34px 34px 34px 8px;
+  background: var(--white);
+
+  box-shadow: 0 30px 60px #10372a25;
+  overflow: hidden;
+}
+
+
+/* =========================================
+   CHAT HEADER
+========================================= */
+
+.bc-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 19px 20px;
+  border-bottom: 1px solid #10372a12;
+}
+
+.bc-chat-avatar {
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--green);
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.bc-chat-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.bc-chat-identity strong {
+  color: var(--green);
+  font-size: 14px;
+}
+
+.bc-chat-identity span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: var(--green);
+  font-size: 10px;
+  opacity: 0.65;
+}
+
+.bc-chat-identity span i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #64ae7b;
+}
+
+.bc-chat-online {
+  margin-left: auto;
+  padding: 7px 11px;
+
+  border-radius: 99px;
+  background: #bfe0c8;
+  color: var(--green);
+
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   CHAT BODY
+========================================= */
+
+.bc-chat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 26px 21px;
+}
+
+.bc-chat-timestamp {
+  color: #87948c;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+
+/* =========================================
+   CHAT MESSAGES
+========================================= */
+
+.bc-message {
+  width: fit-content;
+  max-width: 90%;
+  padding: 14px 16px;
+  border-radius: 19px;
+}
+
+.bc-message > span {
+  display: block;
+  margin-bottom: 7px;
+
+  font-size: 10px;
+  font-weight: 800;
+  opacity: 0.65;
+}
+
+.bc-message p {
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.bc-customer-message {
+  align-self: flex-start;
+
+  border-bottom-left-radius: 5px;
+  background: #efe6d3;
+  color: var(--green);
+}
+
+.bc-ai-message {
+  align-self: flex-end;
+
+  border-bottom-right-radius: 5px;
+  background: var(--green);
+  color: var(--white);
+}
+
+.bc-ai-message > small {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+
+  margin-top: 10px;
+
+  color: #bfe0c8;
+  font-size: 10px;
+}
+
+
+/* =========================================
+   CHAT FOOTER
+========================================= */
+
+.bc-chat-footer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 15px 20px;
+  border-top: 1px solid #10372a12;
+
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bc-footer-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  background: #64ae7b;
+}
+
+
+/* =========================================
+   VISUAL CAPTION
+========================================= */
+
+.bc-visual-caption {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1000px) {
+  .bc-showcase {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .bc-visual {
+    min-height: 440px;
+    padding: 55px 18px 65px;
+  }
+
+  .bc-content h3 {
+    font-size: clamp(2.7rem, 5vw, 4rem);
+  }
+
+  .bc-message {
+    max-width: 95%;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 760px) {
+  .business-capabilities-section {
+    padding: 7vh 5vw 8vh;
+  }
+
+  .bc-heading h2 {
+    font-size: clamp(2.6rem, 10vw, 4.3rem);
+  }
+
+  .bc-capability-list {
+    gap: 9px;
+    margin-top: 25px;
+  }
+
+  .bc-capability-pill {
+    padding: 11px 16px;
+    font-size: 12px;
+  }
+
+  .bc-showcase {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 24px;
+  }
+
+  .bc-content h3 {
+    font-size: clamp(2.8rem, 11vw, 4.5rem);
+  }
+
+  .bc-description {
+    font-size: 16px;
+  }
+
+  .bc-benefits {
+    gap: 13px;
+    margin-top: 24px;
+  }
+
+  .bc-link {
+    margin-top: 27px;
+  }
+
+  .bc-visual {
+    min-height: 430px;
+    padding: 55px 16px 65px;
+    border-radius: 38px 38px 38px 8px;
+  }
+
+  .bc-floating-one {
+    top: 18px;
+    left: 12px;
+  }
+
+  .bc-floating-two {
+    right: 10px;
+    bottom: 37px;
+  }
+
+  .bc-chat-header {
+    padding: 16px;
+  }
+
+  .bc-chat-body {
+    padding: 22px 16px;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 400px) {
+  .bc-heading h2 {
+    font-size: 2.6rem;
+  }
+
+  .bc-visual {
+    min-height: 410px;
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+  .bc-chat-header {
+    padding: 15px;
+  }
+
+  .bc-chat-body {
+    padding: 21px 15px;
+  }
+
+  .bc-message {
+    max-width: 94%;
+  }
+
+  .bc-message p {
+    font-size: 12px;
+  }
+
+  .bc-floating-label {
+    padding: 9px 12px;
+    font-size: 10px;
+  }
+
+  .bc-chat-online {
+    padding: 6px 8px;
+  }
+}

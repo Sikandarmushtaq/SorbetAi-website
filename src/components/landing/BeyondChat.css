@@ -1,0 +1,259 @@
+
+/* Main Section */
+.beyond-section {
+  position: relative;
+  isolation: isolate;
+  padding: 6vh 5vw 7vh;
+  overflow: hidden;
+}
+
+.beyond-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* Decorative Organic Blob */
+.beyond-blob {
+  position: absolute;
+  z-index: 0;
+  top: -100px;
+  right: -80px;
+  width: 260px;
+  height: 260px;
+  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+  background: var(--lavender);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Heading */
+.beyond-heading {
+  max-width: 900px;
+}
+
+.beyond-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.beyond-eyebrow span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.beyond-heading h2 {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.8rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.beyond-heading h2 span {
+  color: var(--coral);
+  font-family: 'Newsreader', Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.beyond-heading > p {
+  max-width: 600px;
+  margin-top: 17px;
+  font-size: 16px;
+  line-height: 1.65;
+  opacity: 0.8;
+}
+
+/* Integration Grid */
+.beyond-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 32px;
+}
+
+/* Individual Cards */
+.beyond-card {
+  min-height: 174px;
+  padding: 20px;
+  border-radius: 27px 27px 27px 7px;
+  background: var(--beyond-card);
+  color: var(--green);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.beyond-card:hover {
+  transform: translateY(-7px) rotate(-1deg);
+  box-shadow: 0 17px 32px #10372a16;
+}
+
+/* Card Top */
+.beyond-card-top {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.beyond-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #fffaf0b8;
+  color: var(--green);
+}
+
+.beyond-card-star {
+  font-size: 20px;
+}
+
+/* New Badge */
+.beyond-badge {
+  padding: 6px 11px;
+  border-radius: 99px;
+  background: var(--green);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+/* Card Content */
+.beyond-card h3 {
+  color: var(--green);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(17px, 1.7vw, 21px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.beyond-card p {
+  margin-top: 9px;
+  color: var(--green);
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* Order Confirmation Strip */
+.beyond-order {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 17px;
+  padding: 14px 19px;
+  border-radius: 17px;
+  background: var(--green);
+  color: var(--white);
+}
+
+.beyond-order-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--green);
+}
+
+.beyond-order p {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.beyond-order-star {
+  color: var(--coral);
+  font-size: 20px;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+  .beyond-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .beyond-card {
+    min-height: 165px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .beyond-section {
+    padding: 6vh 5vw 7vh;
+  }
+
+  .beyond-heading h2 {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .beyond-heading > p {
+    font-size: 14px;
+  }
+
+  .beyond-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .beyond-card {
+    min-height: 165px;
+    padding: 15px;
+    border-radius: 23px 23px 23px 7px;
+  }
+
+  .beyond-card-top {
+    margin-bottom: 17px;
+  }
+
+  .beyond-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .beyond-card h3 {
+    font-size: 17px;
+  }
+
+  .beyond-card p {
+    font-size: 12px;
+  }
+
+  .beyond-order {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .beyond-order p {
+    font-size: 12px;
+  }
+
+  .beyond-blob {
+    width: 170px;
+    height: 170px;
+    right: -90px;
+  }
+}
