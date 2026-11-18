@@ -34,10 +34,12 @@ export default function CampaignsPage() {
       resourceRequest('templates'),
       isResourceConfigured('customers') ? resourceRequest('customers') : Promise.resolve(null),
     ]);
+    let nextLoadError = '';
     if (requests[0].status === 'fulfilled') setCampaigns(listFrom(requests[0].value, 'campaigns'));
-    else setLoadError(requests[0].reason.message);
+    else nextLoadError = requests[0].reason?.message || 'Could not load campaigns.';
     if (requests[1].status === 'fulfilled') setTemplates(listFrom(requests[1].value, 'templates'));
-    else if (!loadError) setLoadError(requests[1].reason.message);
+    else if (!nextLoadError) nextLoadError = requests[1].reason?.message || 'Could not load templates.';
+    setLoadError(nextLoadError);
     if (requests[2].status === 'fulfilled' && requests[2].value) {
       const customerResponse = requests[2].value;
       const customers = listFrom(customerResponse, 'customers');

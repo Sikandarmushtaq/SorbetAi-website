@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowUpRight, CheckCircle2, CreditCard, Link2, LockKeyhole, Plus, RefreshCw, ShieldCheck, Wallet } from 'lucide-react';
+import { ArrowUpRight, CreditCard, Link2, LockKeyhole, Plus, RefreshCw, ShieldCheck, Wallet } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
 import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
 

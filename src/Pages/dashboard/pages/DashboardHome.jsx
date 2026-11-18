@@ -61,7 +61,6 @@ export default function DashboardHome() {
 
   const isStepComplete = (step) => completed.includes(step.id) || (step.plan && isStarted);
   const doneCount = setupSteps.filter(isStepComplete).length;
-  const progress = Math.round((doneCount / setupSteps.length) * 100);
   const nextStep = setupSteps.find((step) => !isStepComplete(step));
   const welcomeName = workspace?.name || overview?.workspace_name || user?.full_name || 'there';
   const showHoursConfirmation = Boolean(businessHours?.is_default_example || businessHours?.is_example_hours);

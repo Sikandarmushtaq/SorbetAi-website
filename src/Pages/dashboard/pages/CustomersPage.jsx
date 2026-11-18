@@ -7,6 +7,8 @@ import {
 import { EmptyState, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
 import { resourceRequest } from '../../../services/dashboardApi';
 
+const EMPTY_LABELS = Object.freeze([]);
+
 function recordsFrom(response) {
   return Array.isArray(response) ? response : response?.items || response?.results || response?.customers || [];
 }
@@ -36,7 +38,8 @@ export default function CustomersPage() {
   const selectedId = searchParams.get('customer') || '';
   const sort = searchParams.get('sort') || 'lastContact';
   const direction = searchParams.get('direction') || 'desc';
-  const selectedLabels = (searchParams.get('label') || '').split(',').filter(Boolean);
+  const labelQuery = searchParams.get('label') || '';
+  const selectedLabels = useMemo(() => labelQuery.split(',').filter(Boolean), [labelQuery]);
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -55,7 +58,7 @@ export default function CustomersPage() {
       .catch((error) => { if (active) { setCustomers([]); setLoadError(error.message); } })
       .finally(() => { if (active) setIsLoading(false); });
     return () => { active = false; };
-  }, [query, selectedLabels.join(','), sort, direction]);
+  }, [query, selectedLabels, sort, direction]);
 
   const labels = useMemo(() => [...new Set(customers.flatMap((customer) => Array.isArray(customer.labels) ? customer.labels : []))].filter(Boolean).sort(), [customers]);
   const sortedCustomers = useMemo(() => {
@@ -86,14 +89,15 @@ export default function CustomersPage() {
       const compare = firstTime - secondTime;
       return direction === 'asc' ? compare : -compare;
     });
-  }, [customers, query, selectedLabels.join(','), sort, direction]);
+  }, [customers, query, selectedLabels, sort, direction]);
 
   const selectedCustomer = customers.find((customer) => String(customer.id || customer.customer_id) === selectedId) || null;
+  const selectedCustomerLabels = Array.isArray(selectedCustomer?.labels) ? selectedCustomer.labels : EMPTY_LABELS;
 
   useEffect(() => {
     setNotes(selectedCustomer?.notes || '');
-    setLabelsDraft(Array.isArray(selectedCustomer?.labels) ? selectedCustomer.labels : []);
-  }, [selectedId, selectedCustomer?.notes, JSON.stringify(selectedCustomer?.labels || [])]);
+    setLabelsDraft(selectedCustomerLabels);
+  }, [selectedId, selectedCustomer?.notes, selectedCustomerLabels]);
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(searchParams);

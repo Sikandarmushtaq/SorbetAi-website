@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Bot, Building2, CalendarDays, Check, Clock3, Copy, FileText,
+  Bot, Building2, CalendarDays, Clock3, Copy, FileText,
   Lightbulb, MapPin, Package, Pencil, Plus, RotateCcw, Search,
   Send, Settings, Sparkles, Trash2, Users, X,
 } from 'lucide-react';
@@ -54,9 +54,6 @@ function normaliseHours(response) {
   });
 }
 
-function statusTone(status) {
-  return String(status || '').toLowerCase() === 'approved' || String(status || '').toLowerCase() === 'active' ? 'success' : 'neutral';
-}
 
 // Coordinates the URL-driven AI Brain sections and keeps all business knowledge connected to API data.
 export default function BrainPage() {
