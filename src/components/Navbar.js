@@ -1,19 +1,20 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 const sectionLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'Features', href: '#features' },
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'FAQs', href: '#faqs' },
+  { label: 'Home', to: '/#home' },
+  { label: 'Features', to: '/#features' },
+  { label: 'How it works', to: '/#how-it-works' },
+  { label: 'Pricing', to: '/#pricing' },
+  { label: 'FAQs', to: '/#faqs' },
 ];
 
 const pageLinks = [
-  { label: 'Blogs', href: '/blogs' },
-  { label: 'About us', href: '/about' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Blogs', to: '/blogs' },
+  { label: 'About us', to: '/about' },
+  { label: 'Contact', to: '/contact' },
 ];
 
 export default function Navbar() {
@@ -34,9 +35,9 @@ export default function Navbar() {
       {/* Navbar Header */}
       <div className="relative flex min-h-[44px] items-center justify-between">
 
-        {/* Logo - Always visible on desktop, hidden when mobile menu opens */}
-        <a
-          href="#home"
+        {/* Logo */}
+        <Link
+          to="/#home"
           onClick={closeMenu}
           className={`shrink-0 text-[22px] font-extrabold tracking-[-0.04em] transition-opacity duration-300 ${
             menuOpen
@@ -45,36 +46,36 @@ export default function Navbar() {
           }`}
         >
           sorbet✦
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-4 min-[1200px]:flex">
           {allLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
+              to={link.to}
               className="whitespace-nowrap text-[14px] opacity-70 transition-opacity duration-300 hover:opacity-100"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
         {/* Desktop Action Buttons */}
         <div className="hidden shrink-0 items-center gap-2 min-[1200px]:flex">
-          <a
-            href="/signin"
+          <Link
+            to="/signin"
             className="rounded-full border-2 border-sorbet-cream px-4 py-2.5 text-[14px] font-semibold transition-transform duration-300 hover:rotate-[-3deg] hover:scale-105"
           >
             Sign in
-          </a>
+          </Link>
 
-          <a
-            href="/signup"
+          <Link
+            to="/signup"
             className="whitespace-nowrap rounded-full border-2 border-sorbet-coral bg-sorbet-coral px-5 py-2.5 text-[14px] font-semibold text-sorbet-green transition-transform duration-300 hover:rotate-[-3deg] hover:scale-105"
           >
             Start using free
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -92,7 +93,6 @@ export default function Navbar() {
             <Menu size={24} strokeWidth={2.5} />
           )}
         </button>
-
       </div>
 
       {/* Mobile Navigation */}
@@ -104,9 +104,9 @@ export default function Navbar() {
           {/* Navigation Links */}
           <div className="flex flex-col gap-1">
             {allLinks.map((link, index) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
+                to={link.to}
                 onClick={closeMenu}
                 style={{
                   transitionDelay: `${index * 35}ms`,
@@ -114,27 +114,27 @@ export default function Navbar() {
                 className="rounded-full px-4 py-3 text-[15px] font-semibold opacity-75 transition-all duration-300 hover:bg-sorbet-cream/10 hover:pl-6 hover:opacity-100"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
           {/* Mobile Action Buttons */}
-          <div className="mt-5 flex flex-col gap-3 px-2">
-            <a
-              href="/signin"
+          <div className="flex flex-col gap-3 px-2 mt-5">
+            <Link
+              to="/signin"
               onClick={closeMenu}
               className="rounded-full border-2 border-sorbet-cream py-3 text-center text-sm font-semibold transition-transform duration-300 hover:scale-[1.02]"
             >
               Sign in
-            </a>
+            </Link>
 
-            <a
-              href="/signup"
+            <Link
+              to="/signup"
               onClick={closeMenu}
               className="rounded-full border-2 border-sorbet-coral bg-sorbet-coral py-3 text-center text-sm font-semibold text-sorbet-green transition-transform duration-300 hover:scale-[1.02]"
             >
               Start using free
-            </a>
+            </Link>
           </div>
         </div>
       )}

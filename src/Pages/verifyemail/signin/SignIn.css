@@ -1,0 +1,597 @@
+/* =========================================
+   SIGN IN PAGE
+========================================= */
+
+.signin-page {
+  --signin-green: #10372a;
+  --signin-cream: #f3ede1;
+  --signin-white: #fffaf0;
+  --signin-coral: #ff7a59;
+  --signin-yellow: #f4c95d;
+  --signin-lavender: #cdbdff;
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+
+  background: var(--signin-cream);
+  color: var(--signin-green);
+
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.signin-page * {
+  box-sizing: border-box;
+}
+
+.signin-page a {
+  text-decoration: none;
+}
+
+.signin-page a:focus-visible,
+.signin-page button:focus-visible {
+  outline: 2px solid var(--signin-coral);
+  outline-offset: 2px;
+}
+
+
+/* =========================================
+   BACKGROUND CIRCLES
+========================================= */
+
+.signin-circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.signin-circle-yellow {
+  top: 6%;
+  right: -240px;
+
+  width: 720px;
+  height: 720px;
+
+  background: var(--signin-yellow);
+}
+
+.signin-circle-lavender {
+  bottom: -150px;
+  left: -160px;
+
+  width: 340px;
+  height: 340px;
+
+  background: rgba(205, 189, 255, 0.28);
+}
+
+
+/* =========================================
+   CARD STAGE
+========================================= */
+
+.signin-stage {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.signin-card {
+  display: flex;
+  flex-direction: column;
+
+  width: min(100%, 445px);
+  padding: clamp(30px, 4.5vw, 42px) clamp(24px, 4vw, 40px);
+
+  border-radius: 26px;
+  background: var(--signin-white);
+
+  box-shadow: 0 30px 80px rgba(16, 55, 42, 0.12);
+}
+
+.signin-welcome {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin-bottom: 16px;
+
+  color: rgba(16, 55, 42, 0.62);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.signin-welcome-line {
+  width: 23px;
+  height: 2px;
+
+  border-radius: 5px;
+  background: var(--signin-coral);
+}
+
+.signin-card h1 {
+  margin: 0 0 10px;
+
+  color: var(--signin-green);
+  font-size: clamp(32px, 5vw, 40px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -1.6px;
+}
+
+.signin-card h1 em {
+  color: var(--signin-coral);
+  font-family: 'Newsreader', serif;
+  font-weight: 500;
+}
+
+.signin-description {
+  margin: 0 0 26px;
+
+  color: rgba(16, 55, 42, 0.66);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+
+/* =========================================
+   GOOGLE BUTTON
+========================================= */
+
+.signin-google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  width: 100%;
+  min-height: 52px;
+  padding: 0 18px;
+
+  border: 1px solid rgba(16, 55, 42, 0.16);
+  border-radius: 100px;
+
+  background: #ffffff;
+  color: var(--signin-green);
+
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.signin-google-button svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.signin-google-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--signin-coral);
+  box-shadow: 0 10px 22px rgba(16, 55, 42, 0.08);
+}
+
+.signin-google-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================
+   EMAIL DIVIDER
+========================================= */
+
+.signin-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 22px 0;
+}
+
+.signin-divider span {
+  flex: 1;
+  height: 1px;
+  background: rgba(16, 55, 42, 0.14);
+}
+
+.signin-divider p {
+  flex-shrink: 0;
+  margin: 0;
+
+  color: rgba(16, 55, 42, 0.55);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* =========================================
+   FORM AND PILL INPUTS
+========================================= */
+
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.signin-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  height: 54px;
+  padding: 0 22px;
+
+  border: 1px solid rgba(16, 55, 42, 0.15);
+  border-radius: 100px;
+
+  background: #f7f1e6;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.signin-input-wrap:focus-within {
+  border-color: var(--signin-coral);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.13);
+}
+
+.signin-input-wrap input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: var(--signin-green);
+
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13.5px;
+}
+
+.signin-input-wrap input::placeholder {
+  color: rgba(16, 55, 42, 0.44);
+}
+
+.signin-password-toggle {
+  display: grid;
+  place-items: center;
+
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  margin-right: -10px;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+  color: rgba(16, 55, 42, 0.55);
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.signin-password-toggle:hover {
+  background: rgba(16, 55, 42, 0.08);
+  color: var(--signin-green);
+}
+
+
+/* =========================================
+   EMAIL SUMMARY (PASSWORD STEP)
+========================================= */
+
+.signin-email-summary {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  margin-bottom: 20px;
+  padding: 10px 12px;
+
+  border: 1px solid rgba(16, 55, 42, 0.1);
+  border-radius: 16px;
+
+  background: #f7f1e6;
+}
+
+.signin-email-icon {
+  display: grid;
+  place-items: center;
+
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+
+  border-radius: 11px;
+  background: var(--signin-coral);
+  color: var(--signin-green);
+}
+
+.signin-email-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  min-width: 0;
+}
+
+.signin-email-details small {
+  color: rgba(16, 55, 42, 0.5);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.signin-email-details strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 12.5px;
+}
+
+.signin-change-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 8px 13px;
+
+  border: 1px solid rgba(16, 55, 42, 0.16);
+  border-radius: 100px;
+
+  background: #ffffff;
+  color: var(--signin-green);
+
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.signin-change-email:hover {
+  border-color: var(--signin-coral);
+  color: var(--signin-coral);
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.signin-forgot-password {
+  align-self: flex-end;
+  margin-top: -4px;
+  padding: 0;
+
+  border: 0;
+  background: none;
+
+  color: var(--signin-coral);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.signin-forgot-password:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.signin-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  width: 100%;
+  min-height: 54px;
+
+  border: 0;
+  border-radius: 100px;
+
+  background: var(--signin-coral);
+  color: var(--signin-green);
+
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13.5px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+.signin-submit:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow: 0 14px 30px rgba(255, 122, 89, 0.35);
+}
+
+.signin-submit:active {
+  transform: translateY(0);
+}
+
+.signin-notice {
+  margin: 16px 0 0;
+  padding: 12px 15px;
+
+  border-radius: 14px;
+  background: #fff3d7;
+  color: #76531a;
+
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.signin-signup {
+  margin: 24px 0 0;
+
+  color: rgba(16, 55, 42, 0.62);
+  font-size: 12.5px;
+}
+
+.signin-signup a {
+  color: var(--signin-coral);
+  font-weight: 800;
+}
+
+.signin-signup a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* =========================================
+   API BADGE AND FOOTER
+========================================= */
+
+.signin-api-badge {
+  position: absolute;
+  z-index: 2;
+  top: 55%;
+  right: 4%;
+
+  display: none;
+  align-items: center;
+  gap: 9px;
+
+  padding: 13px 19px;
+
+  border-radius: 100px;
+  background: var(--signin-white);
+  color: var(--signin-green);
+
+  font-size: 11.5px;
+  font-weight: 700;
+
+  box-shadow: 0 20px 45px rgba(16, 55, 42, 0.16);
+}
+
+.signin-api-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  background: #66c68b;
+}
+
+.signin-page-footer {
+  position: relative;
+  z-index: 2;
+
+  padding: 16px 20px 20px;
+
+  color: rgba(16, 55, 42, 0.5);
+  font-size: 10.5px;
+  text-align: center;
+}
+
+
+/* =========================================
+   LARGE SCREENS
+========================================= */
+
+@media (min-width: 1200px) {
+  .signin-api-badge {
+    display: inline-flex;
+  }
+}
+
+
+/* =========================================
+   TABLET AND SMALL LAPTOP
+========================================= */
+
+@media (max-width: 1100px) {
+  .signin-circle-yellow {
+    top: 8%;
+    right: -260px;
+
+    width: 580px;
+    height: 580px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+  .signin-stage {
+    padding: 34px 16px;
+  }
+
+  .signin-card {
+    border-radius: 24px;
+  }
+
+  .signin-circle-yellow {
+    top: auto;
+    bottom: -120px;
+    right: -170px;
+
+    width: 440px;
+    height: 440px;
+  }
+
+  .signin-circle-lavender {
+    display: none;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 390px) {
+  .signin-card {
+    padding: 28px 20px;
+  }
+}
