@@ -21,6 +21,12 @@ import AutomationPage from '../Pages/dashboard/pages/AutomationPage';
 import SuggestionsPage from '../Pages/dashboard/pages/SuggestionsPage';
 import ProfilePage from '../Pages/dashboard/pages/ProfilePage';
 import NotificationsPage from '../Pages/dashboard/pages/NotificationsPage';
+import BillingReportsPage from '../Pages/dashboard/pages/BillingReportsPage';
+import ChoosePlanPage from '../Pages/dashboard/pages/ChoosePlanPage';
+import PaymentCollectionPage from '../Pages/dashboard/pages/PaymentCollectionPage';
+import WhatsAppConnectionPage from '../Pages/dashboard/pages/WhatsAppConnectionPage';
+import WebsiteChatPage from '../Pages/dashboard/pages/WebsiteChatPage';
+import FacebookInstagramPage from '../Pages/dashboard/pages/FacebookInstagramPage';
 
 export default function DashboardRoutes() {
   return (
@@ -39,8 +45,15 @@ export default function DashboardRoutes() {
         <Route path="appointments" element={<AppointmentsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="channels" element={<ChannelsPage />} />
+        <Route path="whatsapp" element={<WhatsAppConnectionPage />} />
+        <Route path="website-chat" element={<WebsiteChatPage />} />
+        <Route path="facebook-instagram" element={<FacebookInstagramPage />} />
         <Route path="support" element={<SupportPage />} />
         <Route path="billing" element={<BillingPage />} />
+        <Route path="billing/reports" element={<BillingReportsPage />} />
+        <Route path="billing/plans" element={<ChoosePlanPage />} />
+        <Route path="billing/payment-collection" element={<PaymentCollectionPage />} />
+        <Route path="payment-collection" element={<PaymentCollectionPage />} />
         <Route path="billing/addons" element={<AddonsPage />} />
         <Route path="referrals" element={<ReferralsPage />} />
         <Route path="automation" element={<AutomationPage />} />

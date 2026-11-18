@@ -1,25 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { FreePlanProvider } from '../common/FreePlanContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import GlobalAlerts from './GlobalAlerts';
+import MobileBottomNav from './MobileBottomNav';
+import MobileMoreMenu from './MobileMoreMenu';
 
-// Keeps the dashboard navigation and global controls mounted while child routes change.
+// Keeps the dashboard shell persistent and switches to a five-item bottom bar on mobile.
 export default function DashboardLayout() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const location = useLocation();
 
+  useEffect(() => {
+    setMobileMoreOpen(false);
+  }, [location.pathname]);
+
   return (
-    <div className={`bellbee-dashboard ${mobileMenuOpen ? 'db-mobile-nav-open' : ''}`}>
-      <Sidebar mobileOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-      <div className="db-main">
-        <Header onMenuClick={() => setMobileMenuOpen((open) => !open)} />
-        <GlobalAlerts />
-        <main className="db-page-content" key={location.pathname}>
-          <Outlet />
-        </main>
+    <FreePlanProvider>
+      <div className="bellbee-dashboard">
+        <Sidebar />
+        <div className="db-main">
+          <Header />
+          <GlobalAlerts />
+          {mobileMoreOpen ? (
+            <MobileMoreMenu onNavigate={() => setMobileMoreOpen(false)} />
+          ) : (
+            <main className="db-page-content" key={location.pathname}>
+              <Outlet />
+            </main>
+          )}
+        </div>
+        <MobileBottomNav moreOpen={mobileMoreOpen} onMoreClick={() => setMobileMoreOpen((open) => !open)} />
       </div>
-      {mobileMenuOpen && <button type="button" className="db-mobile-backdrop" onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation" />}
-    </div>
+    </FreePlanProvider>
   );
 }

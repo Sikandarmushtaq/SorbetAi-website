@@ -64,6 +64,10 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/whatsapp" element={<Navigate to="/dashboard/whatsapp" replace />} />
+        <Route path="/billing/plans" element={<Navigate to="/dashboard/billing/plans" replace />} />
+        <Route path="/billing/reports" element={<Navigate to="/dashboard/billing/reports" replace />} />
+        <Route path="/billing/payment-collection" element={<Navigate to="/dashboard/billing/payment-collection" replace />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

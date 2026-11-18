@@ -1,19 +1,80 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Check, Gift, Link2, Users } from 'lucide-react';
 import { PageHeader, Panel, StatCard, StatGrid, useNotice } from '../../../components/dashboard/common/DashboardUI';
+import { resourceRequest } from '../../../services/dashboardApi';
 
-// Displays referral information and lets the user copy or locally enter a referral code.
+// Displays referral code, link, rewards and statistics only when returned by the referrals API.
 export default function ReferralsPage() {
+  const [referral, setReferral] = useState(null);
   const [code, setCode] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isApplying, setIsApplying] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [copied, setCopied] = useState(false);
   const { showNotice, Notice } = useNotice();
-  const copyCode = async () => {
+
+  const loadReferral = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError('');
     try {
-      await navigator.clipboard.writeText('XHX7T');
+      const response = await resourceRequest('referrals');
+      setReferral(response?.referral || response);
+    } catch (error) {
+      setReferral(null);
+      setLoadError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadReferral(); }, [loadReferral]);
+
+  const codeValue = referral?.code || referral?.referral_code || '';
+  const linkValue = referral?.referral_link || referral?.link || '';
+
+  const copyReferral = async () => {
+    const value = linkValue || codeValue;
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
       setCopied(true);
+      showNotice(linkValue ? 'Referral link copied.' : 'Referral code copied.');
     } catch {
-      showNotice('Clipboard access is unavailable. Select and copy the code manually: XHX7T');
+      showNotice('Clipboard access is unavailable. Select and copy the referral details manually.');
     }
   };
-  return <><PageHeader eyebrow="SYSTEM" title="Referrals" description="Invite other businesses to Bellbee and track your referrals." />{Notice}<section className="dp-referral-hero"><div className="dp-referral-icon"><Gift size={24} /></div><span className="dp-section-kicker">REFERRAL PROGRAMME</span><h2>Share Bellbee. Grow together.</h2><p>Referral rewards are starting soon. Your link works, and friends who sign up with it can receive 20% off their first month.</p></section><div className="dp-referral-grid"><Panel className="dp-referral-code-card"><span className="dp-section-kicker">YOUR REFERRAL CODE</span><h2>XHX7T</h2><button type="button" className="dp-primary-button" onClick={copyCode}>{copied ? <Check size={15} /> : <Link2 size={15} />}{copied ? 'Copied' : 'Copy code'}</button><p>Friends get 20% off their first month.</p></Panel><Panel><span className="dp-section-kicker">INVITED BY A FRIEND?</span><h2>Have a referral code?</h2><p className="dp-panel-description">Add their code within 72 hours of signing up.</p><form className="dp-inline-form" onSubmit={(event) => { event.preventDefault(); showNotice(code.trim() ? 'Referral code validation will be enabled with account services.' : 'Enter a referral code first.'); }}><input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder="Enter referral code" /><button type="submit" className="dp-secondary-button">Apply</button></form></Panel></div><StatGrid columns={3}><StatCard label="Businesses you brought" value="0" icon={Users} /><StatCard label="Subscribed" value="0" icon={Check} accent="green" /><StatCard label="You saved" value="PKR 0" icon={Gift} accent="yellow" /></StatGrid></>;
+
+  const applyCode = async (event) => {
+    event.preventDefault();
+    if (!code.trim()) return;
+    setIsApplying(true);
+    try {
+      await resourceRequest('referrals', { method: 'POST', action: 'apply', body: { referral_code: code.trim().toUpperCase() } });
+      setCode('');
+      showNotice('Referral code applied.');
+      await loadReferral();
+    } catch (error) {
+      showNotice(error.message);
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  return (
+    <>
+      <PageHeader eyebrow="SYSTEM" title="Referrals" description="Invite other businesses to Bellbee and track your referrals." />
+      {Notice}
+      {loadError && <div className="dp-inline-notice dp-api-error" role="status">{loadError}</div>}
+      <section className="dp-referral-hero"><div className="dp-referral-icon"><Gift size={24} /></div><span className="dp-section-kicker">REFERRAL PROGRAMME</span><h2>{referral?.headline || 'Share Bellbee. Grow together.'}</h2><p>{referral?.description || (isLoading ? 'Loading referral programme details…' : 'Referral programme details will appear when the referrals API is connected.')}</p></section>
+      <div className="dp-referral-grid">
+        <Panel className="dp-referral-code-card"><span className="dp-section-kicker">YOUR REFERRAL CODE</span><h2>{isLoading ? '…' : codeValue || 'Not available'}</h2>{linkValue && <p className="dp-referral-link-value">{linkValue}</p>}<button type="button" className="dp-primary-button" onClick={copyReferral} disabled={!codeValue && !linkValue}>{copied ? <Check size={15} /> : <Link2 size={15} />}{copied ? 'Copied' : linkValue ? 'Copy referral link' : 'Copy code'}</button><p>{referral?.reward_description || ''}</p></Panel>
+        <Panel><span className="dp-section-kicker">INVITED BY A FRIEND?</span><h2>Have a referral code?</h2><p className="dp-panel-description">Enter your invitation code to apply it to your account.</p><form className="dp-inline-form" onSubmit={applyCode}><input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder="Enter referral code" maxLength={60} /><button type="submit" className="dp-secondary-button" disabled={isApplying || !code.trim()}>{isApplying ? 'Applying…' : 'Apply'}</button></form></Panel>
+      </div>
+      <StatGrid columns={3}>
+        <StatCard label="Businesses you brought" value={isLoading ? '—' : referral?.businesses_invited ?? referral?.invited_count ?? '—'} icon={Users} />
+        <StatCard label="Subscribed" value={isLoading ? '—' : referral?.subscribed_count ?? referral?.subscribed ?? '—'} icon={Check} accent="green" />
+        <StatCard label="You saved" value={isLoading ? '—' : referral?.total_savings != null ? `${referral.currency || 'PKR'} ${Number(referral.total_savings).toLocaleString()}` : '—'} icon={Gift} accent="yellow" />
+      </StatGrid>
+    </>
+  );
 }
