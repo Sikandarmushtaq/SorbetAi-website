@@ -1,8 +1,8 @@
+import { referralsApi } from '../../../services/dashboard/referrals.api.js';
+import './ReferralsPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { Check, Gift, Link2, Users } from 'lucide-react';
 import { PageHeader, Panel, StatCard, StatGrid, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
-
 // Displays referral code, link, rewards and statistics only when returned by the referrals API.
 export default function ReferralsPage() {
   const [referral, setReferral] = useState(null);
@@ -17,7 +17,7 @@ export default function ReferralsPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('referrals');
+      const response = await referralsApi.request();
       setReferral(response?.referral || response);
     } catch (error) {
       setReferral(null);
@@ -49,7 +49,7 @@ export default function ReferralsPage() {
     if (!code.trim()) return;
     setIsApplying(true);
     try {
-      await resourceRequest('referrals', { method: 'POST', action: 'apply', body: { referral_code: code.trim().toUpperCase() } });
+      await referralsApi.request({ method: 'POST', action: 'apply', body: { referral_code: code.trim().toUpperCase() } });
       setCode('');
       showNotice('Referral code applied.');
       await loadReferral();

@@ -1,0 +1,51 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-calendar-wrap {
+  padding: 8px 2px 2px;
+}
+
+.dp-calendar-title {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+
+.dp-calendar-title strong {
+  font-size: 13px;
+}
+
+.dp-calendar-title span {
+  color: var(--db-muted); font-size: 9px;
+}
+
+.dp-calendar-grid {
+  display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px;
+}
+
+.dp-calendar-weekday {
+  padding: 8px 2px; color: var(--db-muted); font-size: 8px; font-weight: 800; text-align: center;
+}
+
+.dp-calendar-day {
+  min-height: 53px; border: 1px solid var(--db-border); border-radius: 8px; background: #fffdf7; color: var(--db-green); font-size: 9px; text-align: left; vertical-align: top; padding: 7px;
+}
+
+.dp-calendar-day:hover {
+  border-color: var(--db-coral); background: #fff4ed;
+}
+
+@media (max-width: 480px) {
+.dp-calendar-day {
+  min-height: 39px;
+}
+
+}
+
+.dp-calendar-day.has-appointments {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-color: var(--db-coral); background: rgba(255,122,89,.08);
+}
+
+.dp-calendar-day.has-appointments small {
+  color: var(--db-coral); font-size: 7px; font-weight: 800;
+}
+
+.dp-calendar-day.empty {
+  pointer-events: none;
+}

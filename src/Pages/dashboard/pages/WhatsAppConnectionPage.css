@@ -1,0 +1,82 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-channel-connection-hero {
+  display: flex; align-items: flex-start; gap: 17px; padding: 22px;
+}
+
+.dp-channel-connection-hero .dp-channel-icon {
+  width: 48px; height: 48px; flex: 0 0 48px; border-radius: 14px;
+}
+
+.dp-channel-connection-copy {
+  flex: 1; min-width: 0;
+}
+
+.dp-channel-connection-copy h2 {
+  margin: 4px 0 6px; font-size: 21px; font-weight: 850;
+}
+
+.dp-channel-connection-copy p {
+  max-width: 700px; margin: 0; color: var(--db-muted); font-size: 10px; line-height: 1.7;
+}
+
+.dp-channel-connection-status {
+  display: flex; align-items: center; gap: 7px; margin-top: 12px; color: var(--db-muted); font-size: 9px; font-weight: 750;
+}
+
+.dp-channel-detail-panel {
+  margin-top: 13px;
+}
+
+.dp-channel-setup-panel {
+  margin-top: 13px;
+}
+
+.dp-channel-details-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin: 15px 0;
+}
+
+.dp-channel-details-grid > div {
+  display: flex; flex-direction: column; gap: 5px; padding: 11px; border-radius: 9px; background: var(--db-cream);
+}
+
+.dp-channel-details-grid small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-channel-details-grid strong {
+  color: var(--db-green); font-size: 10px; overflow-wrap: anywhere;
+}
+
+.dp-channel-setup-steps {
+  display: flex; flex-direction: column; gap: 14px; margin: 16px 0;
+}
+
+.dp-channel-setup-steps > div {
+  display: flex; align-items: flex-start; gap: 11px;
+}
+
+.dp-channel-setup-steps > div > span {
+  display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; border-radius: 9px; background: var(--db-lavender); font-size: 9px; font-weight: 850;
+}
+
+.dp-channel-setup-steps strong {
+  color: var(--db-green); font-size: 10px;
+}
+
+.dp-channel-setup-steps p {
+  margin: 4px 0 0; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+.dp-channel-connection-hero {
+  align-items: flex-start; flex-direction: column;
+}
+.dp-channel-details-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.dp-whatsapp-brand-mark {
+  width: 25px; height: 25px; display: block;
+}

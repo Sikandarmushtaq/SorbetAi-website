@@ -1,5 +1,7 @@
+import { freePlanActivateApi } from '../../../services/dashboard/free-plan-activate.api.js';
+import { freePlanStatusApi } from '../../../services/dashboard/free-plan-status.api.js';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { DashboardApiError, isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
+import { DashboardApiError } from '../../../services/dashboardApi';
 import FreePlanModal from './FreePlanModal';
 
 const FreePlanContext = createContext(null);
@@ -27,12 +29,12 @@ export function FreePlanProvider({ children }) {
   useEffect(() => {
     let isMounted = true;
     const loadPlanStatus = async () => {
-      if (!isResourceConfigured('freePlanStatus')) {
+      if (!freePlanStatusApi.isConfigured()) {
         if (isMounted) setIsChecking(false);
         return;
       }
       try {
-        const result = await resourceRequest('freePlanStatus');
+        const result = await freePlanStatusApi.request();
         if (isMounted) {
           setIsStarted(hasStartedPlan(result));
           setIsStatusKnown(true);
@@ -63,10 +65,10 @@ export function FreePlanProvider({ children }) {
     setIsStarting(true);
     setError('');
     try {
-      if (!isResourceConfigured('freePlanActivate')) {
+      if (!freePlanActivateApi.isConfigured()) {
         throw new DashboardApiError('Free-plan activation is not connected yet. Add the billing activation endpoint to enable this action.', 'ENDPOINT_NOT_CONFIGURED');
       }
-      await resourceRequest('freePlanActivate', { method: 'POST', body: {} });
+      await freePlanActivateApi.request({ method: 'POST', body: {} });
       setIsStarted(true);
       setIsOpen(false);
       const callback = activatedCallback.current;

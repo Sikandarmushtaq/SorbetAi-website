@@ -1,0 +1,291 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-customers-workspace {
+  display: grid; grid-template-columns: minmax(300px,42%) minmax(0,58%); min-height: min(690px,calc(100vh - 210px)); overflow: hidden; border: 1px solid var(--db-border); border-radius: 16px; background: var(--db-white);
+}
+
+.dp-customers-list-pane {
+  display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 15px; border-right: 1px solid var(--db-border);
+}
+
+.dp-customer-search {
+  display: flex; align-items: center; gap: 9px; min-height: 39px; padding: 0 10px; border: 1px solid var(--db-border); border-radius: 9px; background: var(--db-white); color: var(--db-muted);
+}
+
+.dp-customer-search input {
+  width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--db-green); font-size: 9px;
+}
+
+.dp-customer-list-controls {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0;
+}
+
+.dp-label-filter-wrap {
+  position: relative;
+}
+
+.dp-label-filter-button {
+  min-height: 32px; padding: 0 9px; font-size: 8px;
+}
+
+.dp-label-filter-button.is-selected {
+  border-color: var(--db-coral); background: rgba(255,122,89,.08);
+}
+
+.dp-label-filter-menu {
+  position: absolute; z-index: 25; top: calc(100% + 6px); left: 0; display: flex; flex-direction: column; gap: 9px; width: 205px; max-height: 260px; padding: 11px; overflow: auto; border: 1px solid var(--db-border); border-radius: 10px; background: var(--db-white); box-shadow: 0 12px 30px rgba(16,55,42,.13);
+}
+
+.dp-label-filter-menu label {
+  display: flex; align-items: center; gap: 8px; color: var(--db-green); font-size: 9px;
+}
+
+.dp-label-filter-menu input {
+  accent-color: var(--db-green);
+}
+
+.dp-customer-label-editor input {
+  accent-color: var(--db-green);
+}
+
+.dp-label-filter-menu p {
+  margin: 0; color: var(--db-muted); font-size: 8px; line-height: 1.5;
+}
+
+.dp-label-filter-menu > button {
+  align-self: flex-start; padding: 0; border: 0; background: transparent; color: var(--db-green); font-size: 8px; font-weight: 800;
+}
+
+.dp-customer-sort {
+  display: flex; align-items: center; gap: 5px; min-width: 0;
+}
+
+.dp-customer-sort > span {
+  color: var(--db-muted); font-size: 7px; font-weight: 850; letter-spacing: .7px; white-space: nowrap;
+}
+
+.dp-customer-sort select {
+  max-width: 108px; min-height: 31px; padding: 0 4px; border: 0; background: transparent; color: var(--db-green); font-size: 8px; font-weight: 800;
+}
+
+.dp-customer-sort .dp-icon-action {
+  width: 30px; height: 30px;
+}
+
+.dp-customers-list-scroll {
+  flex: 1; min-height: 0; overflow: auto; border-top: 1px solid var(--db-border);
+}
+
+.dp-customer-row {
+  display: flex; align-items: center; gap: 9px; width: 100%; padding: 11px 6px; border: 0; border-bottom: 1px solid var(--db-border); background: transparent; color: var(--db-green); text-align: left;
+}
+
+.dp-customer-row:hover {
+  background: rgba(255,122,89,.08);
+}
+
+.dp-customer-row.active {
+  background: rgba(255,122,89,.08);
+}
+
+.dp-customer-row-main {
+  display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0;
+}
+
+.dp-customer-row-main > strong {
+  overflow: hidden; color: var(--db-green); font-size: 10px; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.dp-customer-row-main > small {
+  overflow: hidden; color: var(--db-muted); font-size: 8px; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.dp-customer-labels {
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+
+.dp-customer-labels i {
+  padding: 3px 6px; border-radius: 20px; background: rgba(16,55,42,.07); color: var(--db-muted); font-size: 7px; font-style: normal;
+}
+
+.dp-customer-row > time {
+  align-self: flex-start; color: var(--db-muted); font-size: 7px; white-space: nowrap;
+}
+
+.dp-customer-list-message {
+  padding: 22px 10px; color: var(--db-muted); font-size: 9px; line-height: 1.6; text-align: center;
+}
+
+.dp-customer-list-message + .dp-empty-state {
+  min-height: 230px;
+}
+
+.dp-customer-detail-pane {
+  min-width: 0; min-height: 0; padding: 17px; background: var(--db-cream);
+}
+
+.dp-customer-detail-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; color: var(--db-muted); text-align: center;
+}
+
+.dp-customer-detail-empty p {
+  margin: 9px 0 0; font-size: 10px;
+}
+
+.dp-customer-detail-content {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.dp-customer-detail-mobile-back {
+  display: none;
+}
+
+.dp-customer-detail-heading {
+  display: flex; align-items: center; gap: 12px; min-width: 0; padding: 3px 0 10px;
+}
+
+.dp-customer-detail-heading > div {
+  flex: 1; min-width: 0;
+}
+
+.dp-customer-detail-heading h2 {
+  margin: 0; color: var(--db-green); font-size: 17px; font-weight: 850;
+}
+
+.dp-customer-detail-heading p {
+  margin: 4px 0 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-customer-detail-heading .dp-primary-button {
+  min-height: 33px; font-size: 8px;
+}
+
+.dp-customer-detail-card {
+  margin: 0; padding: 14px;
+}
+
+.dp-customer-detail-card .dp-panel-heading {
+  margin-bottom: 10px;
+}
+
+.dp-customer-detail-card .dp-panel-heading h3 {
+  margin: 0; color: var(--db-green); font-size: 11px;
+}
+
+.dp-customer-label-editor {
+  display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 12px;
+}
+
+.dp-customer-label-editor label {
+  display: flex; align-items: center; gap: 5px; padding: 5px 8px; border: 1px solid var(--db-border); border-radius: 20px; color: var(--db-muted); font-size: 8px;
+}
+
+.dp-customer-label-editor > small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-customer-notes {
+  margin-bottom: 10px;
+}
+
+.dp-customer-related-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px;
+}
+
+.dp-customer-related-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 8px 0; border-bottom: 1px solid var(--db-border); color: var(--db-muted); font-size: 8px;
+}
+
+.dp-customer-related-row strong {
+  color: var(--db-green);
+}
+
+.dp-customer-related-row small {
+  color: var(--db-muted);
+}
+
+.dp-customer-detail-card > .dp-muted {
+  display: flex; align-items: center; gap: 6px; margin: 0; font-size: 8px;
+}
+
+@media (max-width: 760px) {
+.dp-customers-workspace {
+  display: block; min-height: 0; overflow: visible; border: 0; background: transparent;
+}
+.dp-customers-list-pane {
+  min-height: calc(100dvh - 220px); padding: 13px; border: 1px solid var(--db-border); border-radius: 14px; background: var(--db-white);
+}
+.dp-customers-workspace.has-selection .dp-customers-list-pane {
+  display: none;
+}
+.dp-customer-detail-pane {
+  display: none; min-height: calc(100dvh - 205px); padding: 13px; border: 1px solid var(--db-border); border-radius: 14px;
+}
+.dp-customers-workspace.has-selection .dp-customer-detail-pane {
+  display: block;
+}
+.dp-customer-detail-mobile-back {
+  display: block;
+}
+.dp-customer-related-grid {
+  grid-template-columns: 1fr;
+}
+.dp-customer-related-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+@media (max-width: 480px) {
+.dp-customer-list-controls {
+  align-items: flex-start; flex-direction: column;
+}
+.dp-customer-sort {
+  align-self: flex-end;
+}
+.dp-customer-detail-heading {
+  flex-wrap: wrap;
+}
+.dp-customer-detail-heading .dp-primary-button {
+  width: 100%;
+}
+
+}
+
+.dp-customer-add-label {
+  display: flex; gap: 7px; margin: -3px 0 14px;
+}
+
+.dp-customer-add-label input {
+  flex: 1; min-width: 0; min-height: 34px; padding: 7px 9px; border: 1px solid var(--db-border); border-radius: 8px; background: var(--db-white); color: var(--db-green); font-size: 9px;
+}
+
+@media (max-width: 760px) {
+.dp-customer-row-main > strong {
+  font-size: 11px;
+}
+.dp-customer-row-main > small {
+  font-size: 10px;
+}
+.dp-customers-workspace {
+  min-width: 0;
+    max-width: 100%;
+}
+.dp-customer-row-main > strong {
+  height: auto;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+}
+.dp-customer-row-main > small {
+  height: auto;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+}
+.dp-customer-row-main {
+  min-width: 0;
+}
+
+}

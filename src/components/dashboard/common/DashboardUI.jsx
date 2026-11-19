@@ -1,3 +1,4 @@
+import './DashboardUI.css';
 import { useState } from 'react';
 import { ArrowRight, Plus, X } from 'lucide-react';
 

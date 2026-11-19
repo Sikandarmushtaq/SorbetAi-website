@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
 import DashboardLayout from '../components/dashboard/layout/DashboardLayout';
 import DashboardHome from '../Pages/dashboard/pages/DashboardHome';
 import ChatsPage from '../Pages/dashboard/pages/ChatsPage';
@@ -31,7 +32,7 @@ import FacebookInstagramPage from '../Pages/dashboard/pages/FacebookInstagramPag
 export default function DashboardRoutes() {
   return (
     <Routes>
-      <Route element={<DashboardLayout />}>
+      <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route index element={<DashboardHome />} />
         <Route path="chats" element={<ChatsPage />} />
         <Route path="leads" element={<LeadsPage />} />

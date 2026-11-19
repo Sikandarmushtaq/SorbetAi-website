@@ -1,8 +1,8 @@
+import { templatesApi } from '../../../services/dashboard/templates.api.js';
+import './TemplatesPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { FileText, Info, Plus, RefreshCw } from 'lucide-react';
 import { EmptyState, FieldInput, FieldSelect, FieldTextarea, FormField, Modal, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
-
 const initialForm = {
   name: '', category: 'Utility', language: 'en_US', headerType: 'None', header: '',
   body: 'Hello {{1}},', footer: '', buttonType: 'None', buttonText: '', buttonUrl: '',
@@ -33,7 +33,7 @@ export default function TemplatesPage() {
   const loadTemplates = useCallback(async (refresh = false) => {
     setLoadError('');
     try {
-      const response = await resourceRequest('templates', { query: refresh ? { refresh_meta_status: true } : undefined });
+      const response = await templatesApi.request({ query: refresh ? { refresh_meta_status: true } : undefined });
       setTemplates(templateRecords(response));
     } catch (error) {
       setLoadError(error.message);
@@ -57,7 +57,7 @@ export default function TemplatesPage() {
         body: form.body.trim(), footer: form.footer.trim() || null,
         buttons: form.buttonType === 'None' ? [] : [{ type: form.buttonType.toLowerCase().replace(' ', '_'), text: form.buttonText, ...(form.buttonType === 'URL' ? { url: form.buttonUrl } : {}) }],
       };
-      const created = await resourceRequest('templates', { method: 'POST', body: payload });
+      const created = await templatesApi.request({ method: 'POST', body: payload });
       const newTemplate = created?.template || created;
       if (newTemplate && (newTemplate.id || newTemplate.name)) setTemplates((current) => [newTemplate, ...current]);
       setForm(initialForm);
@@ -75,7 +75,7 @@ export default function TemplatesPage() {
     const id = template.id || template.template_id;
     setRefreshingId(String(id));
     try {
-      const response = await resourceRequest('templates', { id, query: { refresh_meta_status: true } });
+      const response = await templatesApi.request({ id, query: { refresh_meta_status: true } });
       const updated = response?.template || response;
       if (updated) setTemplates((current) => current.map((item) => String(item.id || item.template_id) === String(id) ? { ...item, ...updated } : item));
       showNotice('Template status refreshed from the connected Meta account.');

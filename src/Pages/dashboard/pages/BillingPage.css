@@ -1,0 +1,277 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-plan-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 13px; padding: 20px; border: 1px solid rgba(255,122,89,.27); border-radius: 14px; background: #fff0e7;
+}
+
+.dp-plan-card h2 {
+  margin: 0; color: var(--db-green); font-size: 18px; font-weight: 800;
+}
+
+.dp-plan-card p {
+  display: block; margin: 5px 0 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-plan-card small {
+  display: block; margin: 5px 0 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-plan-price {
+  display: flex; align-items: baseline; gap: 6px; flex-shrink: 0;
+}
+
+.dp-plan-price strong {
+  color: var(--db-green); font-size: 27px; font-weight: 800;
+}
+
+.dp-plan-price span {
+  color: var(--db-muted); font-size: 8px;
+}
+
+@media (max-width: 480px) {
+.dp-plan-card {
+  align-items: flex-start; flex-direction: column;
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-billing-links-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.dp-billing-links-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-top: 14px;
+}
+
+.dp-billing-links-grid > .dp-panel {
+  margin: 0;
+}
+
+.dp-billing-links-grid a.dp-secondary-button {
+  display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+}
+
+.dp-plan-early-bird .dp-plan-price strong {
+  color: var(--db-coral);
+}
+
+@media (max-width: 760px) {
+.dp-billing-links-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.dp-plan-detail-card {
+  margin-top: 12px;
+}
+
+.dp-active-billing-grid {
+  display: grid; grid-template-columns: minmax(0,1.2fr) minmax(290px,.8fr); gap: 13px; margin-bottom: 24px;
+}
+
+.dp-active-plan-panel {
+  margin: 0; padding: 21px;
+}
+
+.dp-current-billing-panel {
+  margin: 0; padding: 21px;
+}
+
+.dp-active-plan-panel {
+  background: var(--db-green); color: var(--db-white);
+}
+
+.dp-active-plan-panel .dp-section-kicker {
+  color: var(--db-yellow);
+}
+
+.dp-active-plan-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+
+.dp-active-plan-panel h2 {
+  margin: 13px 0 7px; color: var(--db-white); font-size: clamp(20px,2.2vw,27px); font-weight: 800; letter-spacing: -.6px;
+}
+
+.dp-active-plan-description {
+  max-width: 680px; margin: 0; color: rgba(255,250,240,.74); font-size: 10px; line-height: 1.75;
+}
+
+.dp-active-plan-features {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 19px 0;
+}
+
+.dp-active-plan-features span {
+  display: flex; align-items: flex-start; gap: 7px; color: rgba(255,250,240,.88); font-size: 9px; line-height: 1.5;
+}
+
+.dp-active-plan-features svg {
+  flex: 0 0 14px; color: var(--db-yellow);
+}
+
+.dp-active-plan-footer {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 13px 0; border-top: 1px solid rgba(255,250,240,.15); border-bottom: 1px solid rgba(255,250,240,.15); color: rgba(255,250,240,.72); font-size: 9px;
+}
+
+.dp-active-plan-footer strong {
+  color: var(--db-yellow);
+}
+
+.dp-active-plan-footer b {
+  color: var(--db-white);
+}
+
+.dp-active-plan-panel .dp-text-button {
+  margin-top: 13px; color: var(--db-yellow);
+}
+
+.dp-current-billing-panel h2 {
+  margin: 3px 0 4px; font-size: 17px; font-weight: 800;
+}
+
+.dp-current-billing-status {
+  display: block; margin-top: 10px; color: var(--db-green); font-size: 13px;
+}
+
+.dp-current-credit-value {
+  margin: 6px 0 0; color: var(--db-green); font-size: clamp(27px,3vw,36px); font-weight: 850; letter-spacing: -1px;
+}
+
+.dp-current-billing-panel > p {
+  margin: 3px 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-credit-usage-heading {
+  display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 24px; color: var(--db-green); font-size: 9px;
+}
+
+.dp-credit-usage-heading b {
+  text-align: right;
+}
+
+.dp-credit-track {
+  height: 7px; margin: 9px 0 12px; overflow: hidden; border-radius: 20px; background: #e8e2d6;
+}
+
+.dp-credit-track span {
+  display: block; height: 100%; border-radius: inherit; background: var(--db-coral); transition: width .25s ease;
+}
+
+.dp-current-billing-panel .dp-current-renewal {
+  margin-top: 9px;
+}
+
+.dp-current-billing-panel .dp-current-included {
+  margin: 8px 0 12px; color: var(--db-muted);
+}
+
+.dp-current-included strong {
+  color: var(--db-green);
+}
+
+.dp-current-billing-panel .dp-text-button {
+  margin-top: 8px;
+}
+
+.dp-free-plan-start-card {
+  margin-bottom: 24px; padding: 22px; background: var(--db-green); color: var(--db-white);
+}
+
+.dp-free-plan-start-card .dp-section-kicker {
+  color: var(--db-yellow);
+}
+
+.dp-free-plan-start-card h2 {
+  margin: 4px 0 6px; color: var(--db-white); font-size: 22px; font-weight: 850;
+}
+
+.dp-free-plan-start-card > p {
+  max-width: 650px; margin: 0 0 15px; color: rgba(255,250,240,.74); font-size: 10px; line-height: 1.7;
+}
+
+.dp-free-plan-start-card .dp-billing-hero-icon {
+  background: var(--db-yellow);
+}
+
+.dp-free-plan-start-card .dp-free-plan-credit-empty {
+  max-width: 480px; margin-top: 18px; border: 1px solid rgba(255,250,240,.14); border-radius: 12px; background: rgba(255,250,240,.06);
+}
+
+.dp-free-plan-start-card .dp-empty-state {
+  padding: 16px;
+}
+
+.dp-free-plan-start-card .dp-empty-state h3 {
+  color: var(--db-white);
+}
+
+.dp-free-plan-start-card .dp-empty-state p {
+  color: rgba(255,250,240,.67);
+}
+
+.dp-billing-section-heading {
+  margin-top: 26px;
+}
+
+.dp-billing-addon-grid {
+  margin-top: 0;
+}
+
+.dp-billing-addon-grid .dp-addon-card {
+  min-height: 210px;
+}
+
+.dp-billing-addon-grid .dp-addon-card h3 {
+  min-height: 34px;
+}
+
+.dp-billing-addon-grid .dp-addon-card p {
+  min-height: 46px;
+}
+
+.dp-billing-more-grid {
+  margin-top: 0;
+}
+
+.dp-plan-detail-card {
+  align-items: center;
+}
+
+.dp-plan-detail-card .dp-plan-price {
+  align-items: flex-end; flex-direction: column; min-width: 190px;
+}
+
+.dp-plan-detail-card .dp-plan-price strong {
+  font-size: 17px;
+}
+
+.dp-plan-detail-card .dp-plan-price span {
+  max-width: 190px; text-align: right; line-height: 1.5;
+}
+
+.dp-plan-detail-card .dp-plan-feature-list {
+  grid-template-columns: repeat(2,minmax(0,1fr));
+}
+
+@media (max-width: 1050px) {
+.dp-active-billing-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-active-plan-features {
+  grid-template-columns: 1fr;
+}
+.dp-plan-detail-card .dp-plan-price {
+  align-items: flex-start;
+}
+.dp-plan-detail-card .dp-plan-price span {
+  text-align: left;
+}
+
+}

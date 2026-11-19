@@ -1,0 +1,110 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.bellbee-dashboard {
+  --db-green: #10372a;
+  --db-cream: #f3ede1;
+  --db-white: #fffaf0;
+  --db-coral: #ff7a59;
+  --db-yellow: #f4c95d;
+  --db-lavender: #cdbdff;
+  --db-muted: #78847c;
+  --db-border: rgba(16, 55, 42, 0.12);
+  min-height: 100vh;
+  background: var(--db-cream);
+  color: var(--db-green);
+  font-family: "Bricolage Grotesque", sans-serif;
+  color-scheme: light;
+}
+
+.bellbee-dashboard * {
+  box-sizing: border-box;
+}
+
+.bellbee-dashboard *::before {
+  box-sizing: border-box;
+}
+
+.bellbee-dashboard *::after {
+  box-sizing: border-box;
+}
+
+.bellbee-dashboard button {
+  font: inherit;
+}
+
+.bellbee-dashboard input {
+  font: inherit;
+}
+
+.bellbee-dashboard select {
+  font: inherit;
+}
+
+.bellbee-dashboard textarea {
+  font: inherit;
+}
+
+.bellbee-dashboard button {
+  cursor: pointer;
+}
+
+.bellbee-dashboard button:disabled {
+  cursor: not-allowed; opacity: .55;
+}
+
+.bellbee-dashboard button:focus-visible {
+  outline: 2px solid var(--db-coral); outline-offset: 2px;
+}
+
+.bellbee-dashboard input:focus-visible {
+  outline: 2px solid var(--db-coral); outline-offset: 2px;
+}
+
+.bellbee-dashboard select:focus-visible {
+  outline: 2px solid var(--db-coral); outline-offset: 2px;
+}
+
+.bellbee-dashboard textarea:focus-visible {
+  outline: 2px solid var(--db-coral); outline-offset: 2px;
+}
+
+.db-main {
+  min-height: 100vh; margin-left: 100px; padding: 0 27px 42px 8px; transition: margin-left .28s ease;
+}
+
+.db-page-content {
+  width: 100%; max-width: 1500px; margin: 0 auto; padding: 4px 0 24px;
+}
+
+@media (max-width: 760px) {
+.db-main {
+  margin-left: 0; padding: 0 15px 28px;
+}
+.bellbee-dashboard.db-mobile-nav-open .db-main {
+  display: none;
+}
+
+}
+
+@media (max-width: 480px) {
+.db-main {
+  padding-right: 10px; padding-left: 10px;
+}
+
+}
+
+@media (max-width: 760px) {
+.db-main {
+  margin-left: 0; padding: 0 13px 90px;
+}
+.db-page-content {
+  padding-bottom: 16px;
+}
+
+}
+
+@media (max-width: 480px) {
+.db-main {
+  padding-right: 10px; padding-left: 10px;
+}
+
+}

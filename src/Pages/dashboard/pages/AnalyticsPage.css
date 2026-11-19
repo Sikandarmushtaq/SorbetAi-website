@@ -1,0 +1,142 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-chart-section {
+  margin-top: 10px;
+}
+
+.dp-chart-section h2 {
+  margin: 0; color: var(--db-green); font-size: 15px;
+}
+
+.dp-chart-section > p {
+  margin: 5px 0 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-chart-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 245px; margin-top: 12px; border: 1px dashed rgba(16,55,42,.18); border-radius: 12px; background: #fffdf7; color: #a5684d; text-align: center;
+}
+
+.dp-chart-placeholder h3 {
+  margin: 10px 0 0; color: var(--db-green); font-size: 13px;
+}
+
+.dp-chart-placeholder p {
+  max-width: 350px; margin: 6px 0 0; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+}
+
+.dp-analytics-lower {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; padding-top: 17px; border-top: 1px solid var(--db-border);
+}
+
+.dp-spend-panel > h2 {
+  margin-top: 4px;
+}
+
+.dp-spend-panel > p {
+  color: var(--db-muted); font-size: 9px; line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+.dp-analytics-lower {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.dp-analytics-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  min-height: 180px;
+  overflow-x: auto;
+  padding: 18px 4px 4px;
+}
+
+.dp-analytics-chart-column {
+  display: flex;
+  flex: 1 0 34px;
+  min-width: 34px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 160px;
+}
+
+.dp-analytics-bar-stack {
+  display: flex;
+  width: min(22px, 100%);
+  height: 100%;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  overflow: hidden;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--db-border, rgba(16, 55, 42, 0.08));
+}
+
+.dp-analytics-bar {
+  display: block; width: 100%; min-height: 0;
+}
+
+.dp-analytics-bar.received {
+  background: var(--db-green);
+}
+
+.dp-analytics-legend i.received {
+  background: var(--db-green);
+}
+
+.dp-analytics-bar.ai {
+  background: var(--db-coral);
+}
+
+.dp-analytics-legend i.ai {
+  background: var(--db-coral);
+}
+
+.dp-analytics-bar.human {
+  background: var(--db-lavender);
+}
+
+.dp-analytics-legend i.human {
+  background: var(--db-lavender);
+}
+
+.dp-analytics-chart-column small {
+  color: var(--db-muted); font-size: 10px; white-space: nowrap;
+}
+
+.dp-analytics-legend {
+  display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; color: var(--db-muted); font-size: 12px;
+}
+
+.dp-analytics-legend span {
+  display: inline-flex; align-items: center; gap: 6px;
+}
+
+.dp-analytics-legend i {
+  display: inline-block; width: 8px; height: 8px; border-radius: 2px;
+}
+
+.dp-analytics-data-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--db-border);
+}
+
+.dp-analytics-data-row:last-child {
+  border-bottom: 0;
+}
+
+.dp-whatsapp-spend-value {
+  display: flex; flex-direction: column; gap: 4px; margin: 16px 0; font-size: 26px; font-weight: 700;
+}
+
+.dp-whatsapp-spend-value small {
+  color: var(--db-muted); font-size: 12px; font-weight: 400;
+}
+
+@media (max-width: 760px) {
+.dp-analytics-chart {
+  max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+}

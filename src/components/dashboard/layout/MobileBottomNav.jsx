@@ -1,3 +1,4 @@
+import './MobileBottomNav.css';
 import { Brain, Home, MessageSquare, MoreHorizontal, ShoppingCart } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 

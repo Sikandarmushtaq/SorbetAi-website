@@ -1,0 +1,35 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-toolbar-label {
+  color: var(--db-muted); font-size: 9px;
+}
+
+.dp-orders-search {
+  margin-bottom: 10px;
+}
+
+.dp-orders-panel .dp-data-list-heading {
+  min-width: 900px; grid-template-columns: 1.1fr 1.2fr .75fr .8fr 1fr .8fr;
+}
+
+.dp-orders-panel .dp-data-list-row {
+  min-width: 900px; grid-template-columns: 1.1fr 1.2fr .75fr .8fr 1fr .8fr;
+}
+
+.dp-orders-panel .dp-data-list-row > div:first-child {
+  display: flex; flex-direction: column; gap: 3px;
+}
+
+.dp-orders-panel .dp-data-list-row > div:first-child small {
+  color: var(--db-muted); font-size: 7px;
+}
+
+.dp-orders-panel .dp-data-list-row select {
+  min-width: 0; min-height: 29px; padding: 0 5px; border: 1px solid var(--db-border); border-radius: 7px; background: var(--db-white); color: var(--db-green); font-size: 8px;
+}
+
+@media (max-width: 760px) {
+.dp-toolbar-label {
+  font-size: 11px;
+}
+
+}

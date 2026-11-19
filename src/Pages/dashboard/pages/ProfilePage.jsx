@@ -1,3 +1,8 @@
+import { businessProfileApi } from '../../../services/dashboard/business-profile.api.js';
+import { deleteAccountApi } from '../../../services/dashboard/delete-account.api.js';
+import { devicesApi } from '../../../services/dashboard/devices.api.js';
+import { profileNotificationsApi } from '../../../services/dashboard/profile-notifications.api.js';
+import './ProfilePage.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Bell, Building2, LockKeyhole, LogOut, Save, ShieldCheck, Smartphone, Trash2, UserRound,
@@ -5,10 +10,8 @@ import {
 import {
   FieldInput, FieldSelect, FormField, Modal, PageHeader, Panel, useNotice,
 } from '../../../components/dashboard/common/DashboardUI';
-import {
-  apiRequest, getCurrentUser, getCurrentWorkspace, isResourceConfigured, resourceRequest,
-} from '../../../services/dashboardApi';
-
+import { getCurrentUser, getCurrentWorkspace } from '../../../services/dashboardApi';
+import { authApi } from '../../../services/auth.api';
 const defaultBusiness = {
   businessName: '', businessType: 'hybrid', address1: '', address2: '', city: '', state: '',
   postalCode: '', country: 'Pakistan', timezone: 'Asia/Karachi', billingCurrency: 'PKR', storefrontCurrency: 'PKR',
@@ -64,9 +67,9 @@ export default function ProfilePage() {
     setLoadError('');
     const results = await Promise.allSettled([
       getCurrentUser(), getCurrentWorkspace(),
-      isResourceConfigured('businessProfile') ? resourceRequest('businessProfile') : Promise.resolve(null),
-      isResourceConfigured('devices') ? resourceRequest('devices') : Promise.resolve(null),
-      isResourceConfigured('profileNotifications') ? resourceRequest('profileNotifications') : Promise.resolve(null),
+      businessProfileApi.isConfigured() ? businessProfileApi.request() : Promise.resolve(null),
+      devicesApi.isConfigured() ? devicesApi.request() : Promise.resolve(null),
+      profileNotificationsApi.isConfigured() ? profileNotificationsApi.request() : Promise.resolve(null),
     ]);
     const [userResult, workspaceResult, businessResult, devicesResult, notificationsResult] = results;
     const user = userResult.status === 'fulfilled' ? userResult.value : null;
@@ -104,10 +107,13 @@ export default function ProfilePage() {
     event.preventDefault();
     setSaving((current) => ({ ...current, account: true }));
     try {
-      if (!isResourceConfigured('profile')) throw new Error('Account update API is not configured yet. Add REACT_APP_API_PROFILE_PATH when the backend endpoint is ready.');
-      await resourceRequest('profile', { method: 'PATCH', body: {
-        first_name: account.firstName.trim(), last_name: account.lastName.trim(), mobile_number: account.mobile.trim(),
-      } });
+      const details = Object.fromEntries(Object.entries({
+        first_name: account.firstName.trim(),
+        last_name: account.lastName.trim(),
+        phone: account.mobile.trim(),
+      }).filter(([, value]) => value));
+      if (!Object.keys(details).length) return showNotice('Enter a name or phone number to update.');
+      await authApi.updateProfile(details);
       showNotice('Account details saved.');
     } catch (error) { showNotice(error.message); }
     finally { setSaving((current) => ({ ...current, account: false })); }
@@ -118,8 +124,8 @@ export default function ProfilePage() {
     event.preventDefault();
     setSaving((current) => ({ ...current, business: true }));
     try {
-      if (!isResourceConfigured('businessProfile')) throw new Error('Business profile API is not configured yet. Add REACT_APP_API_BUSINESS_PROFILE_PATH when the backend endpoint is ready.');
-      await resourceRequest('businessProfile', { method: 'PATCH', body: {
+      if (!businessProfileApi.isConfigured()) throw new Error('Business profile API is not configured yet. Add REACT_APP_API_BUSINESS_PROFILE_PATH when the backend endpoint is ready.');
+      await businessProfileApi.request({ method: 'PATCH', body: {
         business_name: business.businessName.trim(), business_type: business.businessType,
         address_line_1: business.address1.trim(), address_line_2: business.address2.trim(),
         city: business.city.trim(), state: business.state.trim(), postal_code: business.postalCode.trim(),
@@ -138,7 +144,7 @@ export default function ProfilePage() {
     if (password.next !== password.confirm) return showNotice('New password and confirmation do not match.');
     setSaving((current) => ({ ...current, password: true }));
     try {
-      await apiRequest('/api/v1/auth/password/change', { method: 'POST', body: { current_password: password.current, new_password: password.next } });
+      await authApi.changePassword(password.current, password.next);
       setPassword({ current: '', next: '', confirm: '' });
       showNotice('Password changed. Other sessions have been signed out.');
     } catch (error) { showNotice(error.message); }
@@ -149,8 +155,8 @@ export default function ProfilePage() {
   const saveNotifications = async () => {
     setSaving((current) => ({ ...current, notifications: true }));
     try {
-      if (!isResourceConfigured('profileNotifications')) throw new Error('Notification preferences API is not configured yet.');
-      await resourceRequest('profileNotifications', { method: 'PATCH', body: notifications });
+      if (!profileNotificationsApi.isConfigured()) throw new Error('Notification preferences API is not configured yet.');
+      await profileNotificationsApi.request({ method: 'PATCH', body: notifications });
       showNotice('Notification preferences saved.');
     } catch (error) { showNotice(error.message); }
     finally { setSaving((current) => ({ ...current, notifications: false })); }
@@ -160,8 +166,8 @@ export default function ProfilePage() {
   const signOutDevices = async () => {
     setSaving((current) => ({ ...current, devices: true }));
     try {
-      if (!isResourceConfigured('devices')) throw new Error('Device-session management API is not configured yet.');
-      await resourceRequest('devices', { method: 'DELETE', action: 'revoke-all' });
+      if (!devicesApi.isConfigured()) throw new Error('Device-session management API is not configured yet.');
+      await devicesApi.request({ method: 'DELETE', action: 'revoke-all' });
       setDevices([]);
       showNotice('All other device sessions have been signed out. Sign in again on this device if requested.');
     } catch (error) { showNotice(error.message); }
@@ -172,8 +178,8 @@ export default function ProfilePage() {
   const requestDeletion = async () => {
     setSaving((current) => ({ ...current, deletion: true }));
     try {
-      if (!isResourceConfigured('deleteAccount')) throw new Error('Account deletion request API is not configured yet.');
-      await resourceRequest('deleteAccount', { method: 'POST', body: { confirmation: 'DELETE' } });
+      if (!deleteAccountApi.isConfigured()) throw new Error('Account deletion request API is not configured yet.');
+      await deleteAccountApi.request({ method: 'POST', body: { confirmation: 'DELETE' } });
       setShowDelete(false);
       showNotice('Your deletion request has been submitted for verification.');
     } catch (error) { showNotice(error.message); }
@@ -201,9 +207,8 @@ export default function ProfilePage() {
             <FormField label="First Name"><FieldInput value={account.firstName} onChange={(event) => updateAccount('firstName', event.target.value)} autoComplete="given-name" required /></FormField>
             <FormField label="Last Name"><FieldInput value={account.lastName} onChange={(event) => updateAccount('lastName', event.target.value)} autoComplete="family-name" /></FormField>
             <FormField label="Email"><FieldInput type="email" value={account.email} disabled readOnly autoComplete="email" /><small>Email cannot be changed.</small></FormField>
-            <FormField label="Your mobile number" hint="Your own number, so Bellbee can reach you. It is not shown to your customers."><FieldInput type="tel" value={account.mobile} onChange={(event) => updateAccount('mobile', event.target.value)} autoComplete="tel" placeholder="Add your mobile number" /></FormField>
+            <FormField label="Your mobile number" hint="Include the country code, for example +923001234567."><FieldInput type="tel" value={account.mobile} onChange={(event) => updateAccount('mobile', event.target.value)} autoComplete="tel" placeholder="Add your mobile number" /></FormField>
           </div>
-          {!isResourceConfigured('profile') && <p className="dp-form-note">Account editing is ready for the backend. The signed-in email remains read-only.</p>}
           <button type="submit" className="dp-primary-button dp-settings-save" disabled={saving.account || isLoading}>{saving.account ? 'Saving…' : 'Save account details'} <Save size={14} /></button>
         </Panel>
       </form>
@@ -224,7 +229,7 @@ export default function ProfilePage() {
             <FormField label="Billing Currency"><FieldSelect value={business.billingCurrency} onChange={(event) => updateBusiness('billingCurrency', event.target.value)}><option value="PKR">PKR — Pakistani Rupee</option><option value="GBP">GBP — Pound Sterling</option><option value="USD">USD — US Dollar</option><option value="AED">AED — UAE Dirham</option><option value="EUR">EUR — Euro</option></FieldSelect></FormField>
             <FormField label="Storefront Currency" hint="What your AI shows your own customers for prices and orders. It is separate from your billing currency above."><FieldSelect value={business.storefrontCurrency} onChange={(event) => updateBusiness('storefrontCurrency', event.target.value)}><option value="PKR">PKR — Pakistani Rupee</option><option value="GBP">GBP — Pound Sterling</option><option value="USD">USD — US Dollar</option><option value="AED">AED — UAE Dirham</option><option value="EUR">EUR — Euro</option></FieldSelect></FormField>
           </div>
-          {!isResourceConfigured('businessProfile') && <p className="dp-form-note">Business profile fields are ready. Configure the business profile endpoint to save address, timezone and currency settings.</p>}
+          {!businessProfileApi.isConfigured() && <p className="dp-form-note">Business profile fields are ready. Configure the business profile endpoint to save address, timezone and currency settings.</p>}
           <button type="submit" className="dp-primary-button dp-settings-save" disabled={saving.business || isLoading}>{saving.business ? 'Saving…' : 'Save business details'} <Save size={14} /></button>
         </Panel>
       </form>
@@ -248,8 +253,8 @@ export default function ProfilePage() {
         <div className="dp-device-row"><Smartphone size={21} /><div><strong>{currentSession?.device_name || currentSession?.browser || currentDevice} <span className="dp-mini-badge">This device</span></strong><small>{currentSession?.location || business.country || 'Current location'} · {currentSession?.status || 'Active now'}</small></div><span className="dp-status-pill success">Active</span></div>
         {otherDevices.map((device, index) => <div className="dp-device-row" key={device.id || index}><Smartphone size={20} /><div><strong>{device.device_name || device.browser || 'Signed-in device'}</strong><small>{device.location || 'Location unavailable'} · {device.last_active || device.status || 'Session active'}</small></div></div>)}
         <p className="dp-panel-description">Signs out every device, this one too. Use it if you think someone else has your password, then change it.</p>
-        {!isResourceConfigured('devices') && <p className="dp-form-note">Device session management will be enabled when the sessions API is connected.</p>}
-        <button type="button" className="dp-secondary-button" onClick={signOutDevices} disabled={saving.devices || !isResourceConfigured('devices')}>{saving.devices ? 'Signing out…' : 'Sign out all devices'} <LogOut size={14} /></button>
+        {!devicesApi.isConfigured() && <p className="dp-form-note">Device session management will be enabled when the sessions API is connected.</p>}
+        <button type="button" className="dp-secondary-button" onClick={signOutDevices} disabled={saving.devices || !devicesApi.isConfigured()}>{saving.devices ? 'Signing out…' : 'Sign out all devices'} <LogOut size={14} /></button>
       </Panel>
 
       <Panel className="dp-profile-panel">
@@ -258,16 +263,16 @@ export default function ProfilePage() {
         <div className="dp-profile-toggle-list">
           {[['orders', 'Order notifications'], ['bookings', 'Booking notifications'], ['messages', 'Message notifications']].map(([key, label]) => <label className="dp-profile-toggle" key={key}><span>{label}</span><input type="checkbox" checked={Boolean(notifications[key])} onChange={(event) => setNotifications((current) => ({ ...current, [key]: event.target.checked }))} /></label>)}
         </div>
-        {!isResourceConfigured('profileNotifications') && <p className="dp-form-note">Notification preferences can be saved once the profile notifications endpoint is connected.</p>}
-        <button type="button" className="dp-secondary-button dp-settings-save" onClick={saveNotifications} disabled={saving.notifications || !isResourceConfigured('profileNotifications')}>{saving.notifications ? 'Saving…' : 'Save notification preferences'} <Save size={14} /></button>
+        {!profileNotificationsApi.isConfigured() && <p className="dp-form-note">Notification preferences can be saved once the profile notifications endpoint is connected.</p>}
+        <button type="button" className="dp-secondary-button dp-settings-save" onClick={saveNotifications} disabled={saving.notifications || !profileNotificationsApi.isConfigured()}>{saving.notifications ? 'Saving…' : 'Save notification preferences'} <Save size={14} /></button>
       </Panel>
 
       <Panel className="dp-profile-panel dp-danger-zone">
-        <div><h2>Delete account</h2><p>Ask us to delete your account and everything in it. We check the request is really from you, then delete the account and email you.</p>{!isResourceConfigured('deleteAccount') && <small className="dp-form-note">The verified deletion-request endpoint is not connected yet.</small>}</div>
+        <div><h2>Delete account</h2><p>Ask us to delete your account and everything in it. We check the request is really from you, then delete the account and email you.</p>{!deleteAccountApi.isConfigured() && <small className="dp-form-note">The verified deletion-request endpoint is not connected yet.</small>}</div>
         <button type="button" className="dp-danger-button" onClick={() => setShowDelete(true)}><Trash2 size={14} /> Request deletion</button>
       </Panel>
 
-      {showDelete && <Modal title="Request account deletion" description="This request will be sent to the Bellbee team for identity verification. Your account will not be removed immediately." onClose={() => setShowDelete(false)} footer={<><button type="button" className="dp-secondary-button" onClick={() => setShowDelete(false)} disabled={saving.deletion}>Cancel</button><button type="button" className="dp-danger-button" onClick={requestDeletion} disabled={saving.deletion || !isResourceConfigured('deleteAccount')}>{saving.deletion ? 'Submitting…' : 'Submit deletion request'}</button></>}><div className="dp-delete-confirm"><ShieldCheck size={24} /><p>After verification, Bellbee will delete the account and email you. This action cannot be undone once completed.</p></div></Modal>}
+      {showDelete && <Modal title="Request account deletion" description="This request will be sent to the Bellbee team for identity verification. Your account will not be removed immediately." onClose={() => setShowDelete(false)} footer={<><button type="button" className="dp-secondary-button" onClick={() => setShowDelete(false)} disabled={saving.deletion}>Cancel</button><button type="button" className="dp-danger-button" onClick={requestDeletion} disabled={saving.deletion || !deleteAccountApi.isConfigured()}>{saving.deletion ? 'Submitting…' : 'Submit deletion request'}</button></>}><div className="dp-delete-confirm"><ShieldCheck size={24} /><p>After verification, Bellbee will delete the account and email you. This action cannot be undone once completed.</p></div></Modal>}
     </>
   );
 }

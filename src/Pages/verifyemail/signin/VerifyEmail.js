@@ -1,40 +1,50 @@
-
 import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
+  CheckCircle2,
   Mail,
   MessageCircle,
   ShieldCheck,
+  AlertCircle,
+  RefreshCw,
+  LoaderCircle,
 } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
 import './VerifyEmail.css';
+import { useAuth } from '../../../context/AuthContext';
+import { authApi, authErrorMessage, dashboardDestination } from '../../../services/auth.api';
 
 gsap.registerPlugin(useGSAP);
 
-// Formats seconds as MM:SS.
-function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-
-  return `${String(minutes).padStart(2, '0')}:${String(
-    remainingSeconds
-  ).padStart(2, '0')}`;
-}
-
 export default function VerifyEmail() {
   const pageRef = useRef(null);
+  const verificationStarted = useRef(false);
+
   const location = useLocation();
+  const navigate = useNavigate();
+  const { saveSession } = useAuth();
+  const returnTo = dashboardDestination(location.state);
 
-  const email = location.state?.email || '';
+  const searchParams = new URLSearchParams(location.search);
+  const verificationToken = searchParams.get('token') || '';
 
-  const [code, setCode] = useState('');
-  const [expiryTime, setExpiryTime] = useState(592);
-  const [resendTime, setResendTime] = useState(52);
-  const [notice, setNotice] = useState('');
+  const email =
+    location.state?.email ||
+    window.localStorage.getItem('bellbee_pending_verification_email') ||
+    '';
+
+  const [verifiedEmail, setVerifiedEmail] = useState(email);
+  const [status, setStatus] = useState(
+    verificationToken ? 'verifying' : 'waiting'
+  );
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [resendMessage, setResendMessage] = useState('');
+  const [isResending, setIsResending] = useState(false);
 
   useGSAP(
     () => {
@@ -49,30 +59,95 @@ export default function VerifyEmail() {
     { scope: pageRef }
   );
 
-  // Updates the verification expiry and resend countdowns.
+  // Verifies the single-use token received from the email link.
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setExpiryTime((previous) => Math.max(0, previous - 1));
-      setResendTime((previous) => Math.max(0, previous - 1));
-    }, 1000);
+    if (!verificationToken || verificationStarted.current) return;
 
-    return () => window.clearInterval(timer);
-  }, []);
+    verificationStarted.current = true;
 
-  // Handles verification code submission when the backend is connected.
-  const handleVerify = (event) => {
-    event.preventDefault();
+    const verifyEmail = async () => {
+      setStatus('verifying');
+      setErrorMessage('');
 
-    setNotice(
-      'Email verification will be available once the authentication service is connected.'
-    );
+      try {
+        const result = await authApi.verifyEmail(verificationToken);
+        await saveSession(result.tokens);
+        if (result.user?.email) setVerifiedEmail(result.user.email);
+        window.localStorage.removeItem('bellbee_pending_verification_email');
+        setStatus('success');
+        navigate(returnTo, { replace: true });
+      } catch (error) {
+        console.error('[Bellbee Email Verification]', {
+          endpoint: '/api/v1/auth/verify-email',
+          message: error.message,
+        });
+
+        setErrorMessage(
+          authErrorMessage(error) || 'Something went wrong. Please try again.'
+        );
+
+        setStatus('error');
+      }
+    };
+
+    verifyEmail();
+  }, [verificationToken, saveSession, navigate, returnTo]);
+
+  // Requests a fresh verification link from the backend.
+  const handleResend = async () => {
+    if (!verifiedEmail || isResending) return;
+
+    setIsResending(true);
+    setResendMessage('');
+    setErrorMessage('');
+
+    try {
+      await authApi.resendVerification(verifiedEmail);
+      setResendMessage(
+        'If this email has an unverified account, a new verification link has been sent. Please check your inbox.'
+      );
+    } catch (error) {
+      console.error('[Bellbee Resend Verification]', {
+        endpoint: '/api/v1/auth/resend-verification',
+        message: error.message,
+      });
+
+      setErrorMessage(
+        authErrorMessage(error) || 'Unable to resend the verification email.'
+      );
+    } finally {
+      setIsResending(false);
+    }
   };
 
-  // Handles requesting a new verification code when email delivery is connected.
-  const handleResend = () => {
-    setNotice(
-      'A new verification code can be requested once the email service is connected.'
-    );
+  // Opens the dashboard after successful email verification.
+  const handleContinue = () => {
+    navigate('/dashboard', { replace: true });
+  };
+
+  const userEmail = verifiedEmail || email;
+
+  const heading = {
+    waiting: (
+      <>
+        Check your <em>inbox.</em>
+      </>
+    ),
+    verifying: (
+      <>
+        Verifying your <em>email.</em>
+      </>
+    ),
+    success: (
+      <>
+        Email verified <em>successfully.</em>
+      </>
+    ),
+    error: (
+      <>
+        Verification <em>unsuccessful.</em>
+      </>
+    ),
   };
 
   return (
@@ -88,111 +163,197 @@ export default function VerifyEmail() {
           <span>Bellbee</span>
         </Link>
 
-        <div className="verify-email-icon">
-          <Mail size={31} strokeWidth={1.7} />
-          <span className="verify-email-icon-check">
-            <ShieldCheck size={17} />
-          </span>
+        <div
+          className={`verify-email-icon verify-icon-${status}`}
+        >
+          {status === 'verifying' ? (
+            <LoaderCircle size={32} className="verify-spinner" />
+          ) : status === 'success' ? (
+            <CheckCircle2 size={34} />
+          ) : status === 'error' ? (
+            <AlertCircle size={34} />
+          ) : (
+            <Mail size={31} strokeWidth={1.7} />
+          )}
+
+          {status !== 'verifying' && (
+            <span className="verify-email-icon-check">
+              <ShieldCheck size={17} />
+            </span>
+          )}
         </div>
 
         <p className="verify-email-eyebrow">
-          ONE LAST STEP
+          {status === 'success'
+            ? 'ACCOUNT ACTIVATED'
+            : status === 'verifying'
+              ? 'SECURE VERIFICATION'
+              : status === 'error'
+                ? 'VERIFICATION ISSUE'
+                : 'ONE LAST STEP'}
         </p>
 
-        <h1>
-          Verify your <em>email.</em>
-        </h1>
+        <h1>{heading[status]}</h1>
 
-        <p className="verify-email-description">
-          {email ? (
-            <>
-              We sent a verification code to{' '}
-              <strong>{email}</strong>. Enter it below to activate your
-              account.
-            </>
-          ) : (
-            <>
-              Enter the verification code sent to your email address
-              to activate your account.
-            </>
-          )}
-        </p>
+        {status === 'waiting' && (
+          <>
+            <p className="verify-email-description">
+              We have sent a verification link to your email address.
+              Open the email and click the verification button to
+              activate your Bellbee account.
+            </p>
 
-        <form className="verify-email-form" onSubmit={handleVerify}>
-          <label htmlFor="verification-code">
-            Verification code
-          </label>
+            <div className="verify-email-address">
+              <span className="verify-address-icon">
+                <Mail size={17} />
+              </span>
 
-          <input
-            id="verification-code"
-            type="text"
-            name="code"
-            value={code}
-            onChange={(event) => {
-              const value = event.target.value
-                .replace(/\D/g, '')
-                .slice(0, 6);
+              <span className="verify-address-copy">
+                <small>VERIFICATION EMAIL SENT TO</small>
+                <strong>
+                  {userEmail || 'Your registered email address'}
+                </strong>
+              </span>
+            </div>
 
-              setCode(value);
-              setNotice('');
-            }}
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            placeholder="Enter 6-digit code"
-            maxLength={6}
-            pattern="[0-9]{6}"
-            required
-          />
+            <div className="verify-email-info">
+              <ShieldCheck size={18} />
 
-          <div className="verify-email-timer">
-            <span>
-              Code expires in{' '}
-              <strong>{formatTime(expiryTime)}</strong>
-            </span>
+              <span>
+                Your verification link is valid for 24 hours and
+                can only be used once.
+              </span>
+            </div>
 
-            <span className="verify-timer-dot" />
+            <div className="verify-email-instructions">
+              <strong>What to do next?</strong>
+
+              <p>
+                1. Open your inbox.
+                <br />
+                2. Find the email from Bellbee.
+                <br />
+                3. Click the Verify Email link.
+              </p>
+            </div>
+          </>
+        )}
+
+        {status === 'verifying' && (
+          <div className="verify-email-status-panel is-neutral">
+            <LoaderCircle size={19} className="verify-spinner" />
 
             <span>
-              {expiryTime === 0 ? 'Code expired' : 'Check your inbox'}
+              We're securely verifying your email address and
+              activating your account. Please don't close this page.
             </span>
           </div>
+        )}
 
-          <button
-            type="submit"
-            className="verify-email-submit"
-            disabled={code.length !== 6 || expiryTime === 0}
-          >
-            Verify email
-            <ArrowRight size={17} />
-          </button>
-        </form>
+        {status === 'success' && (
+          <>
+            <p className="verify-email-description">
+              Your email address has been verified and your Bellbee
+              account is now active.
+            </p>
 
-        <div className="verify-email-resend">
-          <span>Didn't receive it?</span>
+            <div className="verify-email-status-panel is-success">
+              <CheckCircle2 size={21} />
 
-          {resendTime > 0 ? (
-            <strong>
-              Resend in {resendTime}s
-            </strong>
-          ) : (
-            <button type="button" onClick={handleResend}>
-              Resend code
+              <span>
+                Your account has been created successfully. You are
+                now signed in.
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className="verify-email-submit"
+              onClick={handleContinue}
+            >
+              Continue to dashboard
+              <ArrowRight size={17} />
             </button>
-          )}
-        </div>
+          </>
+        )}
 
-        {notice && (
-          <p className="verify-email-notice" role="status">
-            {notice}
-          </p>
+        {status === 'error' && (
+          <>
+            <p className="verify-email-description">
+              We couldn't verify your email address. The link may
+              have expired, already been used, or may be invalid.
+            </p>
+
+            <div className="verify-email-status-panel is-error">
+              <AlertCircle size={20} />
+              <span>{errorMessage}</span>
+            </div>
+          </>
+        )}
+
+        {(status === 'waiting' || status === 'error') && (
+          <>
+            {userEmail ? (
+              <div className="verify-email-resend">
+                <span>Didn't receive the email?</span>
+
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={isResending}
+                >
+                  {isResending ? (
+                    <>
+                      <RefreshCw
+                        size={14}
+                        className="verify-spinner"
+                      />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Resend verification email
+                      <ArrowRight size={14} />
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <p className="verify-email-no-address">
+                To request another verification link, return to
+                signup and enter your email address.
+              </p>
+            )}
+
+            {resendMessage && (
+              <div className="verify-email-status-panel is-success">
+                <CheckCircle2 size={19} />
+                <span>{resendMessage}</span>
+              </div>
+            )}
+
+            {errorMessage && status === 'waiting' && (
+              <div className="verify-email-status-panel is-error">
+                <AlertCircle size={19} />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+          </>
         )}
 
         <div className="verify-email-divider" />
 
-        <Link to="/signin" className="verify-back-link">
-          <ArrowLeft size={15} />
-          Back to sign in
-        </Link>
+        {status === 'success' ? (
+          <Link to="/dashboard" className="verify-back-link">
+            <ArrowLeft size={15} />
+            Go to dashboard
+          </Link>
+        ) : (
+          <Link to="/signin" className="verify-back-link">
+            <ArrowLeft size={15} />
+            Back to sign in
+          </Link>
+        )}
 
         <p className="verify-email-copyright">
           © 2026 Bellbee. All rights reserved.

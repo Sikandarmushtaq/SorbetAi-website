@@ -1,3 +1,5 @@
+import { customersApi } from '../../../services/dashboard/customers.api.js';
+import './CustomersPage.css';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
@@ -5,8 +7,6 @@ import {
   Plus, Search, Tag, Users,
 } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
-
 const EMPTY_LABELS = Object.freeze([]);
 
 function recordsFrom(response) {
@@ -53,7 +53,7 @@ export default function CustomersPage() {
     let active = true;
     setIsLoading(true);
     setLoadError('');
-    resourceRequest('customers', { query: { search: query || undefined, labels: selectedLabels.join(',') || undefined, sort, direction } })
+    customersApi.request({ query: { search: query || undefined, labels: selectedLabels.join(',') || undefined, sort, direction } })
       .then((response) => { if (active) setCustomers(recordsFrom(response)); })
       .catch((error) => { if (active) { setCustomers([]); setLoadError(error.message); } })
       .finally(() => { if (active) setIsLoading(false); });
@@ -129,7 +129,7 @@ export default function CustomersPage() {
     setIsSavingDetails(true);
     try {
       const id = selectedCustomer.id || selectedCustomer.customer_id;
-      await resourceRequest('customers', { method: 'PATCH', id, body: { labels: labelsDraft, notes } });
+      await customersApi.request({ method: 'PATCH', id, body: { labels: labelsDraft, notes } });
       setCustomers((current) => current.map((customer) => String(customer.id || customer.customer_id) === String(id) ? { ...customer, labels: labelsDraft, notes } : customer));
       showNotice('Customer details updated.');
     } catch (error) {

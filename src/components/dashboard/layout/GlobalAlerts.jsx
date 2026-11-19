@@ -1,9 +1,9 @@
+import { channelsApi } from '../../../services/dashboard/channels.api.js';
+import './GlobalAlerts.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, MessageSquare, Sparkles, X } from 'lucide-react';
 import { useFreePlan } from '../common/FreePlanContext';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 // Displays only account alerts confirmed by the connected workspace APIs.
 export default function GlobalAlerts() {
   const [whatsappVisible, setWhatsappVisible] = useState(false);
@@ -14,8 +14,8 @@ export default function GlobalAlerts() {
 
   useEffect(() => {
     let active = true;
-    if (!isResourceConfigured('channels')) return undefined;
-    resourceRequest('channels')
+    if (!channelsApi.isConfigured()) return undefined;
+    channelsApi.request()
       .then((response) => {
         const channels = Array.isArray(response) ? response : response?.items || response?.channels || [];
         const whatsapp = response?.whatsapp || channels.find((channel) => String(channel.type || channel.name || channel.channel).toLowerCase().includes('whatsapp'));

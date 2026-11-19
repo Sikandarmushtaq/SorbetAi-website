@@ -1,0 +1,51 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-connection-icon {
+  display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px; border-radius: 10px; background: #dcebd9; color: var(--db-green);
+}
+
+.dp-payment-hero {
+  padding: 22px; background: var(--db-green); color: var(--db-white);
+}
+
+.dp-payment-hero .dp-section-kicker {
+  color: var(--db-yellow);
+}
+
+.dp-payment-hero h2 {
+  margin: 4px 0 7px; color: var(--db-white); font-size: 22px; font-weight: 850;
+}
+
+.dp-payment-hero > p {
+  max-width: 720px; margin: 0; color: rgba(255,250,240,.73); font-size: 10px; line-height: 1.7;
+}
+
+.dp-payment-security {
+  display: flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--db-yellow); font-size: 9px;
+}
+
+.dp-payment-provider-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px;
+}
+
+.dp-payment-provider-card {
+  margin: 0;
+}
+
+.dp-payment-provider-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+
+.dp-payment-provider-card h3 {
+  margin: 13px 0 5px; font-size: 15px; font-weight: 850;
+}
+
+.dp-payment-provider-card p {
+  min-height: 38px; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+.dp-payment-provider-grid {
+  grid-template-columns: 1fr;
+}
+
+}

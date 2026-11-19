@@ -1,0 +1,108 @@
+.profile-setup-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.profile-setup-form label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--verify-green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.profile-setup-form label span { font-weight: 400; }
+
+.profile-setup-form input[name], .profile-setup-phone {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 13px;
+  border: 1px solid rgba(16, 55, 42, 0.20);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--verify-green);
+  font: inherit;
+}
+
+.profile-setup-form :is(input, button):focus-visible, .profile-setup-signout:focus-visible {
+  outline: 2px solid var(--verify-green);
+  outline-offset: 2px;
+}
+
+.profile-setup-phone {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-block: 0;
+}
+
+.profile-setup-phone input[name] {
+  min-width: 0;
+  padding-inline: 3px;
+  border: 0;
+  background: transparent;
+}
+
+.profile-setup-form [role="alert"] {
+  display: block;
+  margin: 6px 0 0;
+  color: #a53f31;
+  font-size: 13px;
+}
+
+.profile-setup-form .verify-email-submit { margin-top: 4px; }
+
+.profile-setup-avatar {
+  position: relative;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #dcebd9;
+  font-weight: 800;
+}
+
+.profile-setup-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-setup-signout {
+  display: block;
+  margin: 14px auto 0;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--verify-green);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.profile-setup .signup-country-trigger {
+  color: var(--verify-green);
+  border-color: rgba(16, 55, 42, 0.20);
+  background: #fff;
+}
+
+.profile-setup .signup-country-menu {
+  background: var(--verify-white);
+  color: var(--verify-green);
+}
+
+.profile-setup {
+  --signup-green: #10372a;
+  --signup-coral: #ff7a59;
+  --signup-white: #fffaf0;
+  --signup-field-bg: #fff;
+  --signup-field-border: rgba(16, 55, 42, 0.20);
+  --signup-placeholder: rgba(16, 55, 42, 0.62);
+  --signup-error: #b43f28;
+}

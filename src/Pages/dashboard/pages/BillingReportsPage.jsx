@@ -1,10 +1,10 @@
+import { billingReportsApi } from '../../../services/dashboard/billing-reports.api.js';
+import './BillingReportsPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BarChart3, CalendarDays, ChartColumn, FileDown, RefreshCw, Sparkles, Wallet } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, StatCard, StatGrid, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 const reportTabs = [{ label: 'By day', value: 'by_day' }, { label: 'By AI model', value: 'by_model' }, { label: 'Activity log', value: 'activity' }];
 
 function getRows(response, view) {
@@ -32,7 +32,7 @@ export default function BillingReportsPage() {
   const view = reportTabs.some((tab) => tab.value === params.get('view')) ? params.get('view') : 'by_day';
 
   const loadReports = useCallback(async () => {
-    if (!isStarted || !isResourceConfigured('billingReports')) {
+    if (!isStarted || !billingReportsApi.isConfigured()) {
       setReport(null);
       setRows([]);
       setLoading(false);
@@ -41,7 +41,7 @@ export default function BillingReportsPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await resourceRequest('billingReports', { query: { period, view } });
+      const response = await billingReportsApi.request({ query: { period, view } });
       const value = response?.report || response?.reports_summary || response;
       setReport(value);
       setRows(getRows(response, view));
@@ -78,7 +78,7 @@ export default function BillingReportsPage() {
           <div className="dp-panel-heading"><div><span className="dp-section-kicker">DETAILED ACTIVITY</span><h2>Usage history</h2></div><FileDown size={20} /></div>
           <div className="dp-toolbar dp-toolbar-between"><Tabs items={reportTabs.map((tab) => tab.label)} active={reportTabs.find((tab) => tab.value === view)?.label || 'By day'} onChange={changeView} /><select className="dp-field-control dp-report-period" value={period} onChange={(event) => setPeriod(event.target.value)}><option value="7d">Last 7 days</option><option value="30d">Last 30 days</option><option value="90d">Last 90 days</option></select></div>
           {loading ? <div className="dp-api-empty-state">Loading billing reports…</div> : rows.length ? <div className="dp-report-list">{rows.map((row, index) => <div className="dp-report-row" key={row.id || row.date || row.model || index}><div><strong>{row.date || row.day || row.model || row.description || row.action || 'AI activity'}</strong><small>{row.description || (row.replies != null ? `${row.replies} replies` : row.count != null ? `${row.count} events` : row.status || '')}</small></div><strong>{money(row.cost ?? row.amount ?? row.credits_used, currency)}</strong></div>)}</div> : <EmptyState icon={CalendarDays} title="Nothing to track yet" description="When your AI starts replying, usage and billing activity will be listed here." />}
-          {!isResourceConfigured('billingReports') && <p className="dp-form-note">Connect the billing reports endpoint to load detailed usage and payment history.</p>}
+          {!billingReportsApi.isConfigured() && <p className="dp-form-note">Connect the billing reports endpoint to load detailed usage and payment history.</p>}
         </Panel>
         <p className="dp-form-note">Report totals and individual activity are supplied by the billing API. No sample transactions are added.</p>
       </>}

@@ -1,7 +1,7 @@
+import { servicesApi } from '../../../services/dashboard/services.api.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Briefcase, Download, Plus, Upload } from 'lucide-react';
 import { EmptyState, FieldInput, FieldSelect, FieldTextarea, FormField, Modal, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
 import { downloadCsv, parseCsv } from '../../../utils/csv';
 
 const serviceHeaders = ['Name', 'Description', 'Link', 'Pricing Type', 'Price', 'Duration', 'Status'];
@@ -32,7 +32,7 @@ export default function ServicesPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('services');
+      const response = await servicesApi.request();
       setServices(serviceRecords(response));
     } catch (error) {
       setServices([]);
@@ -51,7 +51,7 @@ export default function ServicesPage() {
     event.preventDefault();
     setIsSaving(true);
     try {
-      await resourceRequest('services', {
+      await servicesApi.request({
         method: 'POST',
         body: {
           name: form.name.trim(),
@@ -92,7 +92,7 @@ export default function ServicesPage() {
         visibility: record.status || 'Visible',
       })).filter((service) => service.name);
       if (!imported.length) throw new Error('No services were imported. Check that your CSV has a Name or Service Name column.');
-      await resourceRequest('services', { method: 'POST', action: 'import', body: { services: imported } });
+      await servicesApi.request({ method: 'POST', action: 'import', body: { services: imported } });
       showNotice(`${imported.length} service${imported.length === 1 ? '' : 's'} imported.`);
       await loadServices();
     } catch (error) {

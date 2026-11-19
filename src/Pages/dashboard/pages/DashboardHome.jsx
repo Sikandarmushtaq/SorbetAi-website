@@ -1,10 +1,13 @@
+import { businessHoursApi } from '../../../services/dashboard/business-hours.api.js';
+import { dashboardOverviewApi } from '../../../services/dashboard/dashboard-overview.api.js';
+import { onboardingApi } from '../../../services/dashboard/onboarding.api.js';
+import './DashboardHome.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Bot, CalendarDays, Check, ChevronDown, ChevronUp, Clock3, CreditCard, MessageCircle, Package, ShoppingBag, Sparkles, Users } from 'lucide-react';
 import { PageHeader, Panel, StatCard, StatGrid, useNotice } from '../../../components/dashboard/common/DashboardUI';
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
-import { getCurrentUser, getCurrentWorkspace, isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
+import { getCurrentUser, getCurrentWorkspace } from '../../../services/dashboardApi';
 const setupSteps = [
   { id: 'brain', title: 'Set up your AI Brain', description: 'Tell the AI what your business offers and how it should help customers.', time: '~4 min', route: '/dashboard/brain?tab=setup' },
   { id: 'profile', title: 'Complete your profile', description: 'Add your account and business details.', time: '1 min', route: '/dashboard/profile' },
@@ -42,9 +45,9 @@ export default function DashboardHome() {
     setIsLoading(true);
     setLoadError('');
     const [overviewResult, onboardingResult, hoursResult, userResult, workspaceResult] = await Promise.allSettled([
-      resourceRequest('dashboardOverview'),
-      resourceRequest('onboarding'),
-      resourceRequest('businessHours'),
+      dashboardOverviewApi.request(),
+      onboardingApi.request(),
+      businessHoursApi.request(),
       getCurrentUser(),
       getCurrentWorkspace(),
     ]);
@@ -69,10 +72,10 @@ export default function DashboardHome() {
   const appName = workspace?.name || 'Bellbee';
 
   const markCurrentStepComplete = async () => {
-    if (!nextStep || !isResourceConfigured('onboarding')) return;
+    if (!nextStep || !onboardingApi.isConfigured()) return;
     setIsConfirmingHours(true);
     try {
-      await resourceRequest('onboarding', { method: 'PATCH', id: nextStep.id, body: { is_complete: true } });
+      await onboardingApi.request({ method: 'PATCH', id: nextStep.id, body: { is_complete: true } });
       setCompleted((current) => current.includes(nextStep.id) ? current : [...current, nextStep.id]);
       showNotice('Setup step marked complete.');
       await loadOverview();
@@ -86,7 +89,7 @@ export default function DashboardHome() {
   const confirmHours = async () => {
     setIsConfirmingHours(true);
     try {
-      await resourceRequest('businessHours', { method: 'POST', action: 'confirm-defaults', body: {} });
+      await businessHoursApi.request({ method: 'POST', action: 'confirm-defaults', body: {} });
       setBusinessHours((current) => current ? { ...current, is_default_example: false, is_example_hours: false, is_confirmed: true } : current);
       showNotice('Your opening hours have been confirmed.');
       await loadOverview();
@@ -114,7 +117,7 @@ export default function DashboardHome() {
         <div className="dp-onboarding-top"><div><span className="dp-section-kicker">GET STARTED</span><h2>Your setup checklist</h2><p>{isLoading ? 'Loading saved setup progress…' : `${doneCount} of ${setupSteps.length} steps complete · About 9 minutes in total`}</p></div><button type="button" className="dp-icon-action" onClick={() => setIsCollapsed((value) => !value)} aria-expanded={!isCollapsed} aria-label={isCollapsed ? 'Expand checklist' : 'Collapse checklist'}>{isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}</button></div>
         <div className="dp-progress-segments" aria-label={`${doneCount} of ${setupSteps.length} setup steps complete`}>{setupSteps.map((step) => <span className={isStepComplete(step) ? 'complete' : ''} key={step.id} />)}</div>
         {!isCollapsed && <>
-          {nextStep && <div className="dp-next-step-card"><div><span className="dp-section-kicker">NEXT STEP</span><h3>{nextStep.title}</h3><p>{nextStep.description}</p><small><Clock3 size={13} /> {nextStep.time}</small></div><div className="dp-next-step-actions"><button type="button" className="dp-primary-button" onClick={() => nextStep.plan ? openFreePlan() : navigate(nextStep.route)}>{nextStep.plan ? 'Start free plan' : 'Continue'} <ArrowRight size={14} /></button>{!nextStep.plan && <button type="button" className="dp-text-button" onClick={markCurrentStepComplete} disabled={isConfirmingHours || !isResourceConfigured('onboarding')}>{isConfirmingHours ? 'Saving…' : 'Mark complete'}</button>}</div></div>}
+          {nextStep && <div className="dp-next-step-card"><div><span className="dp-section-kicker">NEXT STEP</span><h3>{nextStep.title}</h3><p>{nextStep.description}</p><small><Clock3 size={13} /> {nextStep.time}</small></div><div className="dp-next-step-actions"><button type="button" className="dp-primary-button" onClick={() => nextStep.plan ? openFreePlan() : navigate(nextStep.route)}>{nextStep.plan ? 'Start free plan' : 'Continue'} <ArrowRight size={14} /></button>{!nextStep.plan && <button type="button" className="dp-text-button" onClick={markCurrentStepComplete} disabled={isConfirmingHours || !onboardingApi.isConfigured()}>{isConfirmingHours ? 'Saving…' : 'Mark complete'}</button>}</div></div>}
           {setupSteps.map((step, index) => {
             const isComplete = isStepComplete(step);
             return <div className={`dp-setup-step ${isComplete ? 'completed' : ''}`} key={step.id}>
@@ -124,7 +127,7 @@ export default function DashboardHome() {
               {isComplete ? <span className="dp-mark-complete">Complete</span> : <button type="button" className="dp-step-action" onClick={() => step.plan ? openFreePlan() : navigate(step.route)}>{step.plan ? 'Start' : 'Set up'} <ArrowRight size={14} /></button>}
             </div>;
           })}
-          {!isResourceConfigured('onboarding') && <p className="dp-form-note">Connect the onboarding API to load and save your checklist progress.</p>}
+          {!onboardingApi.isConfigured() && <p className="dp-form-note">Connect the onboarding API to load and save your checklist progress.</p>}
         </>}
       </Panel>
 

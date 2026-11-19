@@ -1,11 +1,11 @@
+import { analyticsApi } from '../../../services/dashboard/analytics.api.js';
+import './AnalyticsPage.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart3, Bot, CalendarDays, CreditCard, MessageCircle, ShoppingBag, Users,
 } from 'lucide-react';
 import { PageHeader, Panel, StatCard, StatGrid, Tabs } from '../../../components/dashboard/common/DashboardUI';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 const metricDefinitions = [
   { key: 'messages_received', label: 'Messages received', icon: MessageCircle },
   { key: 'ai_replies', label: 'AI replies', icon: Bot },
@@ -61,7 +61,7 @@ export default function AnalyticsPage() {
   const navigate = useNavigate();
 
   const loadAnalytics = useCallback(async () => {
-    if (!isResourceConfigured('analytics')) {
+    if (!analyticsApi.isConfigured()) {
       setAnalytics(null);
       setLoadError('The analytics API is not configured yet.');
       setIsLoading(false);
@@ -70,7 +70,7 @@ export default function AnalyticsPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('analytics', { query: { period: range, view: tab.toLowerCase() } });
+      const response = await analyticsApi.request({ query: { period: range, view: tab.toLowerCase() } });
       setAnalytics(response?.analytics || response);
     } catch (error) {
       setAnalytics(null);

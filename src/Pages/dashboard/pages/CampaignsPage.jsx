@@ -1,9 +1,11 @@
+import { campaignsApi } from '../../../services/dashboard/campaigns.api.js';
+import { customersApi } from '../../../services/dashboard/customers.api.js';
+import { templatesApi } from '../../../services/dashboard/templates.api.js';
+import './CampaignsPage.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Megaphone, Plus, Users } from 'lucide-react';
 import { EmptyState, FieldInput, FieldSelect, FormField, Modal, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 const campaignSteps = ['Campaign name', 'Template', 'Audience', 'Schedule', 'Review & send'];
 const emptyForm = { name: '', templateId: '', audienceType: 'all', label: '', scheduleType: 'now', scheduledAt: '' };
 
@@ -30,9 +32,9 @@ export default function CampaignsPage() {
     setIsLoading(true);
     setLoadError('');
     const requests = await Promise.allSettled([
-      resourceRequest('campaigns'),
-      resourceRequest('templates'),
-      isResourceConfigured('customers') ? resourceRequest('customers') : Promise.resolve(null),
+      campaignsApi.request(),
+      templatesApi.request(),
+      customersApi.isConfigured() ? customersApi.request() : Promise.resolve(null),
     ]);
     let nextLoadError = '';
     if (requests[0].status === 'fulfilled') setCampaigns(listFrom(requests[0].value, 'campaigns'));
@@ -78,7 +80,7 @@ export default function CampaignsPage() {
         audience: form.audienceType === 'all' ? { type: 'all_customers' } : { type: 'label', label: form.label },
         schedule: form.scheduleType === 'now' ? { type: 'now' } : { type: 'scheduled', scheduled_at: new Date(form.scheduledAt).toISOString() },
       };
-      const response = await resourceRequest('campaigns', { method: 'POST', body: payload });
+      const response = await campaignsApi.request({ method: 'POST', body: payload });
       const created = response?.campaign || response;
       if (created && (created.id || created.campaign_id)) setCampaigns((current) => [created, ...current]);
       setIsOpen(false);

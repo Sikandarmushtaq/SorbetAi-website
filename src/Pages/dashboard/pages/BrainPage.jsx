@@ -1,3 +1,15 @@
+import { bookingRulesApi } from '../../../services/dashboard/booking-rules.api.js';
+import { brainAssistantApi } from '../../../services/dashboard/brain-assistant.api.js';
+import { brainOverviewApi } from '../../../services/dashboard/brain-overview.api.js';
+import { brainSetupApi } from '../../../services/dashboard/brain-setup.api.js';
+import { businessHoursApi } from '../../../services/dashboard/business-hours.api.js';
+import { closedDatesApi } from '../../../services/dashboard/closed-dates.api.js';
+import { knowledgeApi } from '../../../services/dashboard/knowledge.api.js';
+import { locationsApi } from '../../../services/dashboard/locations.api.js';
+import { requestTypesApi } from '../../../services/dashboard/request-types.api.js';
+import { staffApi } from '../../../services/dashboard/staff.api.js';
+import { testAiApi } from '../../../services/dashboard/test-ai.api.js';
+import './BrainPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -10,8 +22,8 @@ import {
   PageHeader, Panel, Tabs, useNotice,
 } from '../../../components/dashboard/common/DashboardUI';
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
-import { getCurrentWorkspace, isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
+import { getCurrentWorkspace } from '../../../services/dashboardApi';
+import { deleteBrainResource } from '../../../services/dashboard/brain.api';
 const brainTabs = [
   { label: 'What AI knows', value: 'what-ai-knows' },
   { label: 'Setup', value: 'setup' },
@@ -106,7 +118,7 @@ export default function BrainPage() {
     setOverviewLoading(true);
     setOverviewError('');
     try {
-      const response = await resourceRequest('brainOverview');
+      const response = await brainOverviewApi.request();
       setOverview(response?.overview || response);
     } catch (error) {
       setOverview(null);
@@ -125,7 +137,7 @@ export default function BrainPage() {
       setSectionErrors((current) => ({ ...current, setup: '' }));
       try {
         const [setupResponse, workspaceResponse] = await Promise.all([
-          resourceRequest('brainSetup'),
+          brainSetupApi.request(),
           getCurrentWorkspace().catch(() => null),
         ]);
         if (!active) return;
@@ -147,7 +159,7 @@ export default function BrainPage() {
       setHoursLoading(true);
       setSectionErrors((current) => ({ ...current, hours: '' }));
       const [hoursResult, rulesResult, datesResult, staffResult] = await Promise.allSettled([
-        resourceRequest('businessHours'), resourceRequest('bookingRules'), resourceRequest('closedDates'), resourceRequest('staff'),
+        businessHoursApi.request(), bookingRulesApi.request(), closedDatesApi.request(), staffApi.request(),
       ]);
       if (!active) return;
       if (hoursResult.status === 'fulfilled') setHours(normaliseHours(hoursResult.value));
@@ -165,7 +177,7 @@ export default function BrainPage() {
     let active = true;
     if (tab !== 'locations') return undefined;
     setSectionErrors((current) => ({ ...current, locations: '' }));
-    resourceRequest('locations')
+    locationsApi.request()
       .then((response) => { if (active) setLocations(recordsFrom(response, 'locations')); })
       .catch((error) => { if (active) { setLocations([]); setSectionErrors((current) => ({ ...current, locations: error.message })); } });
     return () => { active = false; };
@@ -175,7 +187,7 @@ export default function BrainPage() {
     let active = true;
     if (tab !== 'knowledge') return undefined;
     setSectionErrors((current) => ({ ...current, knowledge: '' }));
-    resourceRequest('knowledge')
+    knowledgeApi.request()
       .then((response) => { if (active) setKnowledge(recordsFrom(response, 'documents')); })
       .catch((error) => { if (active) { setKnowledge([]); setSectionErrors((current) => ({ ...current, knowledge: error.message })); } });
     return () => { active = false; };
@@ -186,7 +198,7 @@ export default function BrainPage() {
     if (tab !== 'requests') return undefined;
     setIsRequestLoading(true);
     setRequestError('');
-    resourceRequest('requestTypes')
+    requestTypesApi.request()
       .then((response) => { if (active) setRequestTypes(recordsFrom(response, 'request_types')); })
       .catch((error) => { if (active) setRequestError(error.message); })
       .finally(() => { if (active) setIsRequestLoading(false); });
@@ -207,7 +219,7 @@ export default function BrainPage() {
     event.preventDefault();
     setSetupSaving(true);
     try {
-      await resourceRequest('brainSetup', { method: 'PATCH', body: setup });
+      await brainSetupApi.request({ method: 'PATCH', body: setup });
       showNotice('AI Brain setup saved.');
       await loadOverview();
     } catch (error) {
@@ -220,7 +232,7 @@ export default function BrainPage() {
   const saveHours = async () => {
     setHoursSaving(true);
     try {
-      await resourceRequest('businessHours', { method: 'PUT', body: { days: hours } });
+      await businessHoursApi.request({ method: 'PUT', body: { days: hours } });
       showNotice('Business hours saved.');
       await loadOverview();
     } catch (error) { setSectionErrors((current) => ({ ...current, hours: error.message })); }
@@ -230,7 +242,7 @@ export default function BrainPage() {
   const saveRules = async () => {
     setRulesSaving(true);
     try {
-      await resourceRequest('bookingRules', { method: 'PUT', body: rules });
+      await bookingRulesApi.request({ method: 'PUT', body: rules });
       showNotice('Booking rules saved.');
     } catch (error) { setSectionErrors((current) => ({ ...current, rules: error.message })); }
     finally { setRulesSaving(false); }
@@ -244,7 +256,7 @@ export default function BrainPage() {
   const addClosedDate = async (event) => {
     event.preventDefault();
     try {
-      const response = await resourceRequest('closedDates', { method: 'POST', body: closedDate });
+      const response = await closedDatesApi.request({ method: 'POST', body: closedDate });
       const created = response?.date || response;
       if (created && (created.id || created.date)) setClosedDates((current) => [...current, created]);
       setClosedDate({ date: '', reason: '' });
@@ -254,7 +266,7 @@ export default function BrainPage() {
   const deleteResource = async (resource, item, setter, key) => {
     const id = item.id || item[`${key}_id`] || item.date;
     try {
-      await resourceRequest(resource, { method: 'DELETE', id });
+      await deleteBrainResource(resource, id);
       setter((current) => current.filter((entry) => String(entry.id || entry[`${key}_id`]) !== String(id)));
     } catch (error) { showNotice(error.message); }
   };
@@ -263,7 +275,7 @@ export default function BrainPage() {
     event.preventDefault();
     setSavingModal(true);
     try {
-      const response = await resourceRequest('staff', { method: 'POST', body: { ...staffForm, role: staffForm.role.trim(), name: staffForm.name.trim(), phone: staffForm.phone.trim() } });
+      const response = await staffApi.request({ method: 'POST', body: { ...staffForm, role: staffForm.role.trim(), name: staffForm.name.trim(), phone: staffForm.phone.trim() } });
       const created = response?.staff_member || response;
       if (created && (created.id || created.staff_id)) setStaff((current) => [created, ...current]);
       setStaffForm(emptyStaff);
@@ -276,7 +288,7 @@ export default function BrainPage() {
     event.preventDefault();
     setSavingModal(true);
     try {
-      const response = await resourceRequest('locations', { method: 'POST', body: locationForm });
+      const response = await locationsApi.request({ method: 'POST', body: locationForm });
       const created = response?.location || response;
       if (created && (created.id || created.location_id)) setLocations((current) => [created, ...current]);
       setLocationForm(emptyLocation);
@@ -292,7 +304,7 @@ export default function BrainPage() {
     try {
       const payload = new FormData();
       payload.append('file', knowledgeFile);
-      const response = await resourceRequest('knowledge', { method: 'POST', body: payload });
+      const response = await knowledgeApi.request({ method: 'POST', body: payload });
       const created = response?.document || response;
       if (created && (created.id || created.document_id)) setKnowledge((current) => [created, ...current]);
       setKnowledgeFile(null);
@@ -306,7 +318,7 @@ export default function BrainPage() {
     setSearchingKnowledge(true);
     setSearchResult('');
     try {
-      const response = await resourceRequest('knowledge', { method: 'POST', action: 'search', body: { query: knowledgeSearch.trim() } });
+      const response = await knowledgeApi.request({ method: 'POST', action: 'search', body: { query: knowledgeSearch.trim() } });
       setSearchResult(response?.answer || response?.result || response?.message || 'No matching information was returned.');
     } catch (error) { setSearchResult(error.message); }
     finally { setSearchingKnowledge(false); }
@@ -317,7 +329,7 @@ export default function BrainPage() {
     setSavingModal(true);
     setRequestError('');
     try {
-      const response = await resourceRequest('requestTypes', { method: 'POST', body: { name: requestForm.name.trim(), details_to_collect: requestForm.detailsToCollect.trim(), collect_phone_from_whatsapp: true, what_happens_next: requestForm.whatHappensNext.trim() } });
+      const response = await requestTypesApi.request({ method: 'POST', body: { name: requestForm.name.trim(), details_to_collect: requestForm.detailsToCollect.trim(), collect_phone_from_whatsapp: true, what_happens_next: requestForm.whatHappensNext.trim() } });
       const created = response?.request_type || response;
       if (created && (created.id || created.request_type_id || created.name)) setRequestTypes((current) => [created, ...current]);
       setRequestForm(emptyRequest);
@@ -332,7 +344,7 @@ export default function BrainPage() {
     if (!message || assistantSending) return;
     setAssistantSending(true);
     try {
-      const response = await resourceRequest('brainAssistant', { method: 'POST', body: { message } });
+      const response = await brainAssistantApi.request({ method: 'POST', body: { message } });
       const reply = response?.reply || response?.answer || response?.response;
       if (!reply) throw new Error('The Brain Assistant API did not return a reply.');
       setAssistantMessages((current) => [...current, { role: 'user', text: message }, { role: 'assistant', text: reply }]);
@@ -344,7 +356,7 @@ export default function BrainPage() {
   const sendTestQuestion = async (message) => {
     setIsSendingTest(true);
     try {
-      const response = await resourceRequest('testAi', { method: 'POST', body: { message } });
+      const response = await testAiApi.request({ method: 'POST', body: { message } });
       const reply = response?.reply || response?.answer || response?.response;
       if (typeof reply !== 'string' || !reply.trim()) throw new Error('The AI API did not return a reply.');
       setTestMessages((current) => [...current, { role: 'user', text: message }, { role: 'assistant', text: reply }]);
@@ -503,7 +515,7 @@ function BrainAssistantPanel({ messages, value, onChange, onSubmit, isSending, t
       {(Array.isArray(suggestions) ? suggestions : []).slice(0, 3).map((suggestion, index) => <button type="button" className="dp-assistant-suggestion" key={index} onClick={() => onChange(typeof suggestion === 'string' ? suggestion : suggestion.prompt || suggestion.text)}>{typeof suggestion === 'string' ? suggestion : suggestion.label || suggestion.prompt || suggestion.text}</button>)}
     </div>
     <form className="dp-assistant-compose" onSubmit={onSubmit}><input className="dp-brain-assistant-input" value={value} onChange={(event) => onChange(event.target.value)} placeholder="Ask your AI…" disabled={noTokens} /><button type="submit" disabled={!value.trim() || isSending || noTokens} aria-label="Send message"><Send size={15} /></button></form>
-    <small className="dp-assistant-connect-note">{isResourceConfigured('brainAssistant') ? (isSending ? 'Thinking…' : 'Your changes are not saved until you approve them.') : 'Assistant API not connected yet.'}</small>
+    <small className="dp-assistant-connect-note">{brainAssistantApi.isConfigured() ? (isSending ? 'Thinking…' : 'Your changes are not saved until you approve them.') : 'Assistant API not connected yet.'}</small>
   </aside>;
 }
 

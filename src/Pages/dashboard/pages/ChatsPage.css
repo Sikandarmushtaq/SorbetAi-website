@@ -1,0 +1,227 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-chat-placeholder h3 {
+  margin: 0; color: var(--db-green); font-size: 15px; font-weight: 800;
+}
+
+.dp-chat-placeholder p {
+  max-width: 390px; margin: 7px 0 0; color: var(--db-muted); font-size: 10px; line-height: 1.7;
+}
+
+.dp-chat-layout {
+  display: grid; grid-template-columns: minmax(290px,.85fr) minmax(0,1.6fr); min-height: 545px; overflow: hidden; border: 1px solid var(--db-border); border-radius: 16px; background: var(--db-white);
+}
+
+.dp-chat-list {
+  display: flex; flex-direction: column; min-width: 0; padding: 14px; border-right: 1px solid var(--db-border);
+}
+
+.dp-chat-list-top {
+  display: flex; align-items: center; gap: 7px;
+}
+
+.dp-chat-list-top .dp-search-input {
+  flex: 1; width: auto;
+}
+
+.dp-chat-list > .dp-tabs {
+  margin-top: 12px; margin-bottom: 10px;
+}
+
+.dp-chat-list .dp-empty-state {
+  flex: 1; min-height: 270px; padding: 20px 4px;
+}
+
+.dp-chat-conversation {
+  display: grid; place-items: center; min-width: 0; padding: 24px; background: var(--db-cream);
+}
+
+.dp-chat-placeholder {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+
+@media (max-width: 760px) {
+.dp-chat-layout {
+  grid-template-columns: 1fr;
+}
+.dp-chat-list {
+  border-right: 0;
+}
+.dp-chat-conversation {
+  min-height: 240px; border-top: 1px solid var(--db-border);
+}
+
+}
+
+.dp-chat-list .dp-tabs {
+  margin-bottom: 10px;
+}
+
+.dp-chat-rows {
+  flex: 1; min-height: 0; overflow-y: auto;
+}
+
+.dp-chat-row {
+  display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px 4px; border: 0; border-bottom: 1px solid var(--db-border); background: transparent; color: var(--db-green); text-align: left;
+}
+
+.dp-chat-row:hover {
+  background: rgba(255,122,89,.08);
+}
+
+.dp-chat-row.active {
+  background: rgba(255,122,89,.08);
+}
+
+.dp-chat-row-copy {
+  display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0;
+}
+
+.dp-chat-row-copy strong {
+  overflow: hidden; color: var(--db-green); font-size: 9px; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.dp-chat-row-copy small {
+  overflow: hidden; color: var(--db-muted); font-size: 8px; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.dp-chat-row-meta {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px; color: var(--db-muted); font-size: 7px; white-space: nowrap;
+}
+
+.dp-chat-row-meta i {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--db-coral);
+}
+
+.dp-chat-layout .dp-chat-list {
+  min-height: 545px;
+}
+
+.dp-chat-layout .dp-chat-conversation {
+  display: block; padding: 0;
+}
+
+.dp-chat-active-view {
+  display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 545px;
+}
+
+.dp-chat-active-header {
+  display: flex; align-items: center; gap: 10px; padding: 14px 17px; border-bottom: 1px solid var(--db-border); background: var(--db-white);
+}
+
+.dp-chat-active-header > div {
+  display: flex; flex-direction: column; gap: 3px; min-width: 0;
+}
+
+.dp-chat-active-header strong {
+  color: var(--db-green); font-size: 10px;
+}
+
+.dp-chat-active-header small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-chat-back-button {
+  display: none; align-items: center; gap: 5px; margin-right: 4px; padding: 6px 8px; border: 1px solid var(--db-border); border-radius: 7px; background: transparent; color: var(--db-green); font-size: 8px;
+}
+
+.dp-chat-message-list {
+  display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 9px; min-height: 0; padding: 16px; overflow-y: auto; background: var(--db-cream);
+}
+
+.dp-chat-message-bubble {
+  max-width: min(78%, 520px); padding: 9px 11px; border: 1px solid var(--db-border); border-radius: 10px; background: var(--db-white); color: var(--db-green);
+}
+
+.dp-chat-message-bubble.outbound {
+  align-self: flex-end; border-color: rgba(255,122,89,.32); background: rgba(255,122,89,.1);
+}
+
+.dp-chat-message-bubble p {
+  margin: 0; font-size: 9px; line-height: 1.6; white-space: pre-wrap;
+}
+
+.dp-chat-message-bubble time {
+  display: block; margin-top: 5px; color: var(--db-muted); font-size: 7px; text-align: right;
+}
+
+.dp-chat-compose {
+  display: flex; align-items: center; gap: 7px; padding: 12px; border-top: 1px solid var(--db-border); background: var(--db-white);
+}
+
+.dp-chat-compose input {
+  flex: 1; min-width: 0; min-height: 38px; padding: 0 10px; border: 1px solid var(--db-border); border-radius: 8px; background: var(--db-white); color: var(--db-green); font-size: 9px;
+}
+
+.dp-chat-compose .dp-primary-button {
+  min-width: 39px; padding: 0 10px;
+}
+
+@media (max-width: 760px) {
+.dp-chat-layout {
+  display: block; min-height: 0; overflow: visible; border: 0; background: transparent;
+}
+.dp-chat-layout .dp-chat-list {
+  min-height: calc(100dvh - 220px); padding: 13px; border: 1px solid var(--db-border); border-radius: 14px; background: var(--db-white);
+}
+.dp-chat-layout.has-chat-selection .dp-chat-list {
+  display: none;
+}
+.dp-chat-layout .dp-chat-conversation {
+  display: none; min-height: calc(100dvh - 205px); border: 1px solid var(--db-border); border-radius: 14px; background: var(--db-white);
+}
+.dp-chat-layout.has-chat-selection .dp-chat-conversation {
+  display: block;
+}
+.dp-chat-layout.has-chat-selection .dp-chat-active-view {
+  min-height: calc(100dvh - 205px);
+}
+.dp-chat-back-button {
+  display: inline-flex;
+}
+.dp-chat-message-bubble {
+  max-width: 90%;
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-chat-compose input {
+  min-height: 42px;
+    font-size: 13px;
+}
+.dp-chat-placeholder p {
+  font-size: 11px;
+    line-height: 1.6;
+}
+.dp-chat-placeholder h3 {
+  font-size: 16px;
+}
+.dp-chat-row-copy strong {
+  font-size: 11px;
+}
+.dp-chat-row-copy small {
+  font-size: 10px;
+}
+.dp-chat-layout {
+  min-width: 0;
+    max-width: 100%;
+}
+.dp-chat-row-copy strong {
+  height: auto;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+}
+.dp-chat-row-copy small {
+  height: auto;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+}
+.dp-chat-row-copy {
+  min-width: 0;
+}
+
+}

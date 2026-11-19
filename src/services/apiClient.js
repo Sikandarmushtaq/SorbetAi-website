@@ -1,0 +1,366 @@
+const API_BASE_URL = (
+  process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'
+).replace(/\/+$/, '');
+
+const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1$/, '');
+const API_VERSION = '/api/v1';
+const ACCESS_TOKEN_KEYS = ['bellbee_access_token', 'access_token', 'accessToken'];
+const REFRESH_TOKEN_KEYS = ['bellbee_refresh_token', 'refresh_token', 'refreshToken'];
+
+const RESOURCE_PATHS = {
+  customers: process.env.REACT_APP_API_CUSTOMERS_PATH,
+  chats: process.env.REACT_APP_API_CHATS_PATH,
+  leads: process.env.REACT_APP_API_LEADS_PATH,
+  requestTypes: process.env.REACT_APP_API_REQUEST_TYPES_PATH,
+  templates: process.env.REACT_APP_API_TEMPLATES_PATH,
+  campaigns: process.env.REACT_APP_API_CAMPAIGNS_PATH,
+  suggestions: process.env.REACT_APP_API_SUGGESTIONS_PATH,
+  notifications: process.env.REACT_APP_API_NOTIFICATIONS_PATH,
+  automationSettings: process.env.REACT_APP_API_AUTOMATION_SETTINGS_PATH,
+  channels: process.env.REACT_APP_API_CHANNELS_PATH,
+  freePlanStatus: process.env.REACT_APP_API_FREE_PLAN_STATUS_PATH,
+  freePlanActivate: process.env.REACT_APP_API_FREE_PLAN_ACTIVATE_PATH,
+  testAi: process.env.REACT_APP_API_TEST_AI_PATH,
+  profile: process.env.REACT_APP_API_PROFILE_PATH,
+  businessAddress: process.env.REACT_APP_API_BUSINESS_ADDRESS_PATH,
+  orders: process.env.REACT_APP_API_ORDERS_PATH,
+  appointments: process.env.REACT_APP_API_APPOINTMENTS_PATH,
+  products: process.env.REACT_APP_API_PRODUCTS_PATH,
+  services: process.env.REACT_APP_API_SERVICES_PATH,
+  supportTickets: process.env.REACT_APP_API_SUPPORT_TICKETS_PATH,
+  dashboardOverview: process.env.REACT_APP_API_DASHBOARD_OVERVIEW_PATH,
+  onboarding: process.env.REACT_APP_API_ONBOARDING_PATH,
+  referrals: process.env.REACT_APP_API_REFERRALS_PATH,
+  billing: process.env.REACT_APP_API_BILLING_PATH,
+  billingReports: process.env.REACT_APP_API_BILLING_REPORTS_PATH,
+  plans: process.env.REACT_APP_API_PLANS_PATH,
+  paymentCollection: process.env.REACT_APP_API_PAYMENT_COLLECTION_PATH,
+  whatsappConnection: process.env.REACT_APP_API_WHATSAPP_CONNECTION_PATH,
+  websiteChat: process.env.REACT_APP_API_WEBSITE_CHAT_PATH,
+  socialConnections: process.env.REACT_APP_API_SOCIAL_CONNECTIONS_PATH,
+  businessProfile: process.env.REACT_APP_API_BUSINESS_PROFILE_PATH,
+  profileNotifications: process.env.REACT_APP_API_PROFILE_NOTIFICATIONS_PATH,
+  devices: process.env.REACT_APP_API_DEVICES_PATH,
+  deleteAccount: process.env.REACT_APP_API_DELETE_ACCOUNT_PATH,
+  brainOverview: process.env.REACT_APP_API_BRAIN_OVERVIEW_PATH,
+  brainSetup: process.env.REACT_APP_API_BRAIN_SETUP_PATH,
+  businessHours: process.env.REACT_APP_API_BUSINESS_HOURS_PATH,
+  bookingRules: process.env.REACT_APP_API_BOOKING_RULES_PATH,
+  closedDates: process.env.REACT_APP_API_CLOSED_DATES_PATH,
+  staff: process.env.REACT_APP_API_STAFF_PATH,
+  locations: process.env.REACT_APP_API_LOCATIONS_PATH,
+  knowledge: process.env.REACT_APP_API_KNOWLEDGE_PATH,
+  brainAssistant: process.env.REACT_APP_API_BRAIN_ASSISTANT_PATH,
+  analytics: process.env.REACT_APP_API_ANALYTICS_PATH,
+};
+
+export class DashboardApiError extends Error {
+  constructor(message, code = 'DASHBOARD_API_ERROR', status = 0, endpoint = '', errors = null) {
+    super(message);
+    this.name = 'DashboardApiError';
+    this.code = code;
+    this.status = status;
+    this.endpoint = endpoint;
+    this.errors = errors;
+  }
+}
+
+let refreshPromise = null;
+
+function getStorage() {
+  return typeof window !== 'undefined' ? window.localStorage : null;
+}
+
+export function getStoredToken(type = 'access') {
+  const storage = getStorage();
+  if (!storage) return '';
+  const keys = type === 'refresh' ? REFRESH_TOKEN_KEYS : ACCESS_TOKEN_KEYS;
+  for (const key of keys) {
+    const value = storage.getItem(key);
+    if (value) return value;
+  }
+  return '';
+}
+
+export function storeSessionTokens(tokens, { rotated = false } = {}) {
+  const storage = getStorage();
+  if (!storage) throw new DashboardApiError('Browser storage is unavailable.', 'STORAGE_UNAVAILABLE');
+  if (!tokens?.access_token || !tokens?.refresh_token) {
+    throw new DashboardApiError('The authentication response did not include both tokens.', 'TOKENS_MISSING');
+  }
+
+  storage.setItem('bellbee_access_token', tokens.access_token);
+  storage.setItem('bellbee_refresh_token', tokens.refresh_token);
+  [...ACCESS_TOKEN_KEYS.slice(1), ...REFRESH_TOKEN_KEYS.slice(1)].forEach((key) => storage.removeItem(key));
+  window.dispatchEvent(new CustomEvent('bellbee:session-updated', { detail: { rotated } }));
+}
+
+export function clearStoredSession() {
+  const storage = getStorage();
+  if (!storage) return;
+  [...ACCESS_TOKEN_KEYS, ...REFRESH_TOKEN_KEYS].forEach((key) => storage.removeItem(key));
+  storage.removeItem('bellbee_user');
+  storage.removeItem('bellbee_google_profile');
+  storage.removeItem('bellbee_pending_verification_email');
+  window.dispatchEvent(new Event('bellbee:session-updated'));
+}
+
+export function isSessionStorageKey(key) {
+  return key === null || ACCESS_TOKEN_KEYS.includes(key) || REFRESH_TOKEN_KEYS.includes(key);
+}
+
+export function readJwtPayload(token) {
+  try {
+    const encoded = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(encoded));
+  } catch {
+    return null;
+  }
+}
+
+export function accessTokenExpiry(token) {
+  const expiry = readJwtPayload(token)?.exp;
+  return Number.isFinite(expiry) ? expiry * 1000 : null;
+}
+
+export function hasAccessToken() {
+  return Boolean(getStoredToken('access'));
+}
+
+function isPublicAuthEndpoint(path) {
+  return /\/api\/v1\/auth\/(signup|login|google|verify-email|resend-verification|refresh|logout|password\/forgot|password\/reset)$/.test(path);
+}
+
+async function readResponse(response) {
+  const text = await response.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text };
+  }
+}
+
+function logResponse({ endpoint, method, response, payload }) {
+  const details = {
+    method,
+    endpoint,
+    status: response.status,
+    success: response.ok && payload?.success !== false,
+    code: payload?.code || 'UNKNOWN',
+    message: payload?.message || '',
+  };
+  if (details.success) console.info('[Bellbee API]', details);
+  else console.error('[Bellbee API]', details);
+}
+
+function logNetworkError(endpoint, method, error) {
+  console.error('[Bellbee API]', {
+    method,
+    endpoint,
+    status: 0,
+    success: false,
+    code: 'NETWORK_ERROR',
+    message: error?.message || 'Network request failed.',
+  });
+}
+
+function unwrapResponse(payload, status, endpoint) {
+  if (payload && typeof payload === 'object' && payload.success === false) {
+    throw new DashboardApiError(
+      payload.message || 'The request could not be completed.',
+      payload.code || 'REQUEST_FAILED',
+      status,
+      endpoint,
+      payload?.errors,
+    );
+  }
+  return payload && typeof payload === 'object' && 'data' in payload ? payload.data : payload;
+}
+
+async function refreshSessionToken(rejectedAccessToken = '') {
+  const currentAccessToken = getStoredToken('access');
+  if (currentAccessToken && rejectedAccessToken && currentAccessToken !== rejectedAccessToken) {
+    return currentAccessToken;
+  }
+  if (refreshPromise) return refreshPromise;
+
+  const refreshToken = getStoredToken('refresh');
+  if (!refreshToken) return '';
+
+  const rotate = async () => {
+    // Another tab may have rotated or cleared the session while we waited.
+    if (getStoredToken('refresh') !== refreshToken) return getStoredToken('access');
+
+    const endpoint = `${API_VERSION}/auth/refresh`;
+    const data = await performRequest(endpoint, {
+      method: 'POST',
+      body: { refresh_token: refreshToken },
+    }, '', false).catch((error) => {
+      if (error.status !== 401) throw error;
+      if (getStoredToken('refresh') === refreshToken) clearStoredSession();
+      return null;
+    });
+
+    if (!data || getStoredToken('refresh') !== refreshToken) return getStoredToken('access');
+    storeSessionTokens(data, { rotated: true });
+    return data.access_token;
+  };
+
+  // The backend treats reuse of a rotated token as session revocation.
+  const locks = typeof navigator !== 'undefined' ? navigator.locks : null;
+  refreshPromise = (locks ? locks.request('bellbee:refresh-session', rotate) : rotate())
+    .finally(() => { refreshPromise = null; });
+  return refreshPromise;
+}
+
+async function performRequest(path, options, tokenOverride, hasRetried) {
+  const endpoint = path.startsWith('/') ? path : `/${path}`;
+  const method = String(options.method || 'GET').toUpperCase();
+  const headers = new Headers(options.headers || {});
+  const usesCustomAuthorization = headers.has('Authorization');
+  headers.set('Accept', 'application/json');
+
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+  if (options.body !== undefined && !isFormData) headers.set('Content-Type', 'application/json');
+
+  const token = tokenOverride || getStoredToken('access');
+  if (token && !headers.has('Authorization') && !isPublicAuthEndpoint(endpoint)) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  let response;
+  let payload;
+  try {
+    response = await fetch(`${API_ORIGIN}${endpoint}`, {
+      ...options,
+      method,
+      headers,
+      body: options.body !== undefined && !isFormData && typeof options.body !== 'string'
+        ? JSON.stringify(options.body)
+        : options.body,
+    });
+    payload = await readResponse(response);
+    logResponse({ endpoint, method, response, payload });
+  } catch (error) {
+    logNetworkError(endpoint, method, error);
+    throw new DashboardApiError(
+      error?.message || 'Unable to connect to the backend.',
+      'NETWORK_ERROR',
+      0,
+      endpoint,
+    );
+  }
+
+  if (response.status === 401 && !isPublicAuthEndpoint(endpoint) && !usesCustomAuthorization) {
+    const newAccessToken = hasRetried ? '' : await refreshSessionToken(token);
+    if (newAccessToken) return performRequest(path, options, newAccessToken, true);
+    if (token && getStoredToken('access') === token) clearStoredSession();
+  }
+
+  if (!response.ok) {
+    throw new DashboardApiError(
+      payload?.message || `Request failed (${response.status}).`,
+      payload?.code || 'HTTP_ERROR',
+      response.status,
+      endpoint,
+      payload?.errors,
+    );
+  }
+
+  return unwrapResponse(payload, response.status, endpoint);
+}
+
+export async function apiRequest(path, options = {}) {
+  if (!path) {
+    throw new DashboardApiError('An API endpoint is required.', 'ENDPOINT_REQUIRED');
+  }
+  return performRequest(path, options, '', false);
+}
+
+export function getResourcePath(resource) {
+  return RESOURCE_PATHS[resource] || '';
+}
+
+export function isResourceConfigured(resource) {
+  return Boolean(getResourcePath(resource));
+}
+
+export async function resourceRequest(resource, options = {}) {
+  const basePath = getResourcePath(resource);
+  if (!basePath) {
+    throw new DashboardApiError(
+      `The ${resource} API endpoint is not configured. Add its exact backend path to the environment file.`,
+      'ENDPOINT_NOT_CONFIGURED',
+    );
+  }
+
+  const { method = 'GET', id, action, query, body, headers } = options;
+  const suffix = [id, action].filter((part) => part !== undefined && part !== null && part !== '')
+    .map((part) => encodeURIComponent(String(part)))
+    .join('/');
+  const url = new URL(
+    `${basePath.replace(/\/$/, '')}${suffix ? `/${suffix}` : ''}`,
+    `${API_ORIGIN}/`,
+  );
+
+  if (query) {
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        url.searchParams.set(key, String(value));
+      }
+    });
+  }
+
+  return apiRequest(`${url.pathname}${url.search}`, { method, body, headers });
+}
+
+export function createResourceApi(resource) {
+  return {
+    resource,
+    isConfigured: () => isResourceConfigured(resource),
+    request: (options = {}) => resourceRequest(resource, options),
+  };
+}
+
+export async function refreshAccessToken() {
+  return refreshSessionToken();
+}
+
+export async function getCurrentUser() {
+  if (!hasAccessToken() && !getStoredToken('refresh')) return null;
+  const accessToken = getStoredToken('access');
+  const expiry = accessTokenExpiry(accessToken);
+  if (!accessToken || (expiry !== null && expiry <= Date.now())) {
+    const refreshed = await refreshSessionToken(accessToken);
+    if (!refreshed) {
+      if (accessToken && getStoredToken('access') === accessToken) clearStoredSession();
+      return null;
+    }
+  }
+  const response = await apiRequest(`${API_VERSION}/auth/me`);
+  const user = response?.user ?? response;
+  if (!user?.id) {
+    throw new DashboardApiError('The backend did not return a valid user profile.', 'USER_MISSING');
+  }
+  return user;
+}
+
+export async function getCurrentWorkspace() {
+  return apiRequest(`${API_VERSION}/workspaces/current`);
+}
+
+export async function logoutSession() {
+  const refreshToken = getStoredToken('refresh');
+  clearStoredSession();
+  if (refreshToken) {
+    await apiRequest(`${API_VERSION}/auth/logout`, {
+      method: 'POST',
+      body: { refresh_token: refreshToken },
+    });
+  }
+}
+
+export function getApiBaseUrl() {
+  return API_BASE_URL;
+}

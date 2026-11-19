@@ -1,0 +1,111 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-info-card {
+  display: flex; align-items: flex-start; gap: 12px; margin-top: 13px; padding: 16px; border: 1px solid rgba(244,201,93,.5); border-radius: 13px; background: #fff5d9;
+}
+
+.dp-info-card-icon {
+  display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 35px; border-radius: 10px; background: var(--db-yellow); color: var(--db-green);
+}
+
+.dp-info-card h3 {
+  margin: 0; color: var(--db-green); font-size: 11px; font-weight: 800;
+}
+
+.dp-info-card p {
+  margin: 5px 0 0; color: rgba(16,55,42,.72); font-size: 9px; line-height: 1.7;
+}
+
+.dp-info-card .dp-text-button {
+  margin-top: 9px;
+}
+
+.dp-template-preview {
+  display: flex; flex-direction: column; gap: 8px; padding: 13px; border: 1px solid var(--db-border); border-radius: 10px; background: #f3efe5;
+}
+
+.dp-template-preview strong {
+  font-size: 10px;
+}
+
+.dp-template-preview p {
+  min-height: 50px; margin: 0; padding: 10px; border-radius: 9px; background: var(--db-white); color: var(--db-green); font-size: 9px; line-height: 1.6; white-space: pre-wrap;
+}
+
+.dp-template-preview small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-template-preview-button {
+  align-self: stretch; padding: 8px; border: 1px solid var(--db-border); border-radius: 8px; color: var(--db-green); font-size: 9px; text-align: center;
+}
+
+.dp-template-list-panel {
+  padding: 8px 17px;
+}
+
+.dp-template-list {
+  width: 100%;
+}
+
+.dp-template-row {
+  display: flex; align-items: center; gap: 11px; padding: 13px 0; border-bottom: 1px solid var(--db-border);
+}
+
+.dp-template-row:last-child {
+  border-bottom: 0;
+}
+
+.dp-template-row-icon {
+  display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px; border-radius: 10px; background: rgba(205,189,255,.32); color: var(--db-green);
+}
+
+.dp-template-row-main {
+  display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0;
+}
+
+.dp-template-row-main strong {
+  color: var(--db-green); font-size: 10px;
+}
+
+.dp-template-row-main small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-template-rejection {
+  margin: 3px 0 0; color: #a63c32; font-size: 8px;
+}
+
+.dp-template-info-card {
+  margin-bottom: 15px;
+}
+
+.dp-template-info-card .dp-approved-word {
+  color: #34724b;
+}
+
+.dp-template-info-card code {
+  padding: 2px 5px; border: 1px solid var(--db-border); border-radius: 5px; background: rgba(16,55,42,.06); color: var(--db-green); font-family: monospace; font-size: 9px;
+}
+
+@media (max-width: 480px) {
+.dp-template-row {
+  flex-wrap: wrap;
+}
+.dp-template-row-main {
+  flex-basis: calc(100% - 55px);
+}
+.dp-template-row > .dp-status-pill {
+  margin-left: 47px;
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-template-row-main strong {
+  font-size: 11px;
+}
+.dp-template-row-main small {
+  font-size: 10px;
+}
+
+}

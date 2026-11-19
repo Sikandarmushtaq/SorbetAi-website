@@ -1,3 +1,4 @@
+import './MobileMoreMenu.css';
 import { ChevronRight } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { navigationGroups, utilityItems } from './navigation';

@@ -1,0 +1,12 @@
+.auth-google {
+  width: 100%;
+  margin-block: 10px;
+}
+
+.auth-google [role='status'], .auth-google [role='alert'] {
+  margin: 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.auth-google [role='alert'] { color: #a53f31; }

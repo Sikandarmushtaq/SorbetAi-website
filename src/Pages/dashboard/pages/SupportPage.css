@@ -1,0 +1,82 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-support-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+
+.dp-ticket-preview {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 210px; padding: 20px; border-left: 1px solid var(--db-border); color: #a5684d; text-align: center;
+}
+
+.dp-ticket-preview h3 {
+  margin: 10px 0 0; color: var(--db-green); font-size: 14px;
+}
+
+.dp-ticket-preview p {
+  max-width: 270px; margin: 6px 0 0; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+}
+
+.dp-ticket-preview small {
+  margin-top: 8px; color: var(--db-muted); font-size: 8px;
+}
+
+.dp-ticket-list {
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.dp-ticket-row {
+  display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px; border: 1px solid var(--db-border); border-radius: 9px; background: transparent; color: #a5684d; text-align: left;
+}
+
+.dp-ticket-row.active {
+  background: #f8f3e9; border-color: var(--db-coral);
+}
+
+.dp-ticket-row:hover {
+  background: #f8f3e9; border-color: var(--db-coral);
+}
+
+.dp-ticket-row span {
+  display: flex; flex-direction: column; gap: 3px;
+}
+
+.dp-ticket-row strong {
+  color: var(--db-green); font-size: 9px;
+}
+
+.dp-ticket-row small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+@media (max-width: 760px) {
+.dp-support-grid {
+  grid-template-columns: 1fr;
+}
+.dp-ticket-preview {
+  min-height: 170px; border-top: 1px solid var(--db-border); border-left: 0;
+}
+
+}
+
+.dp-ticket-reply {
+  margin-top: 12px; padding: 10px; border: 1px solid var(--db-border); border-radius: 9px; background: var(--db-cream);
+}
+
+.dp-ticket-reply strong {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-ticket-reply small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-ticket-reply p {
+  color: var(--db-green); font-size: 9px; white-space: pre-wrap;
+}
+
+@media (max-width: 760px) {
+.dp-ticket-preview p {
+  font-size: 11px;
+    line-height: 1.6;
+}
+
+}

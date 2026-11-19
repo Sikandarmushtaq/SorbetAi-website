@@ -1,0 +1,109 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.db-global-alerts {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; margin: 0 0 25px;
+}
+
+.db-alert {
+  display: flex; align-items: center; gap: 10px; min-width: 0; padding: 11px 12px; border: 1px solid rgba(16,55,42,.07); border-radius: 13px;
+}
+
+.db-whatsapp-alert {
+  background: #f9e4d9;
+}
+
+.db-plan-alert {
+  background: #eee8ff;
+}
+
+.db-alert-icon {
+  display: grid; place-items: center; width: 33px; height: 33px; flex: 0 0 33px; border-radius: 10px; background: rgba(255,250,240,.75); color: var(--db-green);
+}
+
+.db-alert-content {
+  display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0;
+}
+
+.db-alert-content strong {
+  color: var(--db-green); font-size: 10px; font-weight: 800;
+}
+
+.db-alert-content span {
+  color: rgba(16,55,42,.68); font-size: 9px; line-height: 1.45;
+}
+
+.db-alert-action {
+  display: inline-flex; align-items: center; gap: 5px; min-height: 31px; flex: 0 0 auto; padding: 0 9px; border: 0; border-radius: 8px; background: var(--db-green); color: var(--db-white); font-size: 9px; font-weight: 800;
+}
+
+.db-alert-close {
+  display: grid; place-items: center; width: 25px; height: 25px; flex: 0 0 25px; border: 0; border-radius: 7px; background: transparent; color: rgba(16,55,42,.55);
+}
+
+.db-alert-close:hover {
+  background: rgba(16,55,42,.08); color: var(--db-green);
+}
+
+@media (max-width: 1100px) {
+.db-global-alerts {
+  grid-template-columns: 1fr;
+}
+
+}
+
+@media (max-width: 760px) {
+.db-global-alerts {
+  gap: 8px; margin-bottom: 18px;
+}
+.db-alert {
+  gap: 8px; padding: 9px;
+}
+.db-alert-content strong {
+  font-size: 9px;
+}
+.db-alert-content span {
+  font-size: 8px;
+}
+.db-alert-action {
+  min-height: 29px; padding: 0 8px; font-size: 8px;
+}
+
+}
+
+@media (max-width: 480px) {
+.db-alert {
+  align-items: flex-start; flex-wrap: wrap;
+}
+.db-alert-content {
+  flex-basis: calc(100% - 48px);
+}
+.db-alert-action {
+  margin-left: 41px;
+}
+.db-alert-close {
+  margin-left: auto;
+}
+
+}
+
+@media (max-width: 760px) {
+.db-global-alerts {
+  margin: 0 0 14px;
+}
+.db-alert {
+  align-items: flex-start;
+}
+.db-alert-content {
+  flex-basis: auto;
+}
+.db-alert-action {
+  margin-left: 42px;
+}
+
+}
+
+@media (max-width: 480px) {
+.db-alert-content {
+  flex-basis: calc(100% - 48px);
+}
+
+}

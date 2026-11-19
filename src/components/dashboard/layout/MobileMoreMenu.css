@@ -1,0 +1,35 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.db-mobile-more-menu {
+  display: none;
+}
+
+@media (max-width: 760px) {
+.db-mobile-more-menu {
+  display: block; padding-bottom: 18px;
+}
+.db-mobile-more-group {
+  margin-bottom: 13px;
+}
+.db-mobile-more-group > p {
+  margin: 0 0 6px; color: var(--db-muted); font-size: 8px; font-weight: 850; letter-spacing: 1.15px; text-transform: uppercase;
+}
+.db-mobile-more-list {
+  overflow: hidden; border: 1px solid var(--db-border); border-radius: 12px; background: var(--db-white);
+}
+.db-mobile-more-link {
+  display: flex; align-items: center; gap: 10px; min-height: 43px; padding: 0 12px; border-bottom: 1px solid var(--db-border); color: var(--db-green); text-decoration: none; font-size: 10px; font-weight: 650;
+}
+.db-mobile-more-link:last-child {
+  border-bottom: 0;
+}
+.db-mobile-more-link > span {
+  flex: 1;
+}
+.db-mobile-more-link > svg:first-child {
+  color: var(--db-muted);
+}
+.db-mobile-more-link.active {
+  background: rgba(255,122,89,.09); color: var(--db-green);
+}
+
+}

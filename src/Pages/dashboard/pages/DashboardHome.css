@@ -1,0 +1,234 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-onboarding-card {
+  padding: 21px;
+}
+
+.dp-onboarding-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+
+.dp-onboarding-top h2 {
+  margin: 0; color: var(--db-green); font-size: 19px; font-weight: 800;
+}
+
+.dp-onboarding-top p {
+  margin: 5px 0 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-setup-step {
+  display: flex; align-items: center; gap: 11px; min-width: 0; padding: 11px 2px; border-bottom: 1px solid rgba(16,55,42,.07);
+}
+
+.dp-setup-step:last-child {
+  border-bottom: 0;
+}
+
+.dp-step-number {
+  display: grid; place-items: center; width: 29px; height: 29px; flex: 0 0 29px; border: 1px solid var(--db-border); border-radius: 9px; background: var(--db-cream); font-size: 9px; font-weight: 800;
+}
+
+.dp-setup-step.completed .dp-step-number {
+  border-color: #dcebd9; background: #dcebd9; color: #34724b;
+}
+
+.dp-step-content {
+  flex: 1; min-width: 0;
+}
+
+.dp-step-content strong {
+  color: var(--db-green); font-size: 10px; font-weight: 800;
+}
+
+.dp-step-content p {
+  margin: 3px 0 0; color: var(--db-muted); font-size: 8px; line-height: 1.5;
+}
+
+.dp-step-time {
+  flex-shrink: 0; color: var(--db-muted); font-size: 8px;
+}
+
+.dp-step-action {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 28px; flex-shrink: 0; padding: 0 9px; border: 0; border-radius: 7px; background: #f8e1d6; color: var(--db-green); font-size: 8px; font-weight: 800;
+}
+
+.dp-mark-complete {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 28px; flex-shrink: 0; padding: 0 9px; border: 0; border-radius: 7px; background: #f8e1d6; color: var(--db-green); font-size: 8px; font-weight: 800;
+}
+
+.dp-mark-complete {
+  background: #e0efdf;
+}
+
+.dp-home-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 14px;
+}
+
+.dp-opening-hours {
+  margin: 0;
+}
+
+.dp-hours-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--db-border); color: var(--db-muted); font-size: 9px;
+}
+
+.dp-hours-row strong {
+  color: var(--db-green); font-size: 9px;
+}
+
+.dp-opening-hours .dp-text-button {
+  margin-top: 15px;
+}
+
+.dp-early-bird {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; min-height: 205px; padding: 20px; overflow: hidden; border-radius: 16px; background: var(--db-green); color: var(--db-white);
+}
+
+.dp-early-bird::after {
+  position: absolute; right: -47px; bottom: -72px; width: 205px; height: 205px; border: 1px solid rgba(255,250,240,.13); border-radius: 50%; content: "";
+}
+
+.dp-early-bird-icon {
+  display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 12px; border-radius: 10px; background: var(--db-yellow); color: var(--db-green);
+}
+
+.dp-early-bird .dp-section-kicker {
+  color: var(--db-yellow);
+}
+
+.dp-early-bird h2 {
+  position: relative; z-index: 1; max-width: 310px; margin: 0; color: var(--db-white); font-size: 19px; font-weight: 800;
+}
+
+.dp-early-bird p {
+  position: relative; z-index: 1; max-width: 380px; margin: 8px 0 14px; color: rgba(255,250,240,.72); font-size: 9px; line-height: 1.6;
+}
+
+.dp-early-bird button {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 11px; border: 0; border-radius: 8px; background: var(--db-coral); color: var(--db-green); font-size: 9px; font-weight: 800;
+}
+
+.dp-home-shortcuts {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px;
+}
+
+.dp-home-shortcuts button {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 0 10px; border: 1px solid var(--db-border); border-radius: 9px; background: var(--db-white); color: var(--db-green); font-size: 9px; font-weight: 700;
+}
+
+@media (max-width: 760px) {
+.dp-home-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+@media (max-width: 480px) {
+.dp-onboarding-card {
+  padding: 14px;
+}
+.dp-onboarding-top h2 {
+  font-size: 16px;
+}
+.dp-setup-step {
+  flex-wrap: wrap; gap: 8px;
+}
+.dp-step-content {
+  flex-basis: calc(100% - 42px);
+}
+.dp-step-time {
+  margin-left: 37px;
+}
+.dp-step-action {
+  margin-left: auto;
+}
+.dp-mark-complete {
+  margin-left: auto;
+}
+
+}
+
+.dp-progress-segments {
+  display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 5px; margin: 13px 0 15px;
+}
+
+.dp-progress-segments span {
+  height: 6px; border-radius: 20px; background: var(--db-border);
+}
+
+.dp-progress-segments span.complete {
+  background: var(--db-coral);
+}
+
+.dp-next-step-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 13px 0; padding: 15px; border: 1px solid rgba(255,122,89,.35); border-radius: 12px; background: rgba(255,122,89,.07);
+}
+
+.dp-next-step-card h3 {
+  margin: 5px 0 4px; color: var(--db-green); font-size: 13px; font-weight: 850;
+}
+
+.dp-next-step-card p {
+  margin: 0 0 8px; color: var(--db-muted); font-size: 9px; line-height: 1.5;
+}
+
+.dp-next-step-card small {
+  display: inline-flex; align-items: center; gap: 5px; color: var(--db-muted); font-size: 8px;
+}
+
+.dp-next-step-actions {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex: 0 0 auto;
+}
+
+.dp-opening-hours-confirmation {
+  margin-bottom: 15px;
+}
+
+.dp-hours-confirmation-list {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 16px; margin: 10px 0 14px;
+}
+
+.dp-opening-hours-actions {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+
+@media (max-width: 760px) {
+.dp-next-step-card {
+  align-items: stretch; flex-direction: column;
+}
+.dp-next-step-actions {
+  align-items: stretch;
+}
+.dp-next-step-actions .dp-primary-button {
+  width: 100%; justify-content: center;
+}
+.dp-next-step-actions .dp-text-button {
+  width: 100%; justify-content: center;
+}
+.dp-hours-confirmation-list {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.dp-opening-hours-confirmation .dp-opening-hours-actions {
+  margin-top: 11px;
+}
+
+@media (max-width: 760px) {
+.dp-step-content p {
+  font-size: 11px;
+    line-height: 1.6;
+}
+.dp-step-time {
+  font-size: 11px;
+    line-height: 1.6;
+}
+
+}
+
+@media (max-width: 420px) {
+.dp-next-step-card {
+  min-width: 0;
+}
+
+}

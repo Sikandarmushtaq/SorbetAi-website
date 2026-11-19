@@ -1,3 +1,5 @@
+import { billingApi } from '../../../services/dashboard/billing.api.js';
+import './BillingPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -6,8 +8,6 @@ import {
 } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 const activePlanFeatures = [
   'Appointment Booking', 'Order Management',
   'Understands your menus, price lists & documents',
@@ -36,7 +36,7 @@ export default function BillingPage() {
   const [loadError, setLoadError] = useState('');
 
   const loadBilling = useCallback(async () => {
-    if (!isResourceConfigured('billing')) {
+    if (!billingApi.isConfigured()) {
       setBilling(null);
       setLoadError('Billing API is not configured yet. Connect the billing endpoint to show live subscription and credit details.');
       return;
@@ -44,7 +44,7 @@ export default function BillingPage() {
     setLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('billing');
+      const response = await billingApi.request();
       setBilling(response?.billing || response);
     } catch (error) { setLoadError(error.message); setBilling(null); }
     finally { setLoading(false); }
@@ -116,7 +116,7 @@ export default function BillingPage() {
         <Panel><div className="dp-panel-heading"><div><span className="dp-section-kicker">PAYMENT HISTORY</span><h2>Billing reports</h2></div><Wallet size={20} /></div><p className="dp-panel-description">Review AI credit usage, daily activity and billing history.</p><button type="button" className="dp-secondary-button" onClick={() => navigate('/dashboard/billing/reports')}>View reports <ArrowRight size={14} /></button></Panel>
         <Panel><div className="dp-panel-heading"><div><span className="dp-section-kicker">PAYMENT COLLECTION</span><h2>Customer payments</h2></div><CreditCard size={20} /></div><p className="dp-panel-description">Connect and manage payment providers for customer collections.</p><button type="button" className="dp-secondary-button" onClick={() => navigate('/dashboard/billing/payment-collection')}>Payment collection <ArrowRight size={14} /></button></Panel>
       </div>
-      {!isResourceConfigured('billing') && <p className="dp-form-note">Billing is ready for API integration. Configure REACT_APP_API_BILLING_PATH to load real subscription, renewal and credit information.</p>}
+      {!billingApi.isConfigured() && <p className="dp-form-note">Billing is ready for API integration. Configure REACT_APP_API_BILLING_PATH to load real subscription, renewal and credit information.</p>}
     </>
   );
 }

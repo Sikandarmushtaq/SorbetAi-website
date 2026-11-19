@@ -1,9 +1,10 @@
+import { leadsApi } from '../../../services/dashboard/leads.api.js';
+import { requestTypesApi } from '../../../services/dashboard/request-types.api.js';
+import './LeadsPage.css';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Check, MoreHorizontal, Target } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 const leadTabs = [
   { label: 'New', value: 'new' },
   { label: 'Contacted', value: 'contacted' },
@@ -31,12 +32,12 @@ export default function LeadsPage() {
 
   useEffect(() => {
     let active = true;
-    if (!isResourceConfigured('requestTypes')) {
+    if (!requestTypesApi.isConfigured()) {
       setTypesLoaded(true);
       return () => { active = false; };
     }
     setTypesLoaded(false);
-    resourceRequest('requestTypes')
+    requestTypesApi.request()
       .then((response) => { if (active) setRequestTypes(listFrom(response, 'request_types')); })
       .catch((error) => { if (active) setLoadError(error.message); })
       .finally(() => { if (active) setTypesLoaded(true); });
@@ -48,11 +49,11 @@ export default function LeadsPage() {
     setLoadError('');
     setLeadsLoaded(false);
     setLeads([]);
-    if (!isResourceConfigured('leads')) {
+    if (!leadsApi.isConfigured()) {
       setLeadsLoaded(true);
       return () => { active = false; };
     }
-    resourceRequest('leads', { query: { status: activeStatus } })
+    leadsApi.request({ query: { status: activeStatus } })
       .then((response) => { if (active) setLeads(listFrom(response, 'leads')); })
       .catch((error) => { if (active) setLoadError(error.message); })
       .finally(() => { if (active) setLeadsLoaded(true); });
@@ -72,7 +73,7 @@ export default function LeadsPage() {
   const updateStatus = async (lead, status) => {
     const id = lead.id || lead.lead_id;
     try {
-      await resourceRequest('leads', { method: 'PATCH', id, body: { status } });
+      await leadsApi.request({ method: 'PATCH', id, body: { status } });
       setLeads((current) => current.map((item) => String(item.id || item.lead_id) === String(id) ? { ...item, status } : item));
       showNotice(`Lead moved to ${leadTabs.find((tab) => tab.value === status)?.label || status}.`);
     } catch (error) {
@@ -81,8 +82,8 @@ export default function LeadsPage() {
   };
 
   const tabLabel = leadTabs.find((tab) => tab.value === activeStatus)?.label || 'New';
-  const needsSetup = isResourceConfigured('requestTypes') && typesLoaded && requestTypes.length === 0 && !loadError;
-  const apisMissing = !isResourceConfigured('requestTypes') || !isResourceConfigured('leads');
+  const needsSetup = requestTypesApi.isConfigured() && typesLoaded && requestTypes.length === 0 && !loadError;
+  const apisMissing = !requestTypesApi.isConfigured() || !leadsApi.isConfigured();
 
   return (
     <>

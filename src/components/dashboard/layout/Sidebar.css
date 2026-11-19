@@ -1,0 +1,195 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.db-sidebar {
+  position: fixed;
+  z-index: 100;
+  top: 14px;
+  bottom: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  width: 72px;
+  padding: 10px 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,250,240,.1);
+  border-radius: 22px;
+  background: var(--db-green);
+  color: var(--db-white);
+  box-shadow: 0 15px 40px rgba(16,55,42,.14);
+  transition: width .28s ease, box-shadow .28s ease;
+}
+
+.db-sidebar.is-expanded {
+  width: 254px; padding-right: 11px; padding-left: 11px; box-shadow: 0 20px 55px rgba(16,55,42,.22);
+}
+
+.db-sidebar-top {
+  display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 43px; margin-bottom: 7px; flex-shrink: 0;
+}
+
+.db-sidebar.is-expanded .db-sidebar-top {
+  justify-content: space-between; padding: 0 3px;
+}
+
+.db-brand {
+  display: flex; align-items: center; justify-content: center; gap: 9px; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--db-white);
+}
+
+.db-brand-mark {
+  position: relative; display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 11px; background: var(--db-coral); color: var(--db-green);
+}
+
+.db-brand-mark i {
+  position: absolute; right: 5px; bottom: 5px; width: 6px; height: 6px; border: 1px solid var(--db-coral); border-radius: 50%; background: var(--db-yellow);
+}
+
+.db-brand-name {
+  display: none; color: var(--db-white); font-size: 20px; font-weight: 800; letter-spacing: -1px;
+}
+
+.db-sidebar.is-expanded .db-brand-name {
+  display: block;
+}
+
+.db-pin-button {
+  display: grid; place-items: center; width: 31px; height: 31px; flex: 0 0 31px; border: 1px solid rgba(255,250,240,.16); border-radius: 9px; background: rgba(255,250,240,.07); color: rgba(255,250,240,.72);
+}
+
+.db-pin-button:hover {
+  background: var(--db-coral); color: var(--db-green);
+}
+
+.db-pin-button.active {
+  background: var(--db-coral); color: var(--db-green);
+}
+
+.db-sidebar-nav {
+  flex: 1; min-height: 0; overflow: hidden;
+}
+
+.db-dashboard-link {
+  margin-bottom: 5px !important;
+}
+
+.db-nav-group {
+  margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255,250,240,.1);
+}
+
+.db-nav-group-title {
+  display: none; margin: 0 0 3px; padding: 0 10px; color: rgba(255,250,240,.42); font-size: 8px; font-weight: 800; letter-spacing: 1.35px; line-height: 13px; text-transform: uppercase;
+}
+
+.db-sidebar.is-expanded .db-nav-group-title {
+  display: block;
+}
+
+.db-nav-item {
+  position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 30px; margin: 1px 0; padding: 0 3px; border: 0; border-radius: 10px; background: transparent; color: rgba(255,250,240,.7); text-decoration: none; transition: background .18s ease, color .18s ease, padding .2s ease;
+}
+
+.db-sidebar.is-expanded .db-nav-item {
+  justify-content: flex-start; padding: 0 9px;
+}
+
+.db-nav-item:hover {
+  background: rgba(255,250,240,.09); color: var(--db-white);
+}
+
+.db-nav-item.active {
+  background: var(--db-coral); color: var(--db-green);
+}
+
+.db-nav-icon {
+  display: grid; place-items: center; width: 19px; height: 20px; flex: 0 0 19px;
+}
+
+.db-nav-label {
+  display: none; min-width: 0; overflow: hidden; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.db-sidebar.is-expanded .db-nav-label {
+  display: block;
+}
+
+.db-sidebar-bottom {
+  flex: 0 0 auto; padding-top: 6px; border-top: 1px solid rgba(255,250,240,.1);
+}
+
+.db-lightbulb-mark {
+  font-size: 19px; line-height: 1;
+}
+
+.db-sidebar.is-expanded ~ .db-main {
+  margin-left: 282px;
+}
+
+@media (max-width: 760px) {
+.db-sidebar.is-expanded ~ .db-main {
+  margin-left: 0; padding: 0 15px 28px;
+}
+.db-sidebar {
+  z-index: 250; inset: 0; width: 100%; max-width: none; padding: 17px 16px; border: 0; border-radius: 0; transform: translateX(-105%); transition: transform .25s ease;
+}
+.db-sidebar.is-expanded {
+  width: 100%;
+}
+.db-sidebar.mobile-open {
+  transform: translateX(0);
+}
+.db-sidebar .db-brand-name {
+  display: block;
+}
+.db-sidebar .db-nav-label {
+  display: block;
+}
+.db-sidebar .db-nav-group-title {
+  display: block;
+}
+.db-sidebar .db-sidebar-top {
+  justify-content: space-between; padding: 0 3px; margin-bottom: 14px;
+}
+.db-sidebar .db-nav-item {
+  justify-content: flex-start; min-height: 40px; padding: 0 10px;
+}
+.db-sidebar .db-nav-group {
+  margin-top: 9px; padding-top: 9px;
+}
+.db-sidebar .db-nav-group-title {
+  margin-bottom: 5px; font-size: 9px;
+}
+.db-mobile-close {
+  display: grid;
+}
+
+}
+
+@media (max-height: 800px) and (min-width: 761px) {
+.db-sidebar {
+  padding-top: 7px; padding-bottom: 7px;
+}
+.db-sidebar-top {
+  min-height: 38px; margin-bottom: 3px;
+}
+.db-nav-item {
+  min-height: 27px; margin: 0;
+}
+.db-nav-group {
+  margin-top: 3px; padding-top: 3px;
+}
+.db-nav-group-title {
+  line-height: 11px; margin-bottom: 2px;
+}
+.db-sidebar-bottom {
+  padding-top: 3px;
+}
+
+}
+
+@media (max-width: 760px) {
+.db-sidebar {
+  display: none;
+}
+.db-sidebar.is-expanded ~ .db-main {
+  margin-left: 0; padding: 0 13px 90px;
+}
+
+}

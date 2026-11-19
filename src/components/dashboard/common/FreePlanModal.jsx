@@ -1,3 +1,4 @@
+import './FreePlanModal.css';
 import { CheckCircle2 } from 'lucide-react';
 import { Modal } from './DashboardUI';
 import { useFreePlan } from './FreePlanContext';

@@ -1,0 +1,50 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-channels-overview {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 13px; padding: 13px 15px; border: 1px solid var(--db-border); border-radius: 11px; background: var(--db-white);
+}
+
+.dp-channels-overview .dp-section-kicker {
+  margin: 0;
+}
+
+.dp-channel-grid {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 11px;
+}
+
+.dp-channel-card {
+  display: flex; flex-direction: column; align-items: flex-start; min-width: 0; min-height: 245px; padding: 17px;
+}
+
+.dp-channel-status {
+  display: flex; align-items: center; gap: 6px; color: var(--db-muted); font-size: 8px;
+}
+
+.dp-channel-card h2 {
+  margin: 12px 0 6px; color: var(--db-green); font-size: 14px; font-weight: 800;
+}
+
+.dp-channel-card > p {
+  flex: 1; margin: 0 0 15px; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+.dp-channel-grid {
+  grid-template-columns: repeat(2,minmax(0,1fr));
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-channel-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-channel-card > p {
+  font-size: 11px;
+    line-height: 1.6;
+}
+
+}

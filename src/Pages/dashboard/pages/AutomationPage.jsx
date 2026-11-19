@@ -1,3 +1,7 @@
+import { automationSettingsApi } from '../../../services/dashboard/automation-settings.api.js';
+import { channelsApi } from '../../../services/dashboard/channels.api.js';
+import { templatesApi } from '../../../services/dashboard/templates.api.js';
+import './AutomationPage.css';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Banknote, CalendarClock, CalendarDays, CalendarX2, CheckCircle2,
@@ -5,8 +9,6 @@ import {
   ShoppingCart, Trash2, Wallet,
 } from 'lucide-react';
 import { PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 const defaultSettings = {
   cartRecovery: false,
   appointmentReminders: true,
@@ -84,7 +86,7 @@ function serializeSettings(settings) {
 // Loads account automation preferences and keeps every change in an explicit save flow.
 export default function AutomationPage() {
   const [settings, setSettings] = useState(defaultSettings);
-  const [isLoading, setIsLoading] = useState(isResourceConfigured('automationSettings'));
+  const [isLoading, setIsLoading] = useState(automationSettingsApi.isConfigured());
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [hasApprovedTemplate, setHasApprovedTemplate] = useState(false);
@@ -96,8 +98,8 @@ export default function AutomationPage() {
 
   useEffect(() => {
     let active = true;
-    if (!isResourceConfigured('automationSettings')) return undefined;
-    resourceRequest('automationSettings')
+    if (!automationSettingsApi.isConfigured()) return undefined;
+    automationSettingsApi.request()
       .then((response) => {
         if (!active) return;
         const nextSettings = normalizeSettings(response);
@@ -113,8 +115,8 @@ export default function AutomationPage() {
     let active = true;
     const loadRequirements = async () => {
       const [templateResult, channelResult] = await Promise.allSettled([
-        resourceRequest('templates'),
-        isResourceConfigured('channels') ? resourceRequest('channels') : Promise.resolve([]),
+        templatesApi.request(),
+        channelsApi.isConfigured() ? channelsApi.request() : Promise.resolve([]),
       ]);
       if (!active) return;
       if (templateResult.status === 'fulfilled') {
@@ -123,7 +125,7 @@ export default function AutomationPage() {
         setHasApprovedTemplate(templates.some((template) => String(template.status).toLowerCase() === 'approved'));
         setTemplateStatusKnown(true);
       }
-      if (channelResult.status === 'fulfilled' && isResourceConfigured('channels')) {
+      if (channelResult.status === 'fulfilled' && channelsApi.isConfigured()) {
         const response = channelResult.value;
         const channels = Array.isArray(response) ? response : response?.items || response?.channels || [];
         const whatsapp = response?.whatsapp || channels.find((channel) => String(channel.type || channel.name || channel.channel).toLowerCase().includes('whatsapp'));
@@ -149,7 +151,7 @@ export default function AutomationPage() {
     setIsSaving(true);
     setSaveError('');
     try {
-      await resourceRequest('automationSettings', { method: 'PUT', body: serializeSettings(settings) });
+      await automationSettingsApi.request({ method: 'PUT', body: serializeSettings(settings) });
       setInitialSnapshot(JSON.stringify(settings));
       showNotice('Automation settings saved.');
     } catch (error) {

@@ -1,0 +1,110 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-notifications-panel {
+  padding: 17px;
+}
+
+.dp-notification-tabs-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+
+.dp-notification-tabs-row .dp-tabs {
+  flex: 1; min-width: 0;
+}
+
+.dp-unread-filter {
+  display: flex; align-items: center; gap: 7px; padding: 0 3px 15px; color: var(--db-muted); font-size: 8px; white-space: nowrap;
+}
+
+.dp-unread-filter input {
+  accent-color: var(--db-green);
+}
+
+.dp-notification-list {
+  display: flex; flex-direction: column;
+}
+
+.dp-notification-row {
+  display: flex; align-items: center; gap: 11px; width: 100%; padding: 12px 5px; border: 0; border-bottom: 1px solid var(--db-border); background: transparent; color: var(--db-green); text-align: left;
+}
+
+.dp-notification-row:hover {
+  background: rgba(255,122,89,.06);
+}
+
+.dp-notification-row.unread {
+  background: rgba(205,189,255,.10);
+}
+
+.dp-notification-category-icon {
+  display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 10px; background: rgba(205,189,255,.34); color: var(--db-green);
+}
+
+.dp-notification-copy {
+  display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0;
+}
+
+.dp-notification-copy strong {
+  color: var(--db-green); font-size: 9px;
+}
+
+.dp-notification-copy small {
+  overflow: hidden; color: var(--db-muted); font-size: 8px; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.dp-notification-row time {
+  color: var(--db-muted); font-size: 8px; white-space: nowrap;
+}
+
+.dp-notification-unread-dot {
+  width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: transparent;
+}
+
+.dp-notification-row.unread .dp-notification-unread-dot {
+  background: var(--db-coral);
+}
+
+@media (max-width: 760px) {
+.dp-notification-tabs-row {
+  align-items: flex-start; flex-direction: column; gap: 0;
+}
+.dp-notification-tabs-row .dp-tabs {
+  width: 100%; margin-bottom: 7px;
+}
+.dp-unread-filter {
+  padding: 0 0 12px;
+}
+.dp-notification-row {
+  gap: 8px;
+}
+.dp-notification-row time {
+  font-size: 7px;
+}
+
+}
+
+@media (max-width: 480px) {
+.dp-notification-row time {
+  display: none;
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-notification-copy strong {
+  font-size: 11px;
+}
+.dp-notification-copy small {
+  font-size: 10px;
+}
+.dp-notification-copy small {
+  height: auto;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+}
+.dp-notification-copy {
+  min-width: 0;
+}
+
+}

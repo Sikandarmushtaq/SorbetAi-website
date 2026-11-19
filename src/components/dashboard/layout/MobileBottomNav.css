@@ -1,0 +1,41 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.db-mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 760px) {
+.db-mobile-bottom-nav {
+  position: fixed; z-index: 220; right: 12px; bottom: max(9px, env(safe-area-inset-bottom)); left: 12px; display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 3px; min-height: 61px; padding: 5px; border: 1px solid var(--db-border); border-radius: 17px; background: var(--db-white); box-shadow: 0 8px 30px rgba(16,55,42,.13);
+}
+.db-mobile-bottom-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; padding: 3px 1px; border: 0; border-radius: 12px; background: transparent; color: var(--db-muted); text-decoration: none;
+}
+.db-mobile-bottom-item span {
+  font-size: 7px; font-weight: 750; white-space: nowrap;
+}
+.db-mobile-bottom-item.active {
+  background: var(--db-green); color: var(--db-white);
+}
+
+}
+
+@media (max-width: 480px) {
+.db-mobile-bottom-nav {
+  right: 8px; left: 8px; min-height: 58px;
+}
+
+}
+
+@media (max-width: 760px) {
+.db-mobile-bottom-item.active {
+  background: #ff7a59 !important;
+    color: #10372a !important;
+}
+.db-mobile-bottom-item.active svg {
+  color: #10372a !important;
+}
+.db-mobile-bottom-item.active span {
+  color: #10372a !important;
+}
+
+}

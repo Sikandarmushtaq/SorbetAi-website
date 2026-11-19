@@ -1,0 +1,59 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-suggestions-panel .dp-tabs {
+  border-radius: 0; border-bottom: 1px solid var(--db-border); background: transparent; padding: 0 0 7px;
+}
+
+.dp-suggestions-panel .dp-tabs button {
+  border-radius: 0; background: transparent;
+}
+
+.dp-suggestions-panel .dp-tabs button.active {
+  border-bottom: 2px solid var(--db-coral); color: var(--db-green);
+}
+
+.dp-suggestions-panel {
+  padding: 17px;
+}
+
+.dp-suggestion-list {
+  display: flex; flex-direction: column; gap: 9px;
+}
+
+.dp-suggestion-card {
+  display: flex; gap: 13px; padding: 14px; border: 1px solid var(--db-border); border-radius: 11px; background: var(--db-white);
+}
+
+.dp-suggestion-vote {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 43px; min-width: 43px; min-height: 52px; border: 1px solid var(--db-border); border-radius: 9px; background: transparent; color: var(--db-muted);
+}
+
+.dp-suggestion-vote strong {
+  color: var(--db-green); font-size: 9px;
+}
+
+.dp-suggestion-vote.voted {
+  border-color: var(--db-coral); background: rgba(255,122,89,.1); color: var(--db-coral);
+}
+
+.dp-suggestion-card-content {
+  min-width: 0;
+}
+
+.dp-suggestion-type {
+  display: inline-flex; padding: 4px 7px; border-radius: 20px; background: rgba(16,55,42,.07); color: var(--db-muted); font-size: 7px; font-weight: 800;
+}
+
+.dp-suggestion-card-content h3 {
+  margin: 7px 0 4px; color: var(--db-green); font-size: 11px; font-weight: 800;
+}
+
+.dp-suggestion-card-content p {
+  margin: 0; color: var(--db-muted); font-size: 9px; line-height: 1.6; white-space: pre-wrap;
+}
+
+@media (max-width: 480px) {
+.dp-suggestion-card {
+  padding: 10px;
+}
+
+}

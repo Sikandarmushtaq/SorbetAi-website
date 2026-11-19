@@ -1,9 +1,9 @@
+import { suggestionsApi } from '../../../services/dashboard/suggestions.api.js';
+import './SuggestionsPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronUp, Lightbulb, Plus, Send } from 'lucide-react';
 import { EmptyState, FieldInput, FieldSelect, FieldTextarea, FormField, Modal, PageHeader, Panel, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
-
 const suggestionTabs = [{ label: 'All Suggestions', value: 'all' }, { label: 'My Suggestions', value: 'mine' }];
 const types = ['Feature Request', 'Improvement', 'Bug', 'Other'];
 
@@ -28,7 +28,7 @@ export default function SuggestionsPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('suggestions', { query: { mine: activeTab === 'mine' } });
+      const response = await suggestionsApi.request({ query: { mine: activeTab === 'mine' } });
       setSuggestions(suggestionRecords(response));
     } catch (error) {
       setSuggestions([]);
@@ -53,7 +53,7 @@ export default function SuggestionsPage() {
     if (!form.title.trim() || !form.description.trim()) return;
     setIsSubmitting(true);
     try {
-      const response = await resourceRequest('suggestions', { method: 'POST', body: { ...form, title: form.title.trim(), description: form.description.trim() } });
+      const response = await suggestionsApi.request({ method: 'POST', body: { ...form, title: form.title.trim(), description: form.description.trim() } });
       const created = response?.suggestion || response;
       if (created && (created.id || created.suggestion_id)) setSuggestions((current) => [created, ...current]);
       setForm({ type: 'Feature Request', title: '', description: '' });
@@ -72,7 +72,7 @@ export default function SuggestionsPage() {
     const nextVote = !suggestion.has_voted;
     setVotingId(String(id));
     try {
-      const response = await resourceRequest('suggestions', { method: 'PATCH', id, body: { has_voted: nextVote } });
+      const response = await suggestionsApi.request({ method: 'PATCH', id, body: { has_voted: nextVote } });
       const updated = response?.suggestion || response;
       setSuggestions((current) => current.map((item) => String(item.id || item.suggestion_id) === String(id)
         ? { ...item, ...updated, has_voted: nextVote, vote_count: updated?.vote_count ?? item.vote_count }

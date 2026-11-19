@@ -1,8 +1,8 @@
+import { paymentCollectionApi } from '../../../services/dashboard/payment-collection.api.js';
+import './PaymentCollectionPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowUpRight, CreditCard, Link2, LockKeyhole, Plus, RefreshCw, ShieldCheck, Wallet } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 function connectionsFrom(response) {
   return Array.isArray(response) ? response : response?.connections || response?.payment_methods || response?.items || [];
 }
@@ -16,10 +16,10 @@ export default function PaymentCollectionPage() {
   const { showNotice, Notice } = useNotice();
 
   const loadConnections = useCallback(async () => {
-    if (!isResourceConfigured('paymentCollection')) return;
+    if (!paymentCollectionApi.isConfigured()) return;
     setLoading(true);
     setError('');
-    try { setConnections(connectionsFrom(await resourceRequest('paymentCollection'))); }
+    try { setConnections(connectionsFrom(await paymentCollectionApi.request())); }
     catch (requestError) { setError(requestError.message); }
     finally { setLoading(false); }
   }, []);
@@ -28,10 +28,10 @@ export default function PaymentCollectionPage() {
 
   // Starts the selected provider's secure onboarding flow using a URL returned by the backend.
   const connectProvider = async (provider) => {
-    if (!isResourceConfigured('paymentCollection')) return showNotice('Payment connection API is not configured yet.');
+    if (!paymentCollectionApi.isConfigured()) return showNotice('Payment connection API is not configured yet.');
     setBusyProvider(provider);
     try {
-      const result = await resourceRequest('paymentCollection', { method: 'POST', id: provider, action: 'connect', body: {} });
+      const result = await paymentCollectionApi.request({ method: 'POST', id: provider, action: 'connect', body: {} });
       const redirect = result?.authorization_url || result?.connect_url || result?.checkout_url;
       if (redirect) window.location.assign(redirect);
       else { showNotice(result?.message || 'Connection request received.'); await loadConnections(); }
@@ -43,7 +43,7 @@ export default function PaymentCollectionPage() {
     const provider = connection.provider || connection.id;
     setBusyProvider(provider);
     try {
-      await resourceRequest('paymentCollection', { method: 'POST', id: provider, action: 'disconnect', body: {} });
+      await paymentCollectionApi.request({ method: 'POST', id: provider, action: 'disconnect', body: {} });
       await loadConnections();
       showNotice('Payment provider disconnected.');
     } catch (requestError) { showNotice(requestError.message); }
@@ -62,8 +62,8 @@ export default function PaymentCollectionPage() {
         const connected = connection.connected || String(connection.status).toLowerCase() === 'connected';
         const provider = connection.provider || connection.id || name.toLowerCase().replace(/\s+/g, '-');
         return <Panel className="dp-payment-provider-card" key={connection.id || provider || index}><div className="dp-payment-provider-top"><span className="dp-connection-icon"><CreditCard size={20} /></span><span className={`dp-status-pill ${connected ? 'success' : 'neutral'}`}>{connected ? 'Connected' : connection.status || 'Not connected'}</span></div><h3>{name}</h3><p>{connection.description || 'Use this payment connection to collect customer payments through Bellbee.'}</p>{connected ? <button type="button" className="dp-secondary-button" onClick={() => disconnectProvider(connection)} disabled={Boolean(busyProvider)}>{busyProvider === provider ? 'Updating…' : 'Disconnect'}</button> : <button type="button" className="dp-primary-button" onClick={() => connectProvider(provider)} disabled={Boolean(busyProvider)}>{busyProvider === provider ? 'Connecting…' : 'Connect provider'} <ArrowUpRight size={14} /></button>}</Panel>;
-      })}</div> : <Panel>{!isResourceConfigured('paymentCollection') ? <EmptyState icon={LockKeyhole} title="Payment connections are not connected yet" description="Connect the payment collection API to load the providers enabled for your Bellbee workspace." /> : <EmptyState icon={Link2} title="No payment providers connected" description="When a payment provider is made available to your workspace, it will appear here." />}</Panel>}
-      {!isResourceConfigured('paymentCollection') && <p className="dp-form-note"><Plus size={13} /> Configure REACT_APP_API_PAYMENT_COLLECTION_PATH to load available providers and launch their secure onboarding flow.</p>}
+      })}</div> : <Panel>{!paymentCollectionApi.isConfigured() ? <EmptyState icon={LockKeyhole} title="Payment connections are not connected yet" description="Connect the payment collection API to load the providers enabled for your Bellbee workspace." /> : <EmptyState icon={Link2} title="No payment providers connected" description="When a payment provider is made available to your workspace, it will appear here." />}</Panel>}
+      {!paymentCollectionApi.isConfigured() && <p className="dp-form-note"><Plus size={13} /> Configure REACT_APP_API_PAYMENT_COLLECTION_PATH to load available providers and launch their secure onboarding flow.</p>}
     </>
   );
 }

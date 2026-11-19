@@ -1,3 +1,5 @@
+import { notificationsApi } from '../../../services/dashboard/notifications.api.js';
+import './Header.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -16,15 +18,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { allDashboardItems } from './navigation';
-import {
-  clearStoredSession,
-  getCurrentUser,
-  hasAccessToken,
-  logoutSession,
-  resourceRequest,
-  isResourceConfigured,
-} from '../../../services/dashboardApi';
-
+import { useAuth } from '../../../context/AuthContext';
 const searchLinkDefinitions = [
   {
     id: 'customers',
@@ -96,11 +90,11 @@ export default function Header() {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, signOut } = useAuth();
+  const [failedAvatar, setFailedAvatar] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
 
   const searchAnchorRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -130,19 +124,8 @@ export default function Header() {
   useEffect(() => {
     let active = true;
 
-    const loadUser = async () => {
-      if (!hasAccessToken()) return;
-
-      try {
-        const currentUser = await getCurrentUser();
-        if (active) setUser(currentUser);
-      } catch {
-        if (active) setUser(null);
-      }
-    };
-
     const loadNotifications = async () => {
-      if (!isResourceConfigured('notifications')) {
+      if (!notificationsApi.isConfigured()) {
         if (active) {
           setNotifications([]);
           setUnreadCount(0);
@@ -153,7 +136,7 @@ export default function Header() {
       if (active) setNotificationsLoading(true);
 
       try {
-        const response = await resourceRequest('notifications', {
+        const response = await notificationsApi.request({
           query: { limit: 5 },
         });
         const rawRecords = Array.isArray(response)
@@ -184,7 +167,6 @@ export default function Header() {
       }
     };
 
-    loadUser();
     loadNotifications();
     window.addEventListener('bellbee:notifications-updated', loadNotifications);
 
@@ -302,22 +284,19 @@ export default function Header() {
     navigate('/dashboard');
   };
 
-  const handleLogout = async () => {
-    setLoggingOut(true);
-
-    try {
-      await logoutSession();
-    } catch {
-      clearStoredSession();
-    } finally {
-      setLoggingOut(false);
-      navigate('/signin', { replace: true });
-    }
+  const handleLogout = () => {
+    signOut().catch(() => {
+      // Local sign-out still takes effect when the backend cannot be reached.
+    });
   };
 
   const fullName = getUserName(user);
   const email = user?.email || '';
   const initial = (fullName || email || 'U').trim().charAt(0).toUpperCase();
+  const avatarUrl = user?.avatar_url;
+  const avatar = avatarUrl && avatarUrl !== failedAvatar
+    ? <img className="db-account-avatar-image" src={avatarUrl} alt="" onError={() => setFailedAvatar(avatarUrl)} />
+    : initial;
   const isDashboardHome = location.pathname.replace(/\/+$/, '') === '/dashboard';
 
   return (
@@ -551,14 +530,14 @@ export default function Header() {
             aria-label="Open profile menu"
             aria-expanded={profileOpen}
           >
-            <span className="db-avatar-initial">{initial}</span>
+            <span className="db-avatar-initial">{avatar}</span>
             <ChevronDown size={13} className={profileOpen ? 'is-rotated' : ''} />
           </button>
 
           {profileOpen && (
             <div className="db-dropdown db-profile-dropdown">
               <div className="db-profile-summary">
-                <span>{initial}</span>
+                <span>{avatar}</span>
                 <div>
                   <strong>{fullName || 'My account'}</strong>
                   <small>{email || 'Account details'}</small>
@@ -572,9 +551,8 @@ export default function Header() {
                 type="button"
                 className="db-signout-button"
                 onClick={handleLogout}
-                disabled={loggingOut}
               >
-                <LogOut size={16} /> {loggingOut ? 'Signing out...' : 'Sign out'}
+                <LogOut size={16} /> Sign out
               </button>
             </div>
           )}

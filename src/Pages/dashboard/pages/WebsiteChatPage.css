@@ -1,0 +1,66 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-website-chat-layout {
+  display: grid; grid-template-columns: minmax(0,1.25fr) minmax(260px,.75fr); align-items: start; gap: 13px;
+}
+
+.dp-website-chat-layout form {
+  display: flex; flex-direction: column; gap: 13px; min-width: 0;
+}
+
+.dp-code-snippet {
+  min-height: 66px; margin: 12px 0; padding: 12px; overflow-wrap: anywhere; border: 1px solid var(--db-border); border-radius: 9px; background: #f1eee6; color: var(--db-muted); font-family: monospace; font-size: 9px; line-height: 1.6;
+}
+
+.dp-website-chat-preview {
+  position: sticky; top: 86px;
+}
+
+.dp-widget-preview-window {
+  display: flex; flex-direction: column; min-height: 310px; margin-top: 12px; padding: 12px; border: 1px solid var(--db-border); border-radius: 14px; background: #f2eee4;
+}
+
+.dp-widget-preview-header {
+  display: flex; align-items: center; gap: 9px; padding: 10px; border-radius: 10px; background: var(--db-green); color: var(--db-white);
+}
+
+.dp-widget-preview-mark {
+  display: grid; place-items: center; width: 31px; height: 31px; border-radius: 9px; background: var(--db-coral); color: var(--db-green);
+}
+
+.dp-widget-preview-header > div {
+  display: flex; flex: 1; flex-direction: column; gap: 3px;
+}
+
+.dp-widget-preview-header strong {
+  font-size: 9px;
+}
+
+.dp-widget-preview-header small {
+  color: rgba(255,250,240,.65); font-size: 7px;
+}
+
+.dp-widget-preview-online {
+  width: 8px; height: 8px; border-radius: 50%; background: #77cb83;
+}
+
+.dp-widget-preview-message {
+  max-width: 85%; margin: auto auto 12px 0; padding: 11px; border-radius: 10px 10px 10px 3px; background: var(--db-white); color: var(--db-green); font-size: 9px; line-height: 1.6;
+}
+
+.dp-widget-preview-composer {
+  display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid var(--db-border); border-radius: 9px; background: var(--db-white); color: #9ba49d; font-size: 8px;
+}
+
+.dp-widget-preview-composer span {
+  display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--db-coral); color: var(--db-green); font-size: 14px;
+}
+
+@media (max-width: 1050px) {
+.dp-website-chat-layout {
+  grid-template-columns: 1fr;
+}
+.dp-website-chat-preview {
+  position: static;
+}
+
+}

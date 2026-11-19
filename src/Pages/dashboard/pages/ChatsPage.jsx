@@ -1,9 +1,9 @@
+import { chatsApi } from '../../../services/dashboard/chats.api.js';
+import './ChatsPage.css';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowLeft, MessageCircle, Paperclip, Search, Send } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { isResourceConfigured, resourceRequest } from '../../../services/dashboardApi';
-
 const channelTabs = [
   { label: 'All', value: 'all' },
   { label: 'WhatsApp', value: 'whatsapp' },
@@ -58,14 +58,14 @@ export default function ChatsPage() {
     let active = true;
     setIsLoading(true);
     setLoadError('');
-    if (!isResourceConfigured('chats')) {
+    if (!chatsApi.isConfigured()) {
       setConversations([]);
       setLoadError('The chats API is not configured yet. Connect the conversations endpoint to load customer messages.');
       setIsLoading(false);
       return () => { active = false; };
     }
 
-    resourceRequest('chats', {
+    chatsApi.request({
       query: {
         channel: channel === 'all' ? undefined : channel,
         search: query || undefined,
@@ -101,8 +101,8 @@ export default function ChatsPage() {
     setSelectedDetails(null);
     setSendError('');
     setMessageText('');
-    if (!selectedChatId || !isResourceConfigured('chats')) return undefined;
-    resourceRequest('chats', { id: selectedChatId })
+    if (!selectedChatId || !chatsApi.isConfigured()) return undefined;
+    chatsApi.request({ id: selectedChatId })
       .then((response) => { if (active) setSelectedDetails(response?.conversation || response?.chat || response); })
       .catch((error) => { if (active) setSendError(error.message); });
     return () => { active = false; };
@@ -133,9 +133,9 @@ export default function ChatsPage() {
     setIsSending(true);
     setSendError('');
     try {
-      await resourceRequest('chats', { method: 'POST', id, action: 'messages', body: { text: messageText.trim() } });
+      await chatsApi.request({ method: 'POST', id, action: 'messages', body: { text: messageText.trim() } });
       setMessageText('');
-      const response = await resourceRequest('chats', { id });
+      const response = await chatsApi.request({ id });
       const latest = response?.conversation || response?.chat || response;
       setSelectedDetails(latest);
       setConversations((current) => current.map((chat) => chatId(chat) === id ? { ...chat, ...latest } : chat));

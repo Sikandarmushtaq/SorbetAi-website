@@ -1,0 +1,275 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-automation-summary {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-bottom: 14px;
+}
+
+.dp-automation-summary > div {
+  padding: 14px; border: 1px solid var(--db-border); border-radius: 12px; background: var(--db-white);
+}
+
+.dp-automation-summary > div > span {
+  color: var(--db-muted); font-size: 9px;
+}
+
+.dp-automation-summary strong {
+  display: block; margin-top: 8px; color: var(--db-green); font-size: 20px; font-weight: 800;
+}
+
+.dp-automation-summary strong small {
+  color: var(--db-muted); font-size: 10px;
+}
+
+.dp-automation-summary p {
+  margin: 4px 0 0; color: var(--db-muted); font-size: 8px; line-height: 1.5;
+}
+
+.dp-settings-panel {
+  padding: 18px;
+}
+
+.dp-settings-panel > h2 {
+  margin-bottom: 6px;
+}
+
+.dp-switch {
+  display: flex; align-items: center; width: 42px; height: 23px; flex: 0 0 42px; padding: 3px; border: 0; border-radius: 50px; background: #d7d9d4; transition: background .2s ease;
+}
+
+.dp-switch > span {
+  width: 17px; height: 17px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.15); transition: transform .2s ease;
+}
+
+.dp-switch.on {
+  background: var(--db-green);
+}
+
+.dp-switch.on > span {
+  transform: translateX(19px);
+}
+
+.dp-payment-options {
+  display: flex; flex-direction: column; gap: 8px; margin-top: 14px;
+}
+
+.dp-payment-option {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid var(--db-border); border-radius: 10px; cursor: pointer;
+}
+
+.dp-payment-option.selected {
+  border-color: var(--db-coral); background: #fff4ed;
+}
+
+.dp-payment-option input {
+  margin-top: 2px; accent-color: var(--db-green);
+}
+
+.dp-payment-option > span {
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.dp-payment-option strong {
+  color: var(--db-green); font-size: 9px;
+}
+
+.dp-payment-option small {
+  color: var(--db-muted); font-size: 8px; line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+.dp-automation-summary {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.dp-automation-summary-card {
+  display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 15px; border: 1px solid var(--db-border); border-radius: 12px; background: var(--db-white);
+}
+
+.dp-automation-summary-card .dp-automation-icon {
+  margin-bottom: 10px;
+}
+
+.dp-automation-summary-card .dp-summary-label {
+  color: var(--db-muted); font-size: 8px; font-weight: 850; letter-spacing: 1px;
+}
+
+.dp-automation-summary-card > strong {
+  margin-top: 7px; color: var(--db-green); font-size: 23px; font-weight: 850; line-height: 1.2; overflow-wrap: anywhere;
+}
+
+.dp-automation-summary-card > strong small {
+  margin-left: 3px; color: var(--db-muted); font-size: 12px; font-weight: 650;
+}
+
+.dp-automation-summary-card > strong.dp-summary-compact-value {
+  font-size: 16px;
+}
+
+.dp-automation-summary-card > p {
+  margin: 5px 0 0; color: var(--db-muted); font-size: 8px; line-height: 1.55;
+}
+
+.dp-automation-icon {
+  display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 35px; border-radius: 10px; background: rgba(255,122,89,.14); color: #a64e36;
+}
+
+.dp-settings-section {
+  margin-bottom: 17px;
+}
+
+.dp-automation-proactive-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px;
+}
+
+.dp-proactive-card {
+  margin: 0; padding: 17px;
+}
+
+.dp-proactive-card .dp-panel-heading {
+  align-items: center; margin-bottom: 10px;
+}
+
+.dp-proactive-title {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+}
+
+.dp-proactive-title h3 {
+  margin: 0; color: var(--db-green); font-size: 12px; font-weight: 800;
+}
+
+.dp-proactive-card > .dp-panel-description {
+  margin: 0;
+}
+
+.dp-warning-strip {
+  margin-top: 12px; padding: 9px 11px; border: 1px solid rgba(244,201,93,.58); border-radius: 9px; background: rgba(244,201,93,.16); color: var(--db-green); font-size: 9px; line-height: 1.55;
+}
+
+.dp-reminder-options {
+  margin-top: 13px; padding-top: 9px; border-top: 1px solid var(--db-border);
+}
+
+.dp-compact-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; color: var(--db-green); font-size: 9px;
+}
+
+.dp-compact-toggle .dp-switch {
+  transform: scale(.82); transform-origin: right center;
+}
+
+.dp-automation-behavior {
+  padding: 18px;
+}
+
+.dp-automation-behavior-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px;
+}
+
+.dp-automation-behavior-card {
+  min-width: 0; padding: 13px; border: 1px solid var(--db-border); border-radius: 11px; background: var(--db-white);
+}
+
+.dp-automation-card-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px;
+}
+
+.dp-automation-card-top > span {
+  display: grid; place-items: center; width: 31px; height: 31px; border-radius: 9px; background: rgba(205,189,255,.32); color: var(--db-green);
+}
+
+.dp-automation-behavior-card h3 {
+  margin: 0; color: var(--db-green); font-size: 10px; font-weight: 800; line-height: 1.45;
+}
+
+.dp-automation-behavior-card p {
+  margin: 5px 0 0; color: var(--db-muted); font-size: 8px; line-height: 1.6;
+}
+
+.dp-handover-copy strong {
+  color: var(--db-green); font-size: 10px;
+}
+
+.dp-handover-copy p {
+  max-width: 760px; margin: 4px 0 12px; color: var(--db-muted); font-size: 8px; line-height: 1.6;
+}
+
+.dp-handover-list {
+  display: flex; flex-direction: column; gap: 7px; margin-bottom: 11px;
+}
+
+.dp-handover-row {
+  display: flex; align-items: center; gap: 8px;
+}
+
+.dp-handover-row input {
+  flex: 1; min-width: 0; min-height: 37px; padding: 8px 10px; border: 1px solid var(--db-border); border-radius: 8px; background: var(--db-white); color: var(--db-green); font-size: 9px;
+}
+
+.dp-handover-row .dp-icon-action {
+  width: 36px; height: 36px;
+}
+
+.dp-payment-options-grid {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); align-items: stretch;
+}
+
+.dp-payment-radio-card {
+  display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 13px;
+}
+
+.dp-payment-radio-card.selected {
+  border-color: var(--db-coral); background: rgba(255,122,89,.09);
+}
+
+.dp-payment-option-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+
+.dp-payment-option-top input {
+  width: 16px; height: 16px; accent-color: var(--db-green);
+}
+
+.dp-payment-radio-card > strong {
+  color: var(--db-green); font-size: 10px; line-height: 1.4;
+}
+
+.dp-payment-radio-card > small {
+  color: var(--db-muted); font-size: 8px; line-height: 1.55;
+}
+
+.dp-payment-details {
+  margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--db-border);
+}
+
+@media (max-width: 760px) {
+.dp-automation-summary {
+  grid-template-columns: 1fr;
+}
+.dp-automation-summary-card {
+  padding: 10px;
+}
+.dp-automation-summary-card > strong {
+  font-size: 19px;
+}
+.dp-automation-summary-card > strong.dp-summary-compact-value {
+  font-size: 12px;
+}
+.dp-automation-proactive-grid {
+  grid-template-columns: 1fr;
+}
+.dp-automation-behavior-grid {
+  grid-template-columns: 1fr;
+}
+.dp-payment-options-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+@media (max-width: 480px) {
+.dp-automation-summary {
+  grid-template-columns: 1fr;
+}
+
+}

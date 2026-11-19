@@ -1,8 +1,10 @@
+import { appointmentsApi } from '../../../services/dashboard/appointments.api.js';
+import { servicesApi } from '../../../services/dashboard/services.api.js';
+import { staffApi } from '../../../services/dashboard/staff.api.js';
+import './AppointmentsPage.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CalendarDays, CheckCircle2, Clock3, Plus, X } from 'lucide-react';
 import { EmptyState, FieldInput, FieldSelect, FieldTextarea, FormField, Modal, PageHeader, Panel, StatCard, StatGrid, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
-
 const statuses = ['All', 'Pending', 'Confirmed', 'Reschedule Requests', 'Awaiting Customer', 'Served', 'No Show', 'Cancelled'];
 const emptyForm = { customer_name: '', phone: '', service_name: '', staff_id: '', date: '', time: '', notes: '' };
 
@@ -40,7 +42,7 @@ export default function AppointmentsPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('appointments');
+      const response = await appointmentsApi.request();
       setAppointments(appointmentRecords(response));
     } catch (error) {
       setAppointments([]);
@@ -54,7 +56,7 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     let active = true;
-    Promise.allSettled([resourceRequest('staff'), resourceRequest('services')]).then(([staffResult, servicesResult]) => {
+    Promise.allSettled([staffApi.request(), servicesApi.request()]).then(([staffResult, servicesResult]) => {
       if (!active) return;
       if (staffResult.status === 'fulfilled') setStaff(appointmentRecords(staffResult.value));
       if (servicesResult.status === 'fulfilled') setServices(appointmentRecords(servicesResult.value));
@@ -75,7 +77,7 @@ export default function AppointmentsPage() {
     event.preventDefault();
     setIsSaving(true);
     try {
-      await resourceRequest('appointments', {
+      await appointmentsApi.request({
         method: 'POST',
         body: {
           customer_name: form.customer_name.trim(),
@@ -100,7 +102,7 @@ export default function AppointmentsPage() {
   const updateStatus = async (item, status) => {
     const id = item.id || item.appointment_id;
     try {
-      await resourceRequest('appointments', { method: 'PATCH', id, body: { status: status.toLowerCase().replaceAll(' ', '_') } });
+      await appointmentsApi.request({ method: 'PATCH', id, body: { status: status.toLowerCase().replaceAll(' ', '_') } });
       setAppointments((current) => current.map((record) => String(record.id || record.appointment_id) === String(id) ? { ...record, status } : record));
     } catch (error) {
       showNotice(error.message);

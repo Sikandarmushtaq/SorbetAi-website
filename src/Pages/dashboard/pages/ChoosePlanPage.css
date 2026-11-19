@@ -1,0 +1,125 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-plan-free-card {
+  padding: 22px; border-color: rgba(255,122,89,.32); background: #fff3eb;
+}
+
+.dp-plan-free-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+
+.dp-plan-free-content {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+}
+
+.dp-plan-free-content h2 {
+  margin: 7px 0 5px; color: var(--db-green); font-size: 21px; font-weight: 850;
+}
+
+.dp-plan-free-content p {
+  max-width: 570px; margin: 0; color: var(--db-muted); font-size: 10px; line-height: 1.7;
+}
+
+.dp-plan-free-content .dp-plan-feature-list {
+  margin-bottom: 0;
+}
+
+.dp-plan-catalogue-heading {
+  display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 24px 0 10px; padding: 0 2px; color: var(--db-green);
+}
+
+.dp-plan-catalogue-heading h2 {
+  margin: 3px 0; font-size: 18px; font-weight: 850;
+}
+
+.dp-plan-catalogue-heading p {
+  margin: 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-plan-catalogue-card {
+  display: grid; grid-template-columns: minmax(0,1fr) 220px; gap: 25px; padding: 22px;
+}
+
+.dp-plan-catalogue-copy h2 {
+  margin: 12px 0 7px; font-size: 22px; font-weight: 850;
+}
+
+.dp-plan-catalogue-copy p {
+  max-width: 740px; margin: 0; color: var(--db-muted); font-size: 10px; line-height: 1.7;
+}
+
+.dp-plan-catalogue-features {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 15px; margin-top: 17px;
+}
+
+.dp-plan-catalogue-features span {
+  display: flex; align-items: flex-start; gap: 7px; color: var(--db-green); font-size: 9px; line-height: 1.5;
+}
+
+.dp-plan-catalogue-features svg {
+  flex: 0 0 14px; color: #43865c;
+}
+
+.dp-plan-catalogue-action {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 9px; padding: 16px; border-radius: 12px; background: var(--db-cream); color: var(--db-green);
+}
+
+.dp-plan-catalogue-action > strong {
+  font-size: 16px;
+}
+
+.dp-plan-catalogue-action small {
+  color: var(--db-muted); font-size: 8px; line-height: 1.6;
+}
+
+.dp-plan-extra-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-top: 12px;
+}
+
+.dp-plan-extra-card {
+  margin: 0;
+}
+
+.dp-plan-extra-card h3 {
+  margin: 6px 0; font-size: 15px; font-weight: 800;
+}
+
+.dp-plan-extra-card > strong {
+  font-size: 14px;
+}
+
+.dp-plan-extra-card p {
+  color: var(--db-muted); font-size: 9px; line-height: 1.6;
+}
+
+.dp-plan-security-note {
+  display: flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-plan-security-note svg {
+  color: var(--db-green);
+}
+
+@media (max-width: 760px) {
+.dp-plan-catalogue-features {
+  grid-template-columns: 1fr;
+}
+.dp-plan-catalogue-card {
+  grid-template-columns: 1fr;
+}
+.dp-plan-free-content {
+  grid-template-columns: 1fr;
+}
+.dp-plan-extra-grid {
+  grid-template-columns: 1fr;
+}
+.dp-plan-free-content {
+  display: flex; align-items: stretch; flex-direction: column;
+}
+.dp-plan-catalogue-card {
+  display: flex; flex-direction: column;
+}
+.dp-plan-catalogue-action {
+  width: 100%;
+}
+
+}

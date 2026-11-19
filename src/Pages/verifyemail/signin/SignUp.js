@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -9,7 +9,6 @@ import {
   CreditCard,
   Eye,
   EyeOff,
-  Globe2,
   LockKeyhole,
   Mail,
   MessageCircle,
@@ -22,30 +21,15 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
 import './SignUp.css';
+import { countries, CountrySelect, normalizePhone, isPhoneValid } from './CountrySelect';
+import GoogleButton from '../../../components/auth/GoogleButton';
+import { authApi, authErrorMessage } from '../../../services/auth.api';
 
 gsap.registerPlugin(useGSAP);
 
-const API_BASE_URL = (
-  process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/api/v1'
-).replace(/\/+$/, '');
-
-const countries = [
-  { name: 'Pakistan', code: '+92' },
-  { name: 'United Kingdom', code: '+44' },
-  { name: 'United States', code: '+1' },
-  { name: 'Canada', code: '+1' },
-  { name: 'United Arab Emirates', code: '+971' },
-  { name: 'Saudi Arabia', code: '+966' },
-  { name: 'Australia', code: '+61' },
-  { name: 'India', code: '+91' },
-  { name: 'Germany', code: '+49' },
-  { name: 'France', code: '+33' },
-  { name: 'Netherlands', code: '+31' },
-  { name: 'Ireland', code: '+353' },
-  { name: 'South Africa', code: '+27' },
-  { name: 'Singapore', code: '+65' },
-  { name: 'Malaysia', code: '+60' },
-];
+/* =========================================
+   HELPERS
+========================================= */
 
 const emptyRegistration = {
   country: '',
@@ -54,30 +38,33 @@ const emptyRegistration = {
   businessName: '',
   email: '',
   phone: '',
+  phoneInternational: '',
   promoCode: '',
 };
 
 // Checks the password against the account security requirements.
 function getPasswordRequirements(password) {
   return {
-    length: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
+    length: password.length >= 8 && password.length <= 128,
+    letter: /\p{L}/u.test(password),
+    numberOrSymbol: /[\p{N}\p{P}\p{S}]/u.test(password),
   };
 }
 
-// Safely reads the backend error response.
-async function readApiResponse(response) {
-  return response.json().catch(() => ({}));
-}
+/* =========================================
+   SIGN UP PAGE
+========================================= */
 
 export default function SignUp() {
   const pageRef = useRef(null);
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   const [step, setStep] = useState(1);
+  // Holds the ISO code of the country (PK, GB, US...).
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [countryError, setCountryError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [showPromo, setShowPromo] = useState(false);
   const [registrationData, setRegistrationData] = useState(emptyRegistration);
 
@@ -91,7 +78,7 @@ export default function SignUp() {
   const [submitError, setSubmitError] = useState('');
 
   const selectedCountryData = countries.find(
-    (country) => country.name === selectedCountry
+    (country) => country.code === selectedCountry
   );
 
   const passwordRequirements = getPasswordRequirements(password);
@@ -177,23 +164,51 @@ export default function SignUp() {
   const handleDetailsSubmit = (event) => {
     event.preventDefault();
 
+    if (!selectedCountryData) {
+      setCountryError('Please select your country.');
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get('email') || '')
       .trim()
       .toLowerCase();
 
+    const rawPhone = String(formData.get('phone') || '').trim();
+    const nationalPhone = normalizePhone(
+      rawPhone,
+      selectedCountryData.dialCode
+    );
+    // The user enters a local number only; the selected country's code is
+    // attached once when preparing the API payload (E.164 format).
+    const phoneInternational = `${selectedCountryData.dialCode}${nationalPhone}`;
+
+    if (
+      !/^[+\d().\s-]+$/.test(rawPhone) ||
+      !isPhoneValid(nationalPhone, selectedCountryData.dialCode) ||
+      !/^\+[1-9]\d{6,14}$/.test(phoneInternational)
+    ) {
+      setPhoneError(
+        `Please enter a valid mobile number for ${selectedCountryData.name}.`
+      );
+      return;
+    }
+
     const details = {
-      country: selectedCountry,
-      countryCode: selectedCountryData?.code || '',
+      country: selectedCountryData.name,
+      countryIso: selectedCountryData.code,
       firstName: String(formData.get('firstName') || '').trim(),
       lastName: String(formData.get('lastName') || '').trim(),
       businessName: String(formData.get('businessName') || '').trim(),
       email,
-      phone: String(formData.get('phone') || '').trim(),
+      phone: rawPhone,
+      phoneInternational,
       promoCode: String(formData.get('promoCode') || '').trim(),
     };
 
     setRegistrationData(details);
+    setCountryError('');
+    setPhoneError('');
     setSubmitError('');
     setStep(2);
   };
@@ -221,45 +236,28 @@ export default function SignUp() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          full_name: `${registrationData.firstName} ${registrationData.lastName}`.trim(),
-          email: registrationData.email,
-          password,
-          workspace_name: registrationData.businessName,
-        }),
+      await authApi.signUp({
+        first_name: registrationData.firstName,
+        last_name: registrationData.lastName,
+        email: registrationData.email,
+        password,
+        workspace_name: registrationData.businessName,
+        country: registrationData.countryIso,
+        phone: registrationData.phoneInternational,
+        ...(registrationData.promoCode ? { promo_code: registrationData.promoCode } : {}),
       });
 
-      const result = await readApiResponse(response);
-
-      if (!response.ok) {
-        const fieldError = result?.error?.details?.[0]?.message;
-
-        throw new Error(
-          fieldError ||
-            result?.error?.message ||
-            result?.message ||
-            'We could not create your account. Please try again.'
-        );
-      }
-
+      window.localStorage.setItem('bellbee_pending_verification_email', registrationData.email);
       navigate('/verify-email', {
         state: {
+          ...state,
           email: registrationData.email,
-          registrationData: {
-            ...registrationData,
-            whatsappTipsEnabled,
-          },
         },
       });
     } catch (error) {
       setSubmitError(
         error instanceof Error
-          ? error.message
+          ? authErrorMessage(error)
           : 'Something went wrong. Please try again.'
       );
     } finally {
@@ -304,6 +302,8 @@ export default function SignUp() {
                 Start automating your business conversations today.
               </p>
 
+              <GoogleButton />
+
               <div className="signup-divider">
                 <span />
                 <p>Continue with your details</p>
@@ -317,29 +317,21 @@ export default function SignUp() {
                 <div className="signup-field">
                   <label htmlFor="signup-country">Country</label>
 
-                  <div className="signup-input-wrap signup-select-wrap">
-                    <Globe2 size={17} />
+                  <CountrySelect
+                    value={selectedCountry}
+                    hasError={Boolean(countryError)}
+                    onChange={(code) => {
+                      setSelectedCountry(code);
+                      setCountryError('');
+                      setPhoneError('');
+                    }}
+                  />
 
-                    <select
-                      id="signup-country"
-                      name="country"
-                      value={selectedCountry}
-                      onChange={(event) =>
-                        setSelectedCountry(event.target.value)
-                      }
-                      required
-                    >
-                      <option value="">Select...</option>
-
-                      {countries.map((country) => (
-                        <option key={country.name} value={country.name}>
-                          {country.name} ({country.code})
-                        </option>
-                      ))}
-                    </select>
-
-                    <span className="signup-select-arrow" />
-                  </div>
+                  {countryError && (
+                    <small className="signup-field-error" role="alert">
+                      {countryError}
+                    </small>
+                  )}
                 </div>
 
                 <div className="signup-name-row">
@@ -355,6 +347,7 @@ export default function SignUp() {
                         name="firstName"
                         placeholder="First name"
                         autoComplete="given-name"
+                        maxLength={80}
                         defaultValue={registrationData.firstName}
                         required
                       />
@@ -371,6 +364,7 @@ export default function SignUp() {
                         name="lastName"
                         placeholder="Last name"
                         autoComplete="family-name"
+                        maxLength={80}
                         defaultValue={registrationData.lastName}
                         required
                       />
@@ -390,6 +384,8 @@ export default function SignUp() {
                       name="businessName"
                       placeholder="Your business name"
                       autoComplete="organization"
+                      minLength={2}
+                      maxLength={120}
                       defaultValue={registrationData.businessName}
                       required
                     />
@@ -417,30 +413,42 @@ export default function SignUp() {
                 <div className="signup-field">
                   <label htmlFor="signup-phone">Your mobile number</label>
 
-                  <div className="signup-input-wrap">
+                  <div
+                    className={`signup-input-wrap ${
+                      phoneError ? 'has-error' : ''
+                    }`}
+                  >
                     <Phone size={17} />
 
                     {selectedCountryData && (
                       <span className="signup-phone-code">
-                        {selectedCountryData.code}
+                        {selectedCountryData.dialCode}
                       </span>
                     )}
 
                     <input
                       id="signup-phone"
                       type="tel"
+                      inputMode="tel"
                       name="phone"
-                      placeholder="Enter your mobile number"
+                      placeholder={selectedCountry === 'PK' ? '0300 1234567' : 'Enter local mobile number'}
                       autoComplete="tel-national"
                       defaultValue={registrationData.phone}
+                      onChange={() => setPhoneError('')}
                       required
                     />
                   </div>
 
-                  <small className="signup-field-hint">
-                    We may contact you on this number about your account
-                    and Bellbee updates.
-                  </small>
+                  {phoneError ? (
+                    <small className="signup-field-error" role="alert">
+                      {phoneError}
+                    </small>
+                  ) : (
+                    <small className="signup-field-hint">
+                      Enter only your local number. The selected country's
+                      calling code is added automatically.
+                    </small>
+                  )}
                 </div>
 
                 <div className="signup-promo-section">
@@ -537,6 +545,7 @@ export default function SignUp() {
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       minLength={8}
+                      maxLength={128}
                       required
                     />
 
@@ -562,26 +571,15 @@ export default function SignUp() {
                 <ul className="signup-password-rules" aria-live="polite">
                   <li className={passwordRequirements.length ? 'is-valid' : ''}>
                     <Check size={14} />
-                    At least 8 characters
+                    Between 8 and 128 characters
                   </li>
-
-                  <li
-                    className={passwordRequirements.uppercase ? 'is-valid' : ''}
-                  >
+                  <li className={passwordRequirements.letter ? 'is-valid' : ''}>
                     <Check size={14} />
-                    One uppercase letter
+                    At least one letter
                   </li>
-
-                  <li
-                    className={passwordRequirements.lowercase ? 'is-valid' : ''}
-                  >
+                  <li className={passwordRequirements.numberOrSymbol ? 'is-valid' : ''}>
                     <Check size={14} />
-                    One lowercase letter
-                  </li>
-
-                  <li className={passwordRequirements.number ? 'is-valid' : ''}>
-                    <Check size={14} />
-                    One number
+                    At least one number or symbol
                   </li>
                 </ul>
 
@@ -700,6 +698,7 @@ export default function SignUp() {
               </p>
             </>
           )}
+          <p className="signup-login">Already have an account? <Link to="/signin" state={state}>Sign in</Link></p>
         </div>
 
         <p className="signup-copyright">

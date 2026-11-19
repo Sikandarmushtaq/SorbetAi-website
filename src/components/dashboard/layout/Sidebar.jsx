@@ -1,3 +1,4 @@
+import './Sidebar.css';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, MessageSquare, Pin, PinOff, X } from 'lucide-react';

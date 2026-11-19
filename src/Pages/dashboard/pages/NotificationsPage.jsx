@@ -1,3 +1,5 @@
+import { notificationsApi } from '../../../services/dashboard/notifications.api.js';
+import './NotificationsPage.css';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -5,8 +7,7 @@ import {
   Settings, CheckCheck,
 } from 'lucide-react';
 import { EmptyState, PageHeader, Panel, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { getCurrentWorkspace, resourceRequest } from '../../../services/dashboardApi';
-
+import { getCurrentWorkspace } from '../../../services/dashboardApi';
 const categories = ['All', 'Orders', 'Appointments', 'AI', 'Billing', 'WhatsApp', 'System'];
 const categoryIcons = { Orders: Package, Appointments: CalendarDays, AI: Bot, Billing: CreditCard, WhatsApp: MessageSquare, System: Settings };
 
@@ -52,7 +53,7 @@ export default function NotificationsPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('notifications', { query: { category: category === 'All' ? undefined : category, unread_only: unreadOnly } });
+      const response = await notificationsApi.request({ query: { category: category === 'All' ? undefined : category, unread_only: unreadOnly } });
       setNotifications(notificationRecords(response));
     } catch (error) {
       setNotifications([]);
@@ -78,7 +79,7 @@ export default function NotificationsPage() {
     const id = notification.id || notification.notification_id;
     if (!notification.is_read && !notification.read_at) {
       try {
-        await resourceRequest('notifications', { method: 'PATCH', id, action: 'read', body: { is_read: true } });
+        await notificationsApi.request({ method: 'PATCH', id, action: 'read', body: { is_read: true } });
         setNotifications((current) => current.map((item) => String(item.id || item.notification_id) === String(id) ? { ...item, is_read: true, read_at: new Date().toISOString() } : item));
         window.dispatchEvent(new Event('bellbee:notifications-updated'));
       } catch (error) {
@@ -90,7 +91,7 @@ export default function NotificationsPage() {
 
   const markAllRead = async () => {
     try {
-      await resourceRequest('notifications', { method: 'POST', action: 'read-all', body: {} });
+      await notificationsApi.request({ method: 'POST', action: 'read-all', body: {} });
       setNotifications((current) => current.map((item) => ({ ...item, is_read: true, read_at: item.read_at || new Date().toISOString() })));
       window.dispatchEvent(new Event('bellbee:notifications-updated'));
       showNotice('All notifications marked as read.');

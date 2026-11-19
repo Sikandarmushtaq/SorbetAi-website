@@ -1,0 +1,12 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-free-plan-benefits {
+  display: flex; flex-direction: column; gap: 13px; padding: 3px 0;
+}
+
+.dp-free-plan-benefit {
+  display: flex; align-items: flex-start; gap: 10px; color: var(--db-green); font-size: 10px; line-height: 1.55;
+}
+
+.dp-free-plan-benefit svg {
+  flex: 0 0 auto; margin-top: 1px; color: #3b8753;
+}

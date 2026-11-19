@@ -1,7 +1,7 @@
+import { productsApi } from '../../../services/dashboard/products.api.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Download, FileDown, Package, Plus, Upload } from 'lucide-react';
 import { EmptyState, FieldInput, FieldSelect, FieldTextarea, FormField, Modal, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
 import { downloadCsv, parseCsv } from '../../../utils/csv';
 
 const productHeaders = ['Product Name', 'Description', 'Price', 'Stock', 'Category', 'SKU', 'Product Link', 'Visibility', 'Active'];
@@ -44,7 +44,7 @@ export default function ProductsPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('products');
+      const response = await productsApi.request();
       setProducts(productRecords(response));
     } catch (error) {
       setProducts([]);
@@ -79,7 +79,7 @@ export default function ProductsPage() {
         price_visibility: form.visibility,
       }).forEach(([key, value]) => payload.append(key, value));
       if (photo) payload.append('image', photo);
-      await resourceRequest('products', { method: 'POST', body: payload });
+      await productsApi.request({ method: 'POST', body: payload });
       setForm(emptyForm);
       setPhoto(null);
       setIsOpen(false);
@@ -112,7 +112,7 @@ export default function ProductsPage() {
         is_active: String(record.active || 'yes').toLowerCase() !== 'no',
       })).filter((product) => product.name);
       if (!imported.length) throw new Error('No products were imported. Check that your CSV has a Product Name or Name column.');
-      await resourceRequest('products', { method: 'POST', action: 'import', body: { products: imported } });
+      await productsApi.request({ method: 'POST', action: 'import', body: { products: imported } });
       showNotice(`${imported.length} product${imported.length === 1 ? '' : 's'} imported.`);
       await loadProducts();
     } catch (error) {

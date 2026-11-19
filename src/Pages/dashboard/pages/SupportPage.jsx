@@ -1,8 +1,8 @@
+import { supportTicketsApi } from '../../../services/dashboard/support-tickets.api.js';
+import './SupportPage.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LifeBuoy, Plus, Ticket } from 'lucide-react';
 import { EmptyState, FieldInput, FieldSelect, FieldTextarea, FormField, Modal, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
-
 const emptyForm = { subject: '', category: 'General', message: '' };
 const ticketStatuses = ['All statuses', 'Open', 'In progress', 'Resolved'];
 
@@ -27,7 +27,7 @@ export default function SupportPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('supportTickets');
+      const response = await supportTicketsApi.request();
       setTickets(ticketRecords(response));
     } catch (error) {
       setTickets([]);
@@ -63,7 +63,7 @@ export default function SupportPage() {
       payload.append('category', form.category.toLowerCase().replaceAll(' ', '_'));
       payload.append('message', form.message.trim());
       files.forEach((file) => payload.append('attachments', file));
-      await resourceRequest('supportTickets', { method: 'POST', body: payload });
+      await supportTicketsApi.request({ method: 'POST', body: payload });
       setForm(emptyForm);
       setFiles([]);
       setIsOpen(false);

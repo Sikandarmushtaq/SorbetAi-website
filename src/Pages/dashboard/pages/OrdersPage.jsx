@@ -1,8 +1,9 @@
+import { ordersApi } from '../../../services/dashboard/orders.api.js';
+import './OrdersPage.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, Download, Plus, Search, ShoppingBag, Truck } from 'lucide-react';
 import { EmptyState, FieldInput, FieldTextarea, FormField, Modal, PageHeader, Panel, StatCard, StatGrid, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
-import { resourceRequest } from '../../../services/dashboardApi';
 import { downloadCsv } from '../../../utils/csv';
 
 const orderStatuses = [
@@ -70,7 +71,7 @@ export default function OrdersPage() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const response = await resourceRequest('orders');
+      const response = await ordersApi.request();
       setOrders(orderRecords(response));
       setSummary(response?.summary || response?.metrics || null);
     } catch (error) {
@@ -120,7 +121,7 @@ export default function OrdersPage() {
     event.preventDefault();
     setIsSaving(true);
     try {
-      await resourceRequest('orders', {
+      await ordersApi.request({
         method: 'POST',
         body: {
           customer_name: form.customer_name.trim(),
@@ -147,7 +148,7 @@ export default function OrdersPage() {
     const id = orderId(order);
     setStatusUpdatingId(id);
     try {
-      await resourceRequest('orders', { method: 'PATCH', id, body: { status: nextStatus } });
+      await ordersApi.request({ method: 'PATCH', id, body: { status: nextStatus } });
       setOrders((current) => current.map((item) => orderId(item) === id ? { ...item, status: nextStatus } : item));
     } catch (error) {
       showNotice(error.message);
