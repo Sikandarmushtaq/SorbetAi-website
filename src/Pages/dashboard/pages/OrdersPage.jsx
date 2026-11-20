@@ -127,7 +127,7 @@ export default function OrdersPage() {
     }).catch((error) => { if (active) showNotice(error.message); });
     return () => { active = false; };
   // The catalogue only needs to load when the order editor opens.
-  }, [isOpen]);
+  }, [isOpen,showNotice]);
 
   const updateForm = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   const calculatedTotal = lines.reduce((sum, line) => sum + Number(line.price) * Number(line.quantity), 0);

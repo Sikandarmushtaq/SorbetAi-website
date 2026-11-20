@@ -56,7 +56,7 @@ export default function ServicesPage() {
       if (active) setStaffMembers(Array.isArray(response) ? response : response?.staff || response?.items || response?.results || []);
     }).catch((error) => { if (active) showNotice(error.message); });
     return () => { active = false; };
-  }, [isOpen]);
+  }, [isOpen,showNotice]);
 
   const visible = useMemo(() => services.filter((service) => status === 'All Status' || (status === 'Active' ? isActive(service) : !isActive(service))), [services, status]);
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
