@@ -1,4 +1,5 @@
 import { ordersApi } from '../../../services/dashboard/orders.api.js';
+import { productsApi } from '../../../services/dashboard/products.api.js';
 import './OrdersPage.css';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -15,7 +16,7 @@ const orderStatuses = [
   { label: 'Delivered', value: 'delivered' },
   { label: 'Cancelled', value: 'cancelled' },
 ];
-const emptyForm = { customer_name: '', phone: '', address: '', items: '', notes: '', total: '' };
+const emptyForm = { customer_name: '', phone: '', address: '', notes: '' };
 const csvHeaders = ['Customer', 'Items', 'Total', 'Status', 'Date'];
 
 function orderRecords(response) {
@@ -62,6 +63,9 @@ export default function OrdersPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState('');
   const [form, setForm] = useState(emptyForm);
+  const [catalog, setCatalog] = useState([]);
+  const [lines, setLines] = useState([]);
+  const [itemDraft, setItemDraft] = useState({ product_id: '', name: '', price: '', quantity: 1 });
   const { showNotice, Notice } = useNotice();
   const requestedStatus = searchParams.get('status') || 'all';
   const activeStatus = orderStatuses.some((item) => item.value === requestedStatus) ? requestedStatus : 'all';
@@ -115,10 +119,29 @@ export default function OrdersPage() {
     setSearchParams(next, { replace: true });
   };
 
+  useEffect(() => {
+    if (!isOpen || !productsApi.isConfigured()) return undefined;
+    let active = true;
+    productsApi.request().then((response) => {
+      if (active) setCatalog(Array.isArray(response) ? response : response?.items || response?.products || response?.results || []);
+    }).catch((error) => { if (active) showNotice(error.message); });
+    return () => { active = false; };
+  // The catalogue only needs to load when the order editor opens.
+  }, [isOpen]);
+
   const updateForm = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  const calculatedTotal = lines.reduce((sum, line) => sum + Number(line.price) * Number(line.quantity), 0);
+  const addLine = () => {
+    if (!itemDraft.name.trim() || !Number.isFinite(Number(itemDraft.price)) || Number(itemDraft.price) < 0 || Number(itemDraft.quantity) < 1) {
+      showNotice('Enter an item name, a valid price and a quantity of at least one.'); return;
+    }
+    setLines((current) => [...current, { ...itemDraft, name: itemDraft.name.trim(), price: Number(itemDraft.price), quantity: Number(itemDraft.quantity) }]);
+    setItemDraft({ product_id: '', name: '', price: '', quantity: 1 });
+  };
 
   const createOrder = async (event) => {
     event.preventDefault();
+    if (!lines.length) { showNotice('Add at least one order item.'); return; }
     setIsSaving(true);
     try {
       await ordersApi.request({
@@ -127,13 +150,15 @@ export default function OrdersPage() {
           customer_name: form.customer_name.trim(),
           phone: form.phone.trim(),
           delivery_address: form.address.trim(),
-          items_description: form.items.trim(),
+          items_description: lines.map((line) => `${line.name} x ${line.quantity}`).join(', '),
+          items: lines.map((line) => ({ ...(line.product_id ? { product_id: line.product_id } : {}), name: line.name, quantity: line.quantity, unit_price: line.price })),
           notes: form.notes.trim(),
-          total: Number(form.total),
+          total: calculatedTotal,
           currency: 'PKR',
         },
       });
       setForm(emptyForm);
+      setLines([]);
       setIsOpen(false);
       showNotice('Order saved successfully.');
       await loadOrders();
@@ -213,13 +238,22 @@ export default function OrdersPage() {
         )}
       </Panel>
 
-      {isOpen && <Modal title="Create order" description="Add an order to your business records." onClose={() => !isSaving && setIsOpen(false)} footer={<><button type="button" className="dp-secondary-button" onClick={() => setIsOpen(false)} disabled={isSaving}>Cancel</button><button type="submit" form="order-form" className="dp-primary-button" disabled={isSaving}>{isSaving ? 'Saving…' : 'Create order'} <Plus size={14} /></button></>}>
+      {isOpen && <Modal title="Create order" description="Add an order to your business records." onClose={() => !isSaving && setIsOpen(false)} footer={<><button type="button" className="dp-secondary-button" onClick={() => setIsOpen(false)} disabled={isSaving}>Cancel</button><button type="submit" form="order-form" className="dp-primary-button" disabled={isSaving || !lines.length}>{isSaving ? 'Saving…' : 'Create order'} <Plus size={14} /></button></>}>
         <form id="order-form" className="dp-form-grid" onSubmit={createOrder}>
           <FormField label="Customer name"><FieldInput value={form.customer_name} onChange={(event) => updateForm('customer_name', event.target.value)} required /></FormField>
           <FormField label="Phone number"><FieldInput value={form.phone} onChange={(event) => updateForm('phone', event.target.value)} required /></FormField>
           <FormField label="Delivery address" className="dp-form-full"><FieldTextarea rows={2} value={form.address} onChange={(event) => updateForm('address', event.target.value)} required /></FormField>
-          <FormField label="Items" className="dp-form-full"><FieldInput value={form.items} onChange={(event) => updateForm('items', event.target.value)} placeholder="Product name and quantity" required /></FormField>
-          <FormField label="Total (PKR)"><FieldInput type="number" min="0" step="0.01" value={form.total} onChange={(event) => updateForm('total', event.target.value)} required /></FormField>
+          <div className="dp-form-full dp-order-line-builder">
+            <strong>Order items</strong>
+            {catalog.length > 0 && <FormField label="Search catalog / pick a product"><FieldInput list="order-catalog-options" value={itemDraft.name} onChange={(event) => {
+              const name = event.target.value;
+              const match = catalog.find((product) => product.name === name);
+              setItemDraft((c) => ({ ...c, name, product_id: match ? String(match.id || match.product_id) : '', price: match?.price != null ? String(match.price) : c.price }));
+            }} placeholder="Choose a product or type a custom item" /><datalist id="order-catalog-options">{catalog.map((product) => <option key={product.id || product.product_id} value={product.name} />)}</datalist></FormField>}
+            <div className="dp-order-item-grid"><FormField label="Custom item / product name"><FieldInput value={itemDraft.name} onChange={(event) => setItemDraft((c) => ({ ...c, name: event.target.value, product_id: '' }))} placeholder="Item name" /></FormField><FormField label="Unit price (PKR)"><FieldInput type="number" min="0" step="0.01" value={itemDraft.price} onChange={(event) => setItemDraft((c) => ({ ...c, price: event.target.value }))} /></FormField><FormField label="Quantity"><FieldInput type="number" min="1" step="1" value={itemDraft.quantity} onChange={(event) => setItemDraft((c) => ({ ...c, quantity: event.target.value }))} /></FormField><button type="button" className="dp-secondary-button" onClick={addLine}><Plus size={14} /> Add item</button></div>
+            {lines.map((line, index) => <div className="dp-order-item-row" key={`${line.name}-${index}`}><span>{line.name} × {line.quantity}</span><strong>PKR {(line.price * line.quantity).toLocaleString()}</strong><button type="button" className="dp-text-button" onClick={() => setLines((current) => current.filter((_, i) => i !== index))}>Remove</button></div>)}
+          </div>
+          <div className="dp-form-full dp-order-calculated-total"><strong>Total</strong><strong>PKR {calculatedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
           <FormField label="Notes"><FieldInput value={form.notes} onChange={(event) => updateForm('notes', event.target.value)} /></FormField>
         </form>
       </Modal>}

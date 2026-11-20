@@ -1,50 +1,319 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
-.dp-channels-overview {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 13px; padding: 13px 15px; border: 1px solid var(--db-border); border-radius: 11px; background: var(--db-white);
+
+/* =========================================
+   BELLBEE CHANNELS PAGE
+   Uses the existing dashboard color theme.
+========================================= */
+
+.dp-channels-page {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding-bottom: 35px;
 }
 
-.dp-channels-overview .dp-section-kicker {
+/* Page heading */
+
+.dp-channels-page .dp-page-header {
+  margin-bottom: 23px;
+}
+
+.dp-channels-page .dp-page-header h1 {
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.dp-channels-page .dp-page-description {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Live Channels heading */
+
+.dp-channels-section-heading {
+  margin: 0 0 10px;
+  color: var(--db-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+/* Cards grid */
+
+.dp-channels-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Individual channel card */
+
+.dp-channels-card.dp-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 212px;
   margin: 0;
+  padding: 20px;
+  border: 1px solid var(--db-border);
+  border-radius: 14px;
+  background: var(--db-white);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.045);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.dp-channel-grid {
-  display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 11px;
+.dp-channels-card.dp-panel:hover {
+  border-color: var(--db-coral);
+  box-shadow: 0 5px 17px rgba(0, 0, 0, 0.06);
 }
 
-.dp-channel-card {
-  display: flex; flex-direction: column; align-items: flex-start; min-width: 0; min-height: 245px; padding: 17px;
+/* Icon and status row */
+
+.dp-channels-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 13px;
 }
 
-.dp-channel-status {
-  display: flex; align-items: center; gap: 6px; color: var(--db-muted); font-size: 8px;
+/* Icon boxes */
+
+.dp-channels-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  flex: 0 0 45px;
+  border-radius: 12px;
 }
 
-.dp-channel-card h2 {
-  margin: 12px 0 6px; color: var(--db-green); font-size: 14px; font-weight: 800;
+.dp-channels-icon svg {
+  display: block;
 }
 
-.dp-channel-card > p {
-  flex: 1; margin: 0 0 15px; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+.dp-channels-icon-whatsapp {
+  color: #25d366;
+  background: #e3f7e9;
 }
 
-@media (max-width: 1100px) {
-.dp-channel-grid {
-  grid-template-columns: repeat(2,minmax(0,1fr));
+.dp-channels-icon-website {
+  color: var(--db-green);
+  background: var(--db-lavender);
 }
 
+.dp-channels-icon-messenger {
+  background: #e5efff;
 }
 
-@media (max-width: 760px) {
-.dp-channel-grid {
-  grid-template-columns: 1fr;
+.dp-channels-icon-instagram {
+  background: #ffe7f0;
 }
 
+/* Two social brand icons */
+
+.dp-channels-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 9px;
 }
 
-@media (max-width: 760px) {
-.dp-channel-card > p {
+/* Status badge */
+
+.dp-channels-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 175px;
+  min-height: 23px;
+  padding: 3px 9px;
+  border: 1px solid var(--db-border);
+  border-radius: 999px;
+  background: var(--db-white);
+  color: var(--db-muted);
   font-size: 11px;
-    line-height: 1.6;
+  font-weight: 650;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
 }
 
+.dp-channels-status-connected {
+  border-color: #b9eacc;
+  background: #e8f8ee;
+  color: #25834a;
+}
+
+/* Card content */
+
+.dp-channels-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.dp-channels-card-body h2 {
+  margin: 0 0 6px;
+  color: var(--db-green);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.dp-channels-card-body p {
+  margin: 0 0 14px;
+  color: var(--db-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Full-width action button */
+
+.dp-channels-manage-button.dp-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 37px;
+  margin-top: auto;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.dp-channels-manage-button svg {
+  flex: 0 0 auto;
+  transition: transform 0.2s ease;
+}
+
+.dp-channels-manage-button:hover svg {
+  transform: translateX(3px);
+}
+
+/* Request new channel */
+
+.dp-channels-request {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 114px;
+  margin-top: 23px;
+  padding: 20px;
+  border: 1px dashed var(--db-border);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--db-green);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.dp-channels-request svg {
+  color: var(--db-muted);
+}
+
+.dp-channels-request span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dp-channels-request:hover {
+  border-color: var(--db-coral);
+  background: var(--db-cream);
+}
+
+.dp-channels-request:hover svg {
+  color: var(--db-coral);
+}
+
+.dp-channels-request:focus-visible,
+.dp-channels-manage-button:focus-visible {
+  outline: 2px solid var(--db-coral);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 1000px) {
+  .dp-channels-cards {
+    gap: 13px;
+  }
+
+  .dp-channels-card.dp-panel {
+    padding: 17px;
+  }
+}
+
+@media (max-width: 760px) {
+  .dp-channels-page {
+    max-width: 100%;
+    padding-bottom: 25px;
+  }
+
+  .dp-channels-cards {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .dp-channels-card.dp-panel {
+    min-height: 190px;
+    padding: 17px;
+  }
+
+  .dp-channels-page .dp-page-header h1 {
+    font-size: 29px;
+  }
+
+  .dp-channels-page .dp-page-description {
+    font-size: 12px;
+  }
+
+  .dp-channels-card-body p {
+    font-size: 12px;
+  }
+
+  .dp-channels-request {
+    min-height: 105px;
+    margin-top: 17px;
+  }
+}
+
+@media (max-width: 420px) {
+  .dp-channels-card-top {
+    gap: 8px;
+  }
+
+  .dp-channels-icon {
+    width: 41px;
+    height: 41px;
+    flex-basis: 41px;
+  }
+
+  .dp-channels-status {
+    max-width: 150px;
+    font-size: 10px;
+  }
+
+  .dp-channels-card-body h2 {
+    font-size: 15px;
+  }
+
+  .dp-channels-manage-button.dp-primary-button {
+    min-height: 40px;
+    font-size: 12px;
+  }
 }

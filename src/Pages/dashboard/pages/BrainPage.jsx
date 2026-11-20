@@ -1,534 +1,3466 @@
-import { bookingRulesApi } from '../../../services/dashboard/booking-rules.api.js';
-import { brainAssistantApi } from '../../../services/dashboard/brain-assistant.api.js';
-import { brainOverviewApi } from '../../../services/dashboard/brain-overview.api.js';
-import { brainSetupApi } from '../../../services/dashboard/brain-setup.api.js';
-import { businessHoursApi } from '../../../services/dashboard/business-hours.api.js';
-import { closedDatesApi } from '../../../services/dashboard/closed-dates.api.js';
-import { knowledgeApi } from '../../../services/dashboard/knowledge.api.js';
-import { locationsApi } from '../../../services/dashboard/locations.api.js';
-import { requestTypesApi } from '../../../services/dashboard/request-types.api.js';
-import { staffApi } from '../../../services/dashboard/staff.api.js';
-import { testAiApi } from '../../../services/dashboard/test-ai.api.js';
+
 import './BrainPage.css';
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import {
-  Bot, Building2, CalendarDays, Clock3, Copy, FileText,
-  Lightbulb, MapPin, Package, Pencil, Plus, RotateCcw, Search,
-  Send, Settings, Sparkles, Trash2, Users, X,
-} from 'lucide-react';
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
 import {
-  EmptyState, FieldInput, FieldSelect, FieldTextarea, FormField, Modal,
-  PageHeader, Panel, Tabs, useNotice,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
+
+import * as Lucide from 'lucide-react';
+
+import {
+  PageHeader,
+  Modal,
+  useNotice,
 } from '../../../components/dashboard/common/DashboardUI';
+
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
 import { getCurrentWorkspace } from '../../../services/dashboardApi';
-import { deleteBrainResource } from '../../../services/dashboard/brain.api';
-const brainTabs = [
-  { label: 'What AI knows', value: 'what-ai-knows' },
-  { label: 'Setup', value: 'setup' },
-  { label: 'Hours & Staff', value: 'hours-staff' },
-  { label: 'Locations', value: 'locations' },
-  { label: 'Knowledge', value: 'knowledge' },
-  { label: 'Requests', value: 'requests' },
-  { label: 'Test AI', value: 'test-ai' },
-];
-const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const emptySetup = {
-  business_name: '', industry: '', whatsapp_number: '', business_address: '', business_description: '',
-  agent_name: '', agent_gender: 'Not set', reply_language: 'Automatic', tone: 'Friendly', reply_length: 'Balanced',
-  custom_instructions: '', goodbye_message: '',
-};
-const emptyRules = { offer_time: 'First available', booking_gap: '15 minutes', minimum_notice: '1 hour', book_ahead: '30 days', concurrent_customers: '1' };
-const emptyStaff = { name: '', role: '', phone: '', hours_mode: 'business', start_time: '', end_time: '' };
-const emptyLocation = { name: '', address: '', phone: '', notes: '' };
-const emptyRequest = { name: '', detailsToCollect: '', whatHappensNext: '' };
 
-function recordsFrom(response, key) {
-  return Array.isArray(response) ? response : response?.items || response?.results || response?.[key] || [];
+import { brainOverviewApi } from '../../../services/dashboard/brain-overview.api.js';
+import { brainSetupApi } from '../../../services/dashboard/brain-setup.api.js';
+import { brainAssistantApi } from '../../../services/dashboard/brain-assistant.api.js';
+import { businessHoursApi } from '../../../services/dashboard/business-hours.api.js';
+import { bookingRulesApi } from '../../../services/dashboard/booking-rules.api.js';
+import { closedDatesApi } from '../../../services/dashboard/closed-dates.api.js';
+import { staffApi } from '../../../services/dashboard/staff.api.js';
+import { locationsApi } from '../../../services/dashboard/locations.api.js';
+import { knowledgeApi } from '../../../services/dashboard/knowledge.api.js';
+import { requestTypesApi } from '../../../services/dashboard/request-types.api.js';
+import { testAiApi } from '../../../services/dashboard/test-ai.api.js';
+
+// Safe icons: undefined Lucide exports will not crash React.
+function Icon({ name, size = 17, ...props }) {
+  const Component = Lucide[name];
+
+  return Component
+    ? <Component size={size} {...props} />
+    : <span aria-hidden="true">◆</span>;
+}
+
+const brainTabs = [
+  ['What AI Knows', 'what-ai-knows', 'Eye'],
+  ['Setup', 'setup', 'SlidersHorizontal'],
+  ['Hours & Staff', 'hours-staff', 'Users'],
+  ['Locations', 'locations', 'MapPin'],
+  ['Knowledge', 'knowledge', 'BookOpen'],
+  ['Requests', 'requests', 'Target'],
+  ['Test AI', 'test-ai', 'Bot'],
+];
+
+const knowledgeTabs = [
+  ['FAQs', 'BookOpen'],
+  ['Promotions', 'Tag'],
+  ['Documents', 'FileText'],
+  ['Website', 'Globe'],
+  ['Chat Training', 'MessageSquare'],
+];
+
+const weekDays = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+const initialSetup = {
+  business_name: '',
+  industry: '',
+  whatsapp_number: '',
+  business_address: '',
+  business_description: '',
+  agent_name: 'Assistant',
+  agent_gender: 'Not set',
+  reply_language: 'Automatic',
+  tone: 'Friendly',
+  reply_length: 'Medium',
+  custom_instructions: '',
+  goodbye_message: '',
+};
+
+const initialRules = {
+  offer_time: "Each service's own length",
+  booking_gap: 'No gap',
+  minimum_notice: 'No minimum',
+  book_ahead: 'No limit',
+  concurrent_customers: '1',
+};
+
+const initialStaff = {
+  name: '',
+  role: '',
+  phone: '',
+  hours_mode: 'business',
+  start_time: '',
+  end_time: '',
+};
+
+const initialRequest = {
+  name: '',
+  detailsToCollect: '',
+  whatHappensNext: '',
+};
+
+const initialEditor = {
+  question: '',
+  answer: '',
+  title: '',
+  content: '',
+  valid_until: '',
+  website_url: '',
+  document_title: '',
+  document_description: '',
+  share_on_whatsapp: false,
+};
+
+function isConfigured(api) {
+  return typeof api?.isConfigured !== 'function'
+    || api.isConfigured();
+}
+
+function getError(error) {
+  return error?.message || 'The request could not be completed.';
+}
+
+function records(response, key) {
+  if (Array.isArray(response)) return response;
+
+  const result =
+    response?.[key] ||
+    response?.items ||
+    response?.results ||
+    [];
+
+  return Array.isArray(result) ? result : [];
+}
+
+function shortTime(value) {
+  return value ? String(value).slice(0, 5) : '';
 }
 
 function normaliseHours(response) {
-  const source = Array.isArray(response) ? response : response?.days || response?.weekly_hours || response?.hours || [];
-  const raw = Array.isArray(source)
+  const source =
+    response?.days ||
+    response?.weekly_hours ||
+    response?.hours ||
+    response ||
+    [];
+
+  const rows = Array.isArray(source)
     ? source
-    : Object.entries(source || {}).map(([day, details]) => ({ day, ...(details || {}) }));
+    : Object.entries(source).map(([day, data]) => ({
+        day,
+        ...(data || {}),
+      }));
+
   return weekDays.map((day) => {
-    const saved = raw.find((item) => String(item.day || item.name).toLowerCase() === day.toLowerCase()) || {};
+    const match = rows.find(
+      (item) =>
+        String(item.day || item.name).toLowerCase()
+        === day.toLowerCase()
+    ) || {};
+
     return {
       day,
-      enabled: saved.enabled ?? saved.is_open ?? (saved.is_closed !== undefined ? !saved.is_closed : false),
-      is_24_hours: Boolean(saved.is_24_hours || saved.all_day),
-      start_time: saved.start_time || saved.open_time || saved.open || '',
-      end_time: saved.end_time || saved.close_time || saved.close || '',
-      breaks: Array.isArray(saved.breaks) ? saved.breaks : [],
+      enabled:
+        match.enabled ??
+        match.is_open ??
+        (match.is_closed === false),
+      is_24_hours: Boolean(
+        match.is_24_hours || match.all_day
+      ),
+      start_time: shortTime(
+        match.start_time ||
+        match.open_time ||
+        match.open
+      ),
+      end_time: shortTime(
+        match.end_time ||
+        match.close_time ||
+        match.close
+      ),
+      breaks: Array.isArray(match.breaks)
+        ? match.breaks
+        : [],
     };
   });
 }
 
+function Field({ title, hint, wide = false, children }) {
+  return (
+    <label className={`bb2-field ${wide ? 'wide' : ''}`}>
+      <span>{title}</span>
+      {children}
+      {hint && <small>{hint}</small>}
+    </label>
+  );
+}
 
-// Coordinates the URL-driven AI Brain sections and keeps all business knowledge connected to API data.
+function SelectField({ value, onChange, choices }) {
+  return (
+    <select
+      className="bb2-control"
+      value={value ?? ''}
+      onChange={(event) => onChange(event.target.value)}
+    >
+      {choices.map((choice) => {
+        const [key, label] = Array.isArray(choice)
+          ? choice
+          : [choice, choice];
+
+        return (
+          <option key={key} value={key}>
+            {label}
+          </option>
+        );
+      })}
+    </select>
+  );
+}
+
+function InfoCard({ title, children }) {
+  return (
+    <aside className="bb2-brain-info">
+      <div>
+        <Icon name="Info" size={16} />
+        <strong>{title}</strong>
+      </div>
+      <p>{children}</p>
+    </aside>
+  );
+}
+
+function ChatPanel({
+  heading,
+  subheading,
+  emptyText,
+  suggestions = [],
+  messages,
+  sending,
+  text,
+  setText,
+  submit,
+  reset,
+  disabled = false,
+  tokenNotice = '',
+  attachment,
+  onAttachment,
+  allowVoice = false,
+}) {
+  const scrollRef = useRef(null);
+  const fileRef = useRef(null);
+  const speechRef = useRef(null);
+
+  const [voiceError, setVoiceError] = useState('');
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop =
+        scrollRef.current.scrollHeight;
+    }
+  }, [messages, sending]);
+
+  useEffect(() => {
+    return () => {
+      speechRef.current?.stop();
+    };
+  }, []);
+
+  const startVoice = () => {
+    const Recognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    if (!Recognition) {
+      setVoiceError(
+        'Voice typing is not supported in this browser.'
+      );
+      return;
+    }
+
+    const recognition = new Recognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+
+      setText((current) =>
+        `${current} ${transcript}`.trim()
+      );
+    };
+
+    recognition.onerror = (event) => {
+      setVoiceError(`Voice input failed: ${event.error}`);
+    };
+
+    speechRef.current = recognition;
+    recognition.start();
+  };
+
+  return (
+    <section
+      className={`bb2-chat ${
+        heading ? 'bb2-chat-assistant' : 'bb2-chat-test'
+      }`}
+    >
+      {heading && (
+        <header className="bb2-chat-header">
+          <span className="bb2-chat-mark">
+            <Icon name="Sparkles" size={19} />
+          </span>
+
+          <div>
+            <strong>{heading}</strong>
+            <small>{subheading}</small>
+          </div>
+
+          <button
+            type="button"
+            title="Reset conversation"
+            aria-label="Reset conversation"
+            onClick={reset}
+            disabled={sending}
+          >
+            <Icon name="RotateCcw" size={17} />
+          </button>
+        </header>
+      )}
+
+      <div
+        className="bb2-chat-messages"
+        ref={scrollRef}
+        aria-live="polite"
+      >
+        {messages.length === 0 && (
+          <div className="bb2-chat-welcome">
+            <Icon
+              name={heading ? 'Sparkles' : 'Bot'}
+              size={28}
+            />
+
+            <p>{emptyText}</p>
+
+            {suggestions.map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                onClick={() => setText(prompt)}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {messages.map((message, index) => (
+          <div
+            key={`${message.role}-${index}`}
+            className={`bb2-chat-bubble ${message.role}`}
+          >
+            {message.text}
+          </div>
+        ))}
+
+        {sending && (
+          <div
+            className="bb2-chat-typing"
+            role="status"
+          >
+            <span />
+            <span />
+            <span />
+            Thinking…
+          </div>
+        )}
+      </div>
+
+      {tokenNotice && (
+        <div className="bb2-tokens">
+          {tokenNotice}
+          <a href="/dashboard/billing">
+            Add tokens
+          </a>
+        </div>
+      )}
+
+      {attachment && (
+        <div className="bb2-chat-attachment">
+          {attachment.name}
+
+          <button
+            type="button"
+            onClick={() => onAttachment?.(null)}
+          >
+            Remove
+          </button>
+        </div>
+      )}
+
+      {voiceError && (
+        <small
+          className="bb2-chat-error"
+          role="alert"
+        >
+          {voiceError}
+        </small>
+      )}
+
+      <form
+        className="bb2-chat-compose"
+        onSubmit={submit}
+      >
+        {onAttachment && (
+          <>
+            <input
+              ref={fileRef}
+              type="file"
+              hidden
+              accept=".pdf,.png,.jpg,.jpeg"
+              onChange={(event) =>
+                onAttachment(
+                  event.target.files?.[0] || null
+                )
+              }
+            />
+
+            <button
+              type="button"
+              title="Attach file"
+              aria-label="Attach file"
+              disabled={disabled || sending}
+              onClick={() => fileRef.current?.click()}
+            >
+              <Icon name="Paperclip" size={18} />
+            </button>
+          </>
+        )}
+
+        <input
+          value={text}
+          onChange={(event) =>
+            setText(event.target.value)
+          }
+          placeholder={
+            heading
+              ? 'Message the assistant…'
+              : 'Type a message as a customer would…'
+          }
+          disabled={disabled || sending}
+        />
+
+        <button
+          type={text.trim() ? 'submit' : 'button'}
+          disabled={
+            disabled ||
+            sending ||
+            (!text.trim() && !allowVoice)
+          }
+          aria-label={
+            text.trim()
+              ? 'Send message'
+              : 'Voice typing'
+          }
+          onClick={
+            !text.trim() && allowVoice
+              ? startVoice
+              : undefined
+          }
+        >
+          <Icon
+            name={
+              text.trim()
+                ? 'Send'
+                : allowVoice
+                  ? 'Mic'
+                  : 'Send'
+            }
+            size={17}
+          />
+        </button>
+      </form>
+    </section>
+  );
+}
+
 export default function BrainPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const selectedTab = searchParams.get('tab') || 'what-ai-knows';
-  const tab = brainTabs.some((item) => item.value === selectedTab) ? selectedTab : 'what-ai-knows';
+
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+
+  const requestedTab = searchParams.get('tab');
+
+  const tab = brainTabs.some(
+    ([, value]) => value === requestedTab
+  )
+    ? requestedTab
+    : 'what-ai-knows';
+
+  const {
+    isStarted,
+    isStatusKnown,
+    isChecking: checkingPlan,
+    openFreePlan,
+  } = useFreePlan();
+
+  const { Notice, showNotice } = useNotice();
+
   const [overview, setOverview] = useState(null);
-  const [overviewError, setOverviewError] = useState('');
-  const [overviewLoading, setOverviewLoading] = useState(false);
-  const [setup, setSetup] = useState(emptySetup);
-  const [setupLoading, setSetupLoading] = useState(false);
-  const [setupSaving, setSetupSaving] = useState(false);
-  const [hours, setHours] = useState(() => normaliseHours([]));
-  const [hoursLoading, setHoursLoading] = useState(false);
-  const [hoursSaving, setHoursSaving] = useState(false);
-  const [rules, setRules] = useState(emptyRules);
-  const [rulesSaving, setRulesSaving] = useState(false);
+  const [overviewLoading, setOverviewLoading] =
+    useState(true);
+  const [overviewError, setOverviewError] =
+    useState('');
+
+  const [setup, setSetup] = useState(initialSetup);
+  const [hours, setHours] = useState(() =>
+    normaliseHours([])
+  );
+  const [rules, setRules] = useState(initialRules);
+
   const [closedDates, setClosedDates] = useState([]);
-  const [closedDate, setClosedDate] = useState({ date: '', reason: '' });
   const [staff, setStaff] = useState([]);
   const [locations, setLocations] = useState([]);
-  const [knowledge, setKnowledge] = useState([]);
-  const [requestTypes, setRequestTypes] = useState([]);
-  const [sectionErrors, setSectionErrors] = useState({});
-  const [staffModal, setStaffModal] = useState(false);
-  const [staffForm, setStaffForm] = useState(emptyStaff);
-  const [locationModal, setLocationModal] = useState(false);
-  const [locationForm, setLocationForm] = useState(emptyLocation);
-  const [requestModal, setRequestModal] = useState(false);
-  const [requestForm, setRequestForm] = useState(emptyRequest);
-  const [savingModal, setSavingModal] = useState(false);
-  const [knowledgeFile, setKnowledgeFile] = useState(null);
-  const [knowledgeSearch, setKnowledgeSearch] = useState('');
-  const [searchResult, setSearchResult] = useState('');
-  const [searchingKnowledge, setSearchingKnowledge] = useState(false);
-  const [showRules, setShowRules] = useState(false);
-  const [assistantMessage, setAssistantMessage] = useState('');
-  const [assistantMessages, setAssistantMessages] = useState([]);
-  const [assistantSending, setAssistantSending] = useState(false);
-  const [question, setQuestion] = useState('');
+  const [documents, setDocuments] = useState([]);
+  const [entries, setEntries] = useState([]);
+  const [requests, setRequests] = useState([]);
+
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState('');
+
+  const [modal, setModal] = useState('');
+  const [staffForm, setStaffForm] = useState(initialStaff);
+
+  const [locationForm, setLocationForm] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    notes: '',
+  });
+
+  const [requestForm, setRequestForm] =
+    useState(initialRequest);
+
+  const [dateForm, setDateForm] = useState({
+    date: '',
+    day_type: 'Closed all day',
+    reason: '',
+  });
+
+  const [knowledgeSection, setKnowledgeSection] =
+    useState('FAQs');
+
+  const [notApplicable, setNotApplicable] =
+    useState({});
+
+  const [editor, setEditor] = useState(initialEditor);
+  const [documentFile, setDocumentFile] = useState(null);
+
+  const [knowledgeSearch, setKnowledgeSearch] =
+    useState('');
+
+  const [lookup, setLookup] = useState({
+    question: '',
+    result: '',
+  });
+
+  const [assistantText, setAssistantText] =
+    useState('');
+  const [assistantFile, setAssistantFile] =
+    useState(null);
+  const [assistantMessages, setAssistantMessages] =
+    useState([]);
+  const [assistantSending, setAssistantSending] =
+    useState(false);
+
+  const [testText, setTestText] = useState('');
   const [testMessages, setTestMessages] = useState([]);
-  const [isSendingTest, setIsSendingTest] = useState(false);
-  const [isRequestLoading, setIsRequestLoading] = useState(false);
-  const [requestError, setRequestError] = useState('');
-  const { showNotice, Notice } = useNotice();
-  const { isStarted, isStatusKnown, isChecking: isCheckingPlan, openFreePlan } = useFreePlan();
+  const [testSending, setTestSending] = useState(false);
+
+  const changeTab = (value, anchor) => {
+    setSearchParams(
+      value === 'what-ai-knows'
+        ? {}
+        : { tab: value },
+      { replace: true }
+    );
+
+    if (anchor) {
+      window.requestAnimationFrame(() => {
+        document.getElementById(anchor)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
+    }
+  };
 
   const loadOverview = useCallback(async () => {
     setOverviewLoading(true);
     setOverviewError('');
+
     try {
-      const response = await brainOverviewApi.request();
-      setOverview(response?.overview || response);
+      if (!isConfigured(brainOverviewApi)) {
+        throw new Error(
+          'AI Brain overview API is not configured.'
+        );
+      }
+
+      const result = await brainOverviewApi.request();
+
+      setOverview(
+        result?.overview || result || null
+      );
     } catch (error) {
-      setOverview(null);
-      setOverviewError(error.message);
+      setOverviewError(getError(error));
     } finally {
       setOverviewLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadOverview(); }, [loadOverview]);
+  useEffect(() => {
+    loadOverview();
+  }, [loadOverview]);
 
+  // Load only the data required by the selected tab.
   useEffect(() => {
     let active = true;
-    const loadSetup = async () => {
-      setSetupLoading(true);
-      setSectionErrors((current) => ({ ...current, setup: '' }));
+
+    const setError = (key, message) => {
+      if (!active) return;
+
+      setErrors((current) => ({
+        ...current,
+        [key]: message,
+      }));
+    };
+
+    async function loadResource(api, key, update) {
+      if (!isConfigured(api)) {
+        setError(key, 'API is not configured.');
+        return;
+      }
+
       try {
-        const [setupResponse, workspaceResponse] = await Promise.all([
+        const response = await api.request();
+
+        if (active) {
+          update(response);
+          setError(key, '');
+        }
+      } catch (error) {
+        setError(key, getError(error));
+      }
+    }
+
+    if (tab === 'setup') {
+      if (isConfigured(brainSetupApi)) {
+        Promise.all([
           brainSetupApi.request(),
           getCurrentWorkspace().catch(() => null),
-        ]);
-        if (!active) return;
-        const saved = setupResponse?.profile || setupResponse?.settings || setupResponse;
-        setSetup({ ...emptySetup, ...saved, ...(!saved.business_name && workspaceResponse?.name ? { business_name: workspaceResponse.name } : {}) });
-      } catch (error) {
-        if (active) setSectionErrors((current) => ({ ...current, setup: error.message }));
-      } finally {
-        if (active) setSetupLoading(false);
+        ])
+          .then(([response, workspace]) => {
+            if (!active) return;
+
+            const value =
+              response?.profile ||
+              response?.settings ||
+              response ||
+              {};
+
+            setSetup({
+              ...initialSetup,
+              ...value,
+              business_name:
+                value.business_name ||
+                workspace?.name ||
+                '',
+            });
+
+            setError('setup', '');
+          })
+          .catch((error) =>
+            setError('setup', getError(error))
+          );
+      } else {
+        setError(
+          'setup',
+          'AI setup API is not configured.'
+        );
       }
+    }
+
+    if (tab === 'hours-staff') {
+      loadResource(
+        businessHoursApi,
+        'hours',
+        (response) =>
+          setHours(normaliseHours(response))
+      );
+
+      loadResource(
+        bookingRulesApi,
+        'rules',
+        (response) =>
+          setRules({
+            ...initialRules,
+            ...(response?.rules || response),
+          })
+      );
+
+      loadResource(
+        closedDatesApi,
+        'dates',
+        (response) =>
+          setClosedDates(records(response, 'dates'))
+      );
+
+      loadResource(
+        staffApi,
+        'staff',
+        (response) =>
+          setStaff(records(response, 'staff'))
+      );
+    }
+
+    if (tab === 'locations') {
+      loadResource(
+        locationsApi,
+        'locations',
+        (response) =>
+          setLocations(records(response, 'locations'))
+      );
+    }
+
+    if (tab === 'knowledge') {
+      loadResource(
+        knowledgeApi,
+        'documents',
+        (response) =>
+          setDocuments(records(response, 'documents'))
+      );
+    }
+
+    if (tab === 'requests') {
+      loadResource(
+        requestTypesApi,
+        'requests',
+        (response) =>
+          setRequests(records(response, 'request_types'))
+      );
+    }
+
+    return () => {
+      active = false;
     };
-    if (tab === 'setup') loadSetup();
-    return () => { active = false; };
   }, [tab]);
 
+  // Load the selected Knowledge subsection.
   useEffect(() => {
+    if (
+      tab !== 'knowledge' ||
+      knowledgeSection === 'Documents' ||
+      !isConfigured(knowledgeApi)
+    ) {
+      return undefined;
+    }
+
     let active = true;
-    const loadSchedule = async () => {
-      setHoursLoading(true);
-      setSectionErrors((current) => ({ ...current, hours: '' }));
-      const [hoursResult, rulesResult, datesResult, staffResult] = await Promise.allSettled([
-        businessHoursApi.request(), bookingRulesApi.request(), closedDatesApi.request(), staffApi.request(),
-      ]);
-      if (!active) return;
-      if (hoursResult.status === 'fulfilled') setHours(normaliseHours(hoursResult.value));
-      else setSectionErrors((current) => ({ ...current, hours: hoursResult.reason.message }));
-      if (rulesResult.status === 'fulfilled') setRules({ ...emptyRules, ...(rulesResult.value?.rules || rulesResult.value) });
-      if (datesResult.status === 'fulfilled') setClosedDates(recordsFrom(datesResult.value, 'dates'));
-      if (staffResult.status === 'fulfilled') setStaff(recordsFrom(staffResult.value, 'staff'));
-      setHoursLoading(false);
+
+    const type =
+      knowledgeSection === 'FAQs'
+        ? 'faq'
+        : knowledgeSection
+            .toLowerCase()
+            .replace(/\s/g, '_');
+
+    knowledgeApi
+      .request({ query: { type } })
+      .then((response) => {
+        if (!active) return;
+
+        const results = records(response, 'entries');
+
+        setEntries(
+          results.filter(
+            (item) =>
+              !item.type ||
+              String(item.type).toLowerCase() === type
+          )
+        );
+
+        setErrors((current) => ({
+          ...current,
+          entries: '',
+        }));
+      })
+      .catch((error) => {
+        if (active) {
+          setErrors((current) => ({
+            ...current,
+            entries: getError(error),
+          }));
+        }
+      });
+
+    return () => {
+      active = false;
     };
-    if (tab === 'hours-staff') loadSchedule();
-    return () => { active = false; };
-  }, [tab]);
+  }, [tab, knowledgeSection]);
 
-  useEffect(() => {
-    let active = true;
-    if (tab !== 'locations') return undefined;
-    setSectionErrors((current) => ({ ...current, locations: '' }));
-    locationsApi.request()
-      .then((response) => { if (active) setLocations(recordsFrom(response, 'locations')); })
-      .catch((error) => { if (active) { setLocations([]); setSectionErrors((current) => ({ ...current, locations: error.message })); } });
-    return () => { active = false; };
-  }, [tab]);
+  // Save through existing backend resource APIs.
+  const saveResource = async (
+    key,
+    api,
+    method,
+    body,
+    onSuccess
+  ) => {
+    if (!isConfigured(api)) {
+      showNotice('This API is not configured yet.');
+      return;
+    }
 
-  useEffect(() => {
-    let active = true;
-    if (tab !== 'knowledge') return undefined;
-    setSectionErrors((current) => ({ ...current, knowledge: '' }));
-    knowledgeApi.request()
-      .then((response) => { if (active) setKnowledge(recordsFrom(response, 'documents')); })
-      .catch((error) => { if (active) { setKnowledge([]); setSectionErrors((current) => ({ ...current, knowledge: error.message })); } });
-    return () => { active = false; };
-  }, [tab]);
+    setSaving(key);
 
-  useEffect(() => {
-    let active = true;
-    if (tab !== 'requests') return undefined;
-    setIsRequestLoading(true);
-    setRequestError('');
-    requestTypesApi.request()
-      .then((response) => { if (active) setRequestTypes(recordsFrom(response, 'request_types')); })
-      .catch((error) => { if (active) setRequestError(error.message); })
-      .finally(() => { if (active) setIsRequestLoading(false); });
-    return () => { active = false; };
-  }, [tab]);
-
-  const changeTab = (label, hash = '') => {
-    const value = brainTabs.find((item) => item.label === label)?.value || 'what-ai-knows';
-    const params = new URLSearchParams(searchParams);
-    if (value === 'what-ai-knows') params.delete('tab');
-    else params.set('tab', value);
-    setSearchParams(params, { replace: true });
-    if (hash) requestAnimationFrame(() => document.getElementById(hash.split('#')[1])?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-  };
-
-  const updateSetup = (key, value) => setSetup((current) => ({ ...current, [key]: value }));
-  const saveSetup = async (event) => {
-    event.preventDefault();
-    setSetupSaving(true);
     try {
-      await brainSetupApi.request({ method: 'PATCH', body: setup });
-      showNotice('AI Brain setup saved.');
+      const result = await api.request({
+        method,
+        body,
+      });
+
+      if (onSuccess) {
+        await onSuccess(result);
+      }
+
+      showNotice('Changes saved.');
       await loadOverview();
     } catch (error) {
-      setSectionErrors((current) => ({ ...current, setup: error.message }));
+      showNotice(getError(error));
     } finally {
-      setSetupSaving(false);
+      setSaving('');
     }
   };
 
-  const saveHours = async () => {
-    setHoursSaving(true);
-    try {
-      await businessHoursApi.request({ method: 'PUT', body: { days: hours } });
-      showNotice('Business hours saved.');
-      await loadOverview();
-    } catch (error) { setSectionErrors((current) => ({ ...current, hours: error.message })); }
-    finally { setHoursSaving(false); }
+  const updateSetup = (key, value) =>
+    setSetup((current) => ({
+      ...current,
+      [key]: value,
+    }));
+
+  const updateDay = (day, key, value) => {
+    setHours((current) =>
+      current.map((entry) =>
+        entry.day === day
+          ? { ...entry, [key]: value }
+          : entry
+      )
+    );
   };
 
-  const saveRules = async () => {
-    setRulesSaving(true);
-    try {
-      await bookingRulesApi.request({ method: 'PUT', body: rules });
-      showNotice('Booking rules saved.');
-    } catch (error) { setSectionErrors((current) => ({ ...current, rules: error.message })); }
-    finally { setRulesSaving(false); }
+  const addBreak = (day) => {
+    setHours((current) =>
+      current.map((entry) =>
+        entry.day === day
+          ? {
+              ...entry,
+              breaks: [
+                ...entry.breaks,
+                { start_time: '', end_time: '' },
+              ],
+            }
+          : entry
+      )
+    );
   };
 
-  const updateHour = (index, key, value) => setHours((current) => current.map((day, dayIndex) => dayIndex === index ? { ...day, [key]: value } : day));
-  const copyMondayHours = () => setHours((current) => current.map((day, index) => index === 0 || index === 6 ? day : { ...day, enabled: current[0].enabled, is_24_hours: current[0].is_24_hours, start_time: current[0].start_time, end_time: current[0].end_time, breaks: current[0].breaks }));
-  const addBreak = (index) => setHours((current) => current.map((day, dayIndex) => dayIndex === index ? { ...day, breaks: [...day.breaks, { start_time: '', end_time: '' }] } : day));
-  const updateBreak = (dayIndex, breakIndex, key, value) => setHours((current) => current.map((day, index) => index === dayIndex ? { ...day, breaks: day.breaks.map((pause, ix) => ix === breakIndex ? { ...pause, [key]: value } : pause) } : day));
+  const updateBreak = (day, index, key, value) => {
+    setHours((current) =>
+      current.map((entry) =>
+        entry.day === day
+          ? {
+              ...entry,
+              breaks: entry.breaks.map((item, i) =>
+                i === index
+                  ? { ...item, [key]: value }
+                  : item
+              ),
+            }
+          : entry
+      )
+    );
+  };
 
-  const addClosedDate = async (event) => {
+  const removeBreak = (day, index) => {
+    setHours((current) =>
+      current.map((entry) =>
+        entry.day === day
+          ? {
+              ...entry,
+              breaks: entry.breaks.filter(
+                (_, i) => i !== index
+              ),
+            }
+          : entry
+      )
+    );
+  };
+
+  const copyDay = (day) => {
+    setHours((current) => {
+      const source = current.find(
+        (entry) => entry.day === day
+      );
+
+      if (!source) return current;
+
+      return current.map((entry) =>
+        entry.day === day
+          ? entry
+          : {
+              ...entry,
+              enabled: source.enabled,
+              is_24_hours: source.is_24_hours,
+              start_time: source.start_time,
+              end_time: source.end_time,
+              breaks: source.breaks.map(
+                (item) => ({ ...item })
+              ),
+            }
+      );
+    });
+  };
+
+  const sendAssistant = async (event) => {
     event.preventDefault();
+
+    const message = assistantText.trim();
+
+    if (!message || assistantSending) return;
+
+    setAssistantMessages((current) => [
+      ...current,
+      { role: 'user', text: message },
+    ]);
+
+    setAssistantText('');
+    setAssistantSending(true);
+
     try {
-      const response = await closedDatesApi.request({ method: 'POST', body: closedDate });
-      const created = response?.date || response;
-      if (created && (created.id || created.date)) setClosedDates((current) => [...current, created]);
-      setClosedDate({ date: '', reason: '' });
-    } catch (error) { setSectionErrors((current) => ({ ...current, hours: error.message })); }
+      if (!isConfigured(brainAssistantApi)) {
+        throw new Error(
+          'Brain Assistant API is not configured.'
+        );
+      }
+
+      let body = { message };
+
+      if (assistantFile) {
+        const formData = new FormData();
+        formData.append('message', message);
+        formData.append('attachment', assistantFile);
+        body = formData;
+      }
+
+      const response = await brainAssistantApi.request({
+        method: 'POST',
+        body,
+      });
+
+      const reply =
+        response?.reply ||
+        response?.answer ||
+        response?.response;
+
+      if (typeof reply !== 'string' || !reply.trim()) {
+        throw new Error(
+          'AI did not return a valid reply.'
+        );
+      }
+
+      setAssistantMessages((current) => [
+        ...current,
+        { role: 'assistant', text: reply },
+      ]);
+
+      setAssistantFile(null);
+    } catch (error) {
+      setAssistantMessages((current) => [
+        ...current,
+        {
+          role: 'error',
+          text: getError(error),
+        },
+      ]);
+    } finally {
+      setAssistantSending(false);
+    }
   };
 
-  const deleteResource = async (resource, item, setter, key) => {
-    const id = item.id || item[`${key}_id`] || item.date;
+  const sendTestMessage = async (message) => {
+    setTestText('');
+
+    setTestMessages((current) => [
+      ...current,
+      { role: 'user', text: message },
+    ]);
+
+    setTestSending(true);
+
     try {
-      await deleteBrainResource(resource, id);
-      setter((current) => current.filter((entry) => String(entry.id || entry[`${key}_id`]) !== String(id)));
-    } catch (error) { showNotice(error.message); }
+      if (!isConfigured(testAiApi)) {
+        throw new Error('Test AI API is not configured.');
+      }
+
+      const response = await testAiApi.request({
+        method: 'POST',
+        body: { message },
+      });
+
+      const reply =
+        response?.reply ||
+        response?.answer ||
+        response?.response;
+
+      if (typeof reply !== 'string' || !reply.trim()) {
+        throw new Error(
+          'AI did not return a valid reply.'
+        );
+      }
+
+      setTestMessages((current) => [
+        ...current,
+        { role: 'assistant', text: reply },
+      ]);
+    } catch (error) {
+      setTestMessages((current) => [
+        ...current,
+        {
+          role: 'error',
+          text: getError(error),
+        },
+      ]);
+    } finally {
+      setTestSending(false);
+    }
   };
 
-  const saveStaff = async (event) => {
+  const submitTest = (event) => {
     event.preventDefault();
-    setSavingModal(true);
-    try {
-      const response = await staffApi.request({ method: 'POST', body: { ...staffForm, role: staffForm.role.trim(), name: staffForm.name.trim(), phone: staffForm.phone.trim() } });
-      const created = response?.staff_member || response;
-      if (created && (created.id || created.staff_id)) setStaff((current) => [created, ...current]);
-      setStaffForm(emptyStaff);
-      setStaffModal(false);
-    } catch (error) { showNotice(error.message); }
-    finally { setSavingModal(false); }
-  };
 
-  const saveLocation = async (event) => {
-    event.preventDefault();
-    setSavingModal(true);
-    try {
-      const response = await locationsApi.request({ method: 'POST', body: locationForm });
-      const created = response?.location || response;
-      if (created && (created.id || created.location_id)) setLocations((current) => [created, ...current]);
-      setLocationForm(emptyLocation);
-      setLocationModal(false);
-    } catch (error) { showNotice(error.message); }
-    finally { setSavingModal(false); }
-  };
+    const message = testText.trim();
 
-  const saveKnowledgeFile = async (event) => {
-    event.preventDefault();
-    if (!knowledgeFile) return;
-    setSavingModal(true);
-    try {
-      const payload = new FormData();
-      payload.append('file', knowledgeFile);
-      const response = await knowledgeApi.request({ method: 'POST', body: payload });
-      const created = response?.document || response;
-      if (created && (created.id || created.document_id)) setKnowledge((current) => [created, ...current]);
-      setKnowledgeFile(null);
-    } catch (error) { showNotice(error.message); }
-    finally { setSavingModal(false); }
+    if (
+      !message ||
+      testSending ||
+      checkingPlan
+    ) {
+      return;
+    }
+
+    if (!isStatusKnown) {
+      showNotice(
+        'Free Plan status could not be verified.'
+      );
+      return;
+    }
+
+    if (!isStarted) {
+      openFreePlan(() => sendTestMessage(message));
+      return;
+    }
+
+    sendTestMessage(message);
   };
 
   const checkKnowledge = async (event) => {
     event.preventDefault();
-    if (!knowledgeSearch.trim()) return;
-    setSearchingKnowledge(true);
-    setSearchResult('');
-    try {
-      const response = await knowledgeApi.request({ method: 'POST', action: 'search', body: { query: knowledgeSearch.trim() } });
-      setSearchResult(response?.answer || response?.result || response?.message || 'No matching information was returned.');
-    } catch (error) { setSearchResult(error.message); }
-    finally { setSearchingKnowledge(false); }
-  };
 
-  const saveRequestType = async (event) => {
-    event.preventDefault();
-    setSavingModal(true);
-    setRequestError('');
-    try {
-      const response = await requestTypesApi.request({ method: 'POST', body: { name: requestForm.name.trim(), details_to_collect: requestForm.detailsToCollect.trim(), collect_phone_from_whatsapp: true, what_happens_next: requestForm.whatHappensNext.trim() } });
-      const created = response?.request_type || response;
-      if (created && (created.id || created.request_type_id || created.name)) setRequestTypes((current) => [created, ...current]);
-      setRequestForm(emptyRequest);
-      setRequestModal(false);
-    } catch (error) { setRequestError(error.message); }
-    finally { setSavingModal(false); }
-  };
+    if (!lookup.question.trim()) return;
 
-  const sendAssistantMessage = async (event) => {
-    event.preventDefault();
-    const message = assistantMessage.trim();
-    if (!message || assistantSending) return;
-    setAssistantSending(true);
-    try {
-      const response = await brainAssistantApi.request({ method: 'POST', body: { message } });
-      const reply = response?.reply || response?.answer || response?.response;
-      if (!reply) throw new Error('The Brain Assistant API did not return a reply.');
-      setAssistantMessages((current) => [...current, { role: 'user', text: message }, { role: 'assistant', text: reply }]);
-      setAssistantMessage('');
-    } catch (error) { showNotice(error.message); }
-    finally { setAssistantSending(false); }
-  };
-
-  const sendTestQuestion = async (message) => {
-    setIsSendingTest(true);
-    try {
-      const response = await testAiApi.request({ method: 'POST', body: { message } });
-      const reply = response?.reply || response?.answer || response?.response;
-      if (typeof reply !== 'string' || !reply.trim()) throw new Error('The AI API did not return a reply.');
-      setTestMessages((current) => [...current, { role: 'user', text: message }, { role: 'assistant', text: reply }]);
-      setQuestion('');
-    } catch (error) { showNotice(error.message); }
-    finally { setIsSendingTest(false); }
-  };
-
-  const handleTestSubmit = (event) => {
-    event.preventDefault();
-    const pendingMessage = question.trim();
-    if (!pendingMessage || isSendingTest || isCheckingPlan) return;
-    if (!isStatusKnown) {
-      showNotice('Your free-plan status could not be verified. Connect the billing plan-status API before testing your AI.');
+    if (!isConfigured(knowledgeApi)) {
+      showNotice('Knowledge API is not configured.');
       return;
     }
-    if (!isStarted) {
-      openFreePlan(() => sendTestQuestion(pendingMessage));
-      return;
+
+    setSaving('lookup');
+
+    try {
+      const response = await knowledgeApi.request({
+        method: 'POST',
+        action: 'search',
+        body: {
+          query: lookup.question.trim(),
+        },
+      });
+
+      setLookup((current) => ({
+        ...current,
+        result:
+          response?.answer ||
+          response?.result ||
+          response?.message ||
+          'No matching knowledge found.',
+      }));
+    } catch (error) {
+      setLookup((current) => ({
+        ...current,
+        result: getError(error),
+      }));
+    } finally {
+      setSaving('');
     }
-    sendTestQuestion(pendingMessage);
   };
 
-  const tabLabel = brainTabs.find((item) => item.value === tab)?.label || 'What AI knows';
-  const businessName = overview?.business_name || overview?.business?.name || setup.business_name || 'your business';
-  const attentionItems = overview?.needs_attention || overview?.attention_items || [];
-  const knowledgeCards = [
-    { id: 'profile', title: 'Business profile', icon: Building2, value: overview?.business_profile_summary || (overview?.business_profile_complete ? 'Complete' : 'Not set up'), detail: overview?.business_description || 'Your business information and description.', onClick: () => changeTab('Setup', 'setup#business-info') },
-    { id: 'hours', title: 'Opening hours', icon: Clock3, value: overview?.hours_summary || (overview?.hours_configured ? 'Configured' : 'Not set up'), detail: 'Your saved weekly availability.', onClick: () => changeTab('Hours & Staff', 'hours-staff') },
-    { id: 'services', title: 'Services', icon: Settings, value: overview?.services_count ?? '—', detail: 'Services available for appointment booking.', onClick: () => navigate('/dashboard/services') },
-    { id: 'products', title: 'Products', icon: Package, value: overview?.products_count ?? '—', detail: 'Products available for customer orders.', onClick: () => navigate('/dashboard/products') },
-    { id: 'documents', title: 'Documents', icon: FileText, value: overview?.documents_count ?? '—', detail: 'Menus, price lists or documents your AI can share.', onClick: () => changeTab('Knowledge', 'knowledge') },
-    { id: 'personality', title: 'Personality & instructions', icon: Sparkles, value: overview?.ai_behaviour_summary || (overview?.ai_behaviour_configured ? 'Configured' : 'Not set up'), detail: 'Your AI language, tone, reply length and custom instructions.', onClick: () => changeTab('Setup', 'setup#ai-behaviour') },
+  const submitKnowledge = (event) => {
+    event.preventDefault();
+
+    const type =
+      knowledgeSection === 'FAQs'
+        ? 'faq'
+        : knowledgeSection
+            .toLowerCase()
+            .replace(/\s/g, '_');
+
+    let body;
+
+    if (type === 'faq') {
+      body = {
+        type: 'faq',
+        question: editor.question.trim(),
+        answer: editor.answer.trim(),
+      };
+    } else if (type === 'website') {
+      body = {
+        type: 'website',
+        url: editor.website_url.trim(),
+      };
+    } else if (type === 'promotions') {
+      body = {
+        type: 'promotion',
+        title: editor.title.trim(),
+        details: editor.content.trim(),
+        valid_until: editor.valid_until || null,
+      };
+    } else {
+      body = {
+        type,
+        title: editor.title.trim(),
+        content: editor.content.trim(),
+      };
+    }
+
+    saveResource(
+      'knowledge',
+      knowledgeApi,
+      'POST',
+      body,
+      async (response) => {
+        const created =
+          response?.entry ||
+          response?.knowledge ||
+          response;
+
+        if (
+          created &&
+          (created.id || created.title || created.question)
+        ) {
+          setEntries((current) => [
+            created,
+            ...current,
+          ]);
+        }
+
+        setEditor((current) => ({
+          ...current,
+          question: '',
+          answer: '',
+          title: '',
+          content: '',
+          website_url: '',
+          valid_until: '',
+        }));
+      }
+    );
+  };
+
+  const uploadDocument = (event) => {
+    event.preventDefault();
+
+    if (!documentFile) {
+      showNotice('Select a PDF or image first.');
+      return;
+    }
+
+    if (documentFile.size > 10 * 1024 * 1024) {
+      showNotice('Maximum file size is 10 MB.');
+      return;
+    }
+
+    const allowedTypes = [
+      'application/pdf',
+      'image/png',
+      'image/jpeg',
+    ];
+
+    if (!allowedTypes.includes(documentFile.type)) {
+      showNotice('Only PDF, PNG and JPG files are allowed.');
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append('file', documentFile);
+    formData.append(
+      'title',
+      editor.document_title.trim()
+    );
+    formData.append(
+      'description',
+      editor.document_description.trim()
+    );
+    formData.append(
+      'share_on_whatsapp',
+      String(editor.share_on_whatsapp)
+    );
+
+    saveResource(
+      'document',
+      knowledgeApi,
+      'POST',
+      formData,
+      (response) => {
+        const created =
+          response?.document || response;
+
+        if (
+          created?.id ||
+          created?.document_id
+        ) {
+          setDocuments((current) => [
+            created,
+            ...current,
+          ]);
+        }
+
+        setDocumentFile(null);
+
+        setEditor((current) => ({
+          ...current,
+          document_title: '',
+          document_description: '',
+          share_on_whatsapp: false,
+        }));
+      }
+    );
+  };
+
+  // Needs Attention depends ONLY on real business information,
+  // not on whether the Free Plan has started.
+  const serverAttention = Array.isArray(
+    overview?.needs_attention
+  )
+    ? overview.needs_attention
+    : Array.isArray(overview?.attention_items)
+      ? overview.attention_items
+      : null;
+
+  const attention = serverAttention
+    ? serverAttention.map((item) =>
+        typeof item === 'string'
+          ? { message: item }
+          : item
+      )
+    : overview
+      ? [
+          (
+            (
+              Object.prototype.hasOwnProperty.call(
+                overview,
+                'business_description'
+              ) &&
+              !overview.business_description
+            ) ||
+            overview.business_profile_complete === false
+          ) && {
+            message:
+              'Your business has no description, so the AI cannot explain what you do.',
+            level: 'warning',
+          },
+
+          overview.services_count === 0 &&
+          overview.products_count === 0 && {
+            message:
+              'You have no services or products yet, so the AI cannot take bookings or orders.',
+            level: 'warning',
+          },
+
+          overview.hours_configured === false && {
+            message:
+              'Your opening hours need checking so the AI never offers unavailable times.',
+            level: 'warning',
+          },
+
+          (
+            overview.faqs_count === 0 ||
+            overview.faq_count === 0
+          ) && {
+            message:
+              'You have no FAQs yet. FAQs help the AI answer common questions.',
+            level: 'info',
+          },
+        ].filter(Boolean)
+      : [];
+
+  const attentionAction = (item) => {
+    const text = String(
+      item.message ||
+      item.title ||
+      item.description ||
+      ''
+    );
+
+    if (/hour|time/i.test(text)) {
+      changeTab('hours-staff');
+    } else if (/faq|knowledge/i.test(text)) {
+      setKnowledgeSection('FAQs');
+      changeTab('knowledge');
+    } else if (/service|product/i.test(text)) {
+      navigate('/dashboard/services');
+    } else {
+      changeTab('setup');
+    }
+  };
+
+  const knownCards = [
+    {
+      title: 'Business profile',
+      icon: 'Building2',
+      value:
+        overview?.business_profile_summary ||
+        (overview?.business_profile_complete
+          ? 'Configured'
+          : 'Nothing here yet'),
+      detail:
+        overview?.business_description ||
+        'Your business description and details.',
+      action: () => changeTab('setup'),
+    },
+    {
+      title: 'Opening hours',
+      icon: 'Clock3',
+      value:
+        overview?.hours_summary ||
+        (overview?.hours_configured
+          ? 'Configured'
+          : 'Not configured'),
+      detail: 'Weekly working hours and availability.',
+      action: () => changeTab('hours-staff'),
+    },
+    {
+      title: 'Services',
+      icon: 'ListChecks',
+      value: overview?.services_count ?? '—',
+      detail:
+        'Services the AI can book for your customers.',
+      action: () => navigate('/dashboard/services'),
+    },
+    {
+      title: 'Products',
+      icon: 'Package',
+      value: overview?.products_count ?? '—',
+      detail:
+        'Products the AI can help customers order.',
+      action: () => navigate('/dashboard/products'),
+    },
+    {
+      title: 'Documents it can send',
+      icon: 'FileText',
+      value: overview?.documents_count ?? '—',
+      detail: 'Files, menus and price lists.',
+      action: () => {
+        setKnowledgeSection('Documents');
+        changeTab('knowledge');
+      },
+    },
+    {
+      title: 'Personality and instructions',
+      icon: 'Bot',
+      value:
+        overview?.ai_behaviour_summary ||
+        (overview?.ai_behaviour_configured
+          ? 'Configured'
+          : 'Not configured'),
+      detail:
+        'Language, tone and special instructions.',
+      action: () => changeTab('setup'),
+    },
   ];
-  const tokenCount = overview?.tokens_remaining ?? overview?.ai_tokens_remaining ?? overview?.credit?.tokens_remaining;
 
+  const tokenBalance =
+    overview?.tokens_remaining ??
+    overview?.ai_tokens_remaining ??
+    overview?.credit?.tokens_remaining;
+
+  const updateEditor = (key, value) => {
+    setEditor((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  };
+
+  const closeModal = () => {
+    setModal('');
+    setStaffForm(initialStaff);
+    setRequestForm(initialRequest);
+    setLocationForm({
+      name: '',
+      address: '',
+      phone: '',
+      notes: '',
+    });
+  };
+
+  const saveModal = (event) => {
+    event.preventDefault();
+
+    if (modal === 'staff') {
+      saveResource(
+        'staff',
+        staffApi,
+        'POST',
+        staffForm,
+        (response) => {
+          const created =
+            response?.staff_member || response;
+
+          if (created?.id || created?.staff_id) {
+            setStaff((current) => [
+              created,
+              ...current,
+            ]);
+          }
+
+          closeModal();
+        }
+      );
+    }
+
+    if (modal === 'location') {
+      saveResource(
+        'location',
+        locationsApi,
+        'POST',
+        locationForm,
+        (response) => {
+          const created =
+            response?.location || response;
+
+          if (created?.id || created?.location_id) {
+            setLocations((current) => [
+              created,
+              ...current,
+            ]);
+          }
+
+          closeModal();
+        }
+      );
+    }
+
+    if (modal === 'request') {
+      saveResource(
+        'request',
+        requestTypesApi,
+        'POST',
+        {
+          name: requestForm.name,
+          details_to_collect:
+            requestForm.detailsToCollect,
+          what_happens_next:
+            requestForm.whatHappensNext,
+          collect_phone_from_whatsapp: true,
+        },
+        (response) => {
+          const created =
+            response?.request_type || response;
+
+          if (
+            created?.id ||
+            created?.request_type_id
+          ) {
+            setRequests((current) => [
+              created,
+              ...current,
+            ]);
+          }
+
+          closeModal();
+        }
+      );
+    }
+  };
 
   return (
-    <>
-      <PageHeader eyebrow="MANAGE YOUR AI" title="AI Brain" description="See what your AI knows, teach it about your business, and test it before customers do." />
+    <div className="bb2-brain">
+      <PageHeader
+        title="AI Brain"
+        description="See what your AI knows, teach it, and test it live"
+      />
+
       {Notice}
-      <Panel className="dp-brain-panel">
-        <Tabs items={brainTabs.map((item) => item.label)} active={tabLabel} onChange={changeTab} />
-        {tab === 'what-ai-knows' && <div className="dp-brain-overview-layout">
-          <div className="dp-brain-overview-main">
-            {overviewError && <div className="dp-inline-notice dp-api-error" role="status">{overviewError}</div>}
-            <div className="dp-brain-summary"><div><span className="dp-section-kicker">YOUR AI KNOWLEDGE</span><h2>{overviewLoading ? 'Loading your AI knowledge…' : `Your AI knows ${overview?.known_items_count ?? overview?.knowledge_count ?? '—'} things about ${businessName}`}</h2><p>{overview?.summary || 'Your saved business information and reference material help the AI answer customer questions.'}</p></div><button type="button" className="dp-icon-action" onClick={loadOverview} aria-label="Refresh AI knowledge" disabled={overviewLoading}><RotateCcw size={15} /></button></div>
-            <div className="dp-attention-list">
-              {overviewLoading ? <div className="dp-api-empty-state">Loading items that need attention…</div> : attentionItems.length ? attentionItems.map((item, index) => <div className="dp-attention-item" key={item.id || item.key || index}><span><Lightbulb size={16} /></span><p>{item.message || item.description || item.title}</p><div className="dp-attention-actions">{item.fix_tab && <button type="button" className="dp-text-button" onClick={() => changeTab(brainTabs.find((entry) => entry.value === item.fix_tab)?.label || 'Setup', item.anchor || '')}>Fix</button>}<button type="button" className="dp-text-button" onClick={() => { setAssistantMessage(item.assistant_prompt || item.message || item.title || 'Help me improve my AI setup.'); document.querySelector('.dp-brain-assistant-input')?.focus(); }}>Ask assistant</button></div></div>) : !overviewError ? <div className="dp-form-note">No attention items were returned for your business.</div> : null}
+
+      <nav
+        className="bb2-brain-tabs"
+        aria-label="AI Brain sections"
+      >
+        {brainTabs.map(([title, value, icon]) => (
+          <button
+            type="button"
+            key={value}
+            className={tab === value ? 'active' : ''}
+            onClick={() => changeTab(value)}
+            aria-current={
+              tab === value ? 'page' : undefined
+            }
+          >
+            <Icon name={icon} size={15} />
+            {title}
+          </button>
+        ))}
+      </nav>
+
+      {/* WHAT AI KNOWS */}
+      {tab === 'what-ai-knows' && (
+        <div className="bb2-overview-columns">
+          <div className="bb2-overview-content">
+            <h2>
+              Your AI knows{' '}
+              {overview?.known_items_count ??
+                overview?.things_count ??
+                '—'}{' '}
+              things about{' '}
+              {overview?.business_name ||
+                setup.business_name ||
+                'your business'}
+            </h2>
+
+            <p className="bb2-muted">
+              {overview?.always_known_count ?? '—'}{' '}
+              sections it sees in every conversation,
+              and{' '}
+              {overview?.reference_material_count ?? '—'}{' '}
+              items it looks up when customers ask about
+              them.
+            </p>
+
+            {overviewError && (
+              <div className="bb2-error" role="status">
+                {overviewError}
+                <button
+                  type="button"
+                  onClick={loadOverview}
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            <div className="bb2-attention-head">
+              NEEDS ATTENTION ({attention.length})
             </div>
-            <div className="dp-section-heading"><div><span className="dp-section-kicker">CORE KNOWLEDGE</span><h2>Always knows</h2><p>Your AI sees saved core information in every conversation.</p></div></div>
-            <div className="dp-knowledge-grid">
-              {knowledgeCards.map(({ id, title, icon: Icon, value, detail, onClick }) => <article className="dp-knowledge-card dp-knowledge-card-editable" key={id}><div className="dp-knowledge-card-top"><Icon size={19} /><button type="button" className="dp-icon-action" aria-label={`Edit ${title}`} onClick={onClick}><Pencil size={13} /></button></div><h3>{title}</h3><p>{value}</p><small>{detail}</small></article>)}
-            </div>
-            <div className="dp-section-heading"><div><span className="dp-section-kicker">REFERENCE MATERIAL</span><h2>Looks up when relevant</h2><p>Your AI checks relevant reference material when customers ask related questions.</p></div></div>
-            <div className="dp-knowledge-empty"><FileText size={21} /><div><strong>Reference knowledge</strong><p>{overview?.reference_material_summary || 'Documents and knowledge entries connected to your account appear here.'}</p></div><button type="button" className="dp-secondary-button" onClick={() => changeTab('Knowledge')}>Open knowledge</button></div>
+
+            {overviewLoading ? (
+              <p className="bb2-muted">
+                Checking your business knowledge…
+              </p>
+            ) : (
+              attention.map((item, index) => {
+                const message =
+                  item.message ||
+                  item.title ||
+                  item.description ||
+                  '';
+
+                const informational =
+                  item.level === 'info' ||
+                  item.severity === 'info';
+
+                return (
+                  <div
+                    key={item.id || index}
+                    className={`bb2-attention ${
+                      informational ? 'info' : ''
+                    }`}
+                  >
+                    <Icon
+                      name={
+                        informational
+                          ? 'Info'
+                          : 'TriangleAlert'
+                      }
+                      size={17}
+                    />
+
+                    <span>{message}</span>
+
+                    <button
+                      type="button"
+                      className="bb2-soft-button"
+                      onClick={() =>
+                        attentionAction(item)
+                      }
+                    >
+                      Fix
+                    </button>
+
+                    <button
+                      type="button"
+                      className="bb2-main-button"
+                      onClick={() =>
+                        setAssistantText(
+                          `Help me fix this: ${message}`
+                        )
+                      }
+                    >
+                      <Icon
+                        name="Sparkles"
+                        size={14}
+                      />
+                      Ask assistant
+                    </button>
+                  </div>
+                );
+              })
+            )}
+
+            {overview &&
+              !overviewLoading &&
+              attention.length === 0 && (
+                <p className="bb2-muted">
+                  No items need attention right now.
+                </p>
+              )}
+
+            <section className="bb2-section">
+              <h2>Always knows</h2>
+
+              <p className="bb2-muted">
+                Your AI sees this in every conversation,
+                exactly as shown.
+              </p>
+
+              <div className="bb2-knows-grid">
+                {knownCards.map((card) => (
+                  <article
+                    className="bb2-know-card"
+                    key={card.title}
+                  >
+                    <div>
+                      <span className="bb2-small-icon">
+                        <Icon
+                          name={card.icon}
+                          size={17}
+                        />
+                      </span>
+
+                      <div>
+                        <strong>{card.title}</strong>
+                        <small>
+                          {String(card.value)}
+                        </small>
+                      </div>
+
+                      <button
+                        type="button"
+                        title={`Edit ${card.title}`}
+                        onClick={card.action}
+                      >
+                        <Icon
+                          name="Pencil"
+                          size={16}
+                        />
+                      </button>
+                    </div>
+
+                    <p>{card.detail}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="bb2-section">
+              <h2>Looks up when relevant</h2>
+
+              <p className="bb2-muted">
+                Your AI searches this when a customer
+                asks something related.
+              </p>
+
+              <label className="bb2-search">
+                <Icon name="Search" size={17} />
+
+                <input
+                  placeholder="Search what your AI knows…"
+                  value={knowledgeSearch}
+                  onChange={(event) =>
+                    setKnowledgeSearch(
+                      event.target.value
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      setKnowledgeSection('FAQs');
+                      changeTab('knowledge');
+                    }
+                  }}
+                />
+              </label>
+
+              <div className="bb2-empty">
+                <Icon name="FileText" size={24} />
+
+                <strong>
+                  {overview?.reference_material_count > 0
+                    ? 'Reference material available'
+                    : 'Nothing to look up yet'}
+                </strong>
+
+                <p>
+                  Add FAQs, documents or promotions,
+                  or ask the assistant to help.
+                </p>
+              </div>
+            </section>
+
+            <section className="bb2-section">
+              <h2>Try a question</h2>
+
+              <p className="bb2-muted">
+                See what your AI would read before
+                answering a customer.
+              </p>
+
+              <form
+                className="bb2-search-form"
+                onSubmit={checkKnowledge}
+              >
+                <input
+                  placeholder="e.g. Do you deliver on Sundays?"
+                  value={lookup.question}
+                  onChange={(event) =>
+                    setLookup((current) => ({
+                      ...current,
+                      question: event.target.value,
+                    }))
+                  }
+                />
+
+                <button
+                  className="bb2-main-button"
+                  disabled={saving === 'lookup'}
+                >
+                  <Icon name="Search" size={15} />
+
+                  {saving === 'lookup'
+                    ? 'Checking…'
+                    : 'Check'}
+                </button>
+              </form>
+
+              {lookup.result && (
+                <div className="bb2-result">
+                  {lookup.result}
+                </div>
+              )}
+            </section>
+
+            <details className="bb2-rules">
+              <summary>
+                <Icon
+                  name="ShieldCheck"
+                  size={16}
+                />
+                Rules your AI always follows
+              </summary>
+
+              <p>
+                Business instructions and opening
+                hours are used when answering customers.
+                Update these in Setup and Hours &amp;
+                Staff.
+              </p>
+            </details>
           </div>
-          <BrainAssistantPanel
+
+          <ChatPanel
+            heading="Brain Assistant"
+            subheading="Tell it about your business. It suggests changes."
+            emptyText="Hi! I can see everything your AI knows about your business. Tell me what changed, or pick a place to start."
+            suggestions={[
+              'Set up my AI with me',
+              'Help me write a short description of my business.',
+              'Help me add my services.',
+            ]}
             messages={assistantMessages}
-            value={assistantMessage}
-            onChange={setAssistantMessage}
-            onSubmit={sendAssistantMessage}
-            isSending={assistantSending}
-            tokensRemaining={tokenCount}
-            suggestions={overview?.assistant_suggestions || []}
-            onReset={() => { setAssistantMessages([]); setAssistantMessage(''); }}
+            sending={assistantSending}
+            text={assistantText}
+            setText={setAssistantText}
+            submit={sendAssistant}
+            reset={() => {
+              setAssistantMessages([]);
+              setAssistantText('');
+            }}
+            disabled={
+              tokenBalance != null &&
+              Number(tokenBalance) <= 0
+            }
+            tokenNotice={
+              tokenBalance != null &&
+              Number(tokenBalance) <= 0
+                ? 'You are out of AI tokens, so the assistant cannot reply.'
+                : ''
+            }
+            attachment={assistantFile}
+            onAttachment={setAssistantFile}
+            allowVoice
           />
-        </div>}
+        </div>
+      )}
 
-        {tab === 'setup' && <section id="business-info" className="dp-brain-tab-content">
-          <div className="dp-brain-tab-heading"><div><span className="dp-section-kicker">YOUR BUSINESS</span><h2>Business information</h2><p>Give your AI the context it needs to answer questions accurately.</p></div><Building2 size={21} /></div>
-          {sectionErrors.setup && <div className="dp-inline-notice dp-api-error" role="status">{sectionErrors.setup}</div>}
-          {setupLoading && <div className="dp-api-empty-state">Loading your saved AI setup…</div>}
-          <form className="dp-form-grid dp-brain-form" onSubmit={saveSetup}>
-            <FormField label="Business name"><FieldInput value={setup.business_name || ''} onChange={(event) => updateSetup('business_name', event.target.value)} maxLength={120} required /></FormField>
-            <FormField label="Industry"><FieldInput value={setup.industry || ''} onChange={(event) => updateSetup('industry', event.target.value)} placeholder="e.g. Restaurant, salon, retail" /></FormField>
-            <FormField label="WhatsApp number" hint="Connected number is managed in Channels."><FieldInput value={setup.whatsapp_number || ''} readOnly placeholder="No connected WhatsApp number" /></FormField>
-            <FormField label="Business address" hint="Manage your address in Profile."><div className="dp-readonly-address"><FieldInput value={setup.business_address || ''} readOnly placeholder="No saved address" /><button type="button" className="dp-text-button" onClick={() => navigate('/dashboard/profile')}>Edit in Profile</button></div></FormField>
-            <FormField label="Business description" className="dp-form-full"><FieldTextarea rows={4} maxLength={1000} value={setup.business_description || ''} onChange={(event) => updateSetup('business_description', event.target.value)} placeholder="Describe what your business does, who it serves and what makes it different." /><small>{(setup.business_description || '').length}/1000 characters</small></FormField>
-            <div className="dp-form-full dp-settings-save-row"><span className="dp-muted">Your AI uses this information when answering customers.</span><button type="submit" className="dp-primary-button" disabled={setupSaving || setupLoading}>{setupSaving ? 'Saving…' : 'Save business information'}</button></div>
+      {/* SETUP */}
+      {tab === 'setup' && (
+        <div className="bb2-brain-page-content">
+          <section className="bb2-section">
+            <h2>Business info</h2>
+
+            <p className="bb2-muted">
+              Basic details about your business,
+              used to personalise AI responses.
+            </p>
+
+            {errors.setup && (
+              <p className="bb2-error">
+                {errors.setup}
+              </p>
+            )}
+
+            <div className="bb2-form-with-help">
+              <form
+                className="bb2-form-grid"
+                onSubmit={(event) => {
+                  event.preventDefault();
+
+                  saveResource(
+                    'setup',
+                    brainSetupApi,
+                    'PATCH',
+                    setup
+                  );
+                }}
+              >
+                <Field title="Business name *" wide>
+                  <input
+                    className="bb2-control"
+                    required
+                    value={setup.business_name}
+                    onChange={(event) =>
+                      updateSetup(
+                        'business_name',
+                        event.target.value
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field title="Industry">
+                  <input
+                    className="bb2-control"
+                    placeholder="Select or enter your business type"
+                    value={setup.industry || ''}
+                    onChange={(event) =>
+                      updateSetup(
+                        'industry',
+                        event.target.value
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field
+                  title="Business phone number"
+                  hint="Connect WhatsApp to verify your business number."
+                >
+                  <input
+                    className="bb2-control"
+                    value={setup.whatsapp_number || ''}
+                    placeholder="Connect WhatsApp to set it"
+                    readOnly
+                  />
+                </Field>
+
+                <Field
+                  title="Location / address"
+                  wide
+                >
+                  <div className="bb2-readonly">
+                    <Icon name="MapPin" size={16} />
+
+                    {setup.business_address ||
+                      'Not set yet'}
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate('/dashboard/profile')
+                      }
+                    >
+                      Edit in Profile
+                    </button>
+                  </div>
+                </Field>
+
+                <Field
+                  title="Business description"
+                  wide
+                >
+                  <textarea
+                    className="bb2-control"
+                    rows={4}
+                    maxLength={1000}
+                    placeholder="Brief description of your business for the AI…"
+                    value={
+                      setup.business_description || ''
+                    }
+                    onChange={(event) =>
+                      updateSetup(
+                        'business_description',
+                        event.target.value
+                      )
+                    }
+                  />
+
+                  <small className="bb2-count">
+                    {
+                      (
+                        setup.business_description || ''
+                      ).length
+                    }/1000
+                  </small>
+                </Field>
+
+                <button
+                  className="bb2-main-button"
+                  disabled={saving === 'setup'}
+                >
+                  {saving === 'setup'
+                    ? 'Saving…'
+                    : 'Save changes'}
+                </button>
+              </form>
+
+              <InfoCard title="Why this matters">
+                Your business name appears in AI
+                greetings. The description helps the
+                AI understand what you offer. Be
+                specific about your services.
+              </InfoCard>
+            </div>
+          </section>
+
+          <section className="bb2-section bb2-divider-section">
+            <h2>AI behaviour</h2>
+
+            <p className="bb2-muted">
+              Control how your AI agent communicates
+              with customers.
+            </p>
+
+            <div className="bb2-form-with-help">
+              <form
+                className="bb2-form-grid"
+                onSubmit={(event) => {
+                  event.preventDefault();
+
+                  saveResource(
+                    'behaviour',
+                    brainSetupApi,
+                    'PATCH',
+                    setup
+                  );
+                }}
+              >
+                <Field title="AI agent name">
+                  <input
+                    className="bb2-control"
+                    value={setup.agent_name || ''}
+                    onChange={(event) =>
+                      updateSetup(
+                        'agent_name',
+                        event.target.value
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field title="AI agent gender">
+                  <SelectField
+                    value={setup.agent_gender}
+                    choices={[
+                      'Not set',
+                      'Female',
+                      'Male',
+                      'Neutral',
+                    ]}
+                    onChange={(value) =>
+                      updateSetup(
+                        'agent_gender',
+                        value
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field title="Reply language">
+                  <SelectField
+                    value={setup.reply_language}
+                    choices={[
+                      'Automatic',
+                      'English',
+                      'Urdu',
+                      'Roman Urdu',
+                      'Customer language',
+                    ]}
+                    onChange={(value) =>
+                      updateSetup(
+                        'reply_language',
+                        value
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field title="Tone">
+                  <SelectField
+                    value={setup.tone}
+                    choices={[
+                      'Friendly',
+                      'Professional',
+                      'Casual',
+                      'Formal',
+                    ]}
+                    onChange={(value) =>
+                      updateSetup('tone', value)
+                    }
+                  />
+                </Field>
+
+                <Field title="Reply length">
+                  <SelectField
+                    value={setup.reply_length}
+                    choices={[
+                      'Short',
+                      'Medium',
+                      'Long',
+                      'Balanced',
+                    ]}
+                    onChange={(value) =>
+                      updateSetup(
+                        'reply_length',
+                        value
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field
+                  title="Custom instructions"
+                  wide
+                  hint="Added to every AI prompt as extra context."
+                >
+                  <textarea
+                    className="bb2-control"
+                    rows={4}
+                    placeholder="e.g. Always greet customers with Assalamualaikum…"
+                    value={
+                      setup.custom_instructions || ''
+                    }
+                    onChange={(event) =>
+                      updateSetup(
+                        'custom_instructions',
+                        event.target.value
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field
+                  title="Goodbye message (optional)"
+                  wide
+                >
+                  <input
+                    className="bb2-control"
+                    placeholder="A message sent when a chat goes quiet"
+                    value={
+                      setup.goodbye_message || ''
+                    }
+                    onChange={(event) =>
+                      updateSetup(
+                        'goodbye_message',
+                        event.target.value
+                      )
+                    }
+                  />
+                </Field>
+
+                <button
+                  className="bb2-main-button"
+                  disabled={saving === 'behaviour'}
+                >
+                  {saving === 'behaviour'
+                    ? 'Saving…'
+                    : 'Save AI settings'}
+                </button>
+              </form>
+
+              <div>
+                <InfoCard title="Tone & language">
+                  Auto-detect handles mixed English
+                  and Urdu conversations. Choose
+                  Friendly for most businesses.
+                </InfoCard>
+
+                <InfoCard title="Custom instructions">
+                  Add greetings, disclaimers or rules
+                  the AI should always follow.
+                </InfoCard>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* HOURS & STAFF */}
+      {tab === 'hours-staff' && (
+        <div className="bb2-brain-page-content">
+          <section className="bb2-section">
+            <h2>Working hours</h2>
+
+            <p className="bb2-muted">
+              When your business is open. The AI
+              uses this to answer availability
+              questions.
+            </p>
+
+            {errors.hours && (
+              <p className="bb2-error">
+                {errors.hours}
+              </p>
+            )}
+
+            <div className="bb2-form-with-help">
+              <div>
+                <div className="bb2-week">
+                  {hours.map((day) => (
+                    <div
+                      key={day.day}
+                      className={`bb2-day ${
+                        !day.enabled ? 'closed' : ''
+                      }`}
+                    >
+                      <div className="bb2-day-top">
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={Boolean(day.enabled)}
+                            onChange={(event) =>
+                              updateDay(
+                                day.day,
+                                'enabled',
+                                event.target.checked
+                              )
+                            }
+                          />
+                          {day.day}
+                        </label>
+
+                        {day.enabled ? (
+                          <>
+                            <label className="bb2-24h">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(
+                                  day.is_24_hours
+                                )}
+                                onChange={(event) =>
+                                  updateDay(
+                                    day.day,
+                                    'is_24_hours',
+                                    event.target.checked
+                                  )
+                                }
+                              />
+                              24 hours
+                            </label>
+
+                            <button
+                              type="button"
+                              className="bb2-icon-btn"
+                              title="Copy these hours to other days"
+                              onClick={() =>
+                                copyDay(day.day)
+                              }
+                            >
+                              <Icon
+                                name="Copy"
+                                size={16}
+                              />
+                            </button>
+
+                            {!day.is_24_hours && (
+                              <>
+                                <input
+                                  type="time"
+                                  value={day.start_time}
+                                  onChange={(event) =>
+                                    updateDay(
+                                      day.day,
+                                      'start_time',
+                                      event.target.value
+                                    )
+                                  }
+                                />
+
+                                <span>to</span>
+
+                                <input
+                                  type="time"
+                                  value={day.end_time}
+                                  onChange={(event) =>
+                                    updateDay(
+                                      day.day,
+                                      'end_time',
+                                      event.target.value
+                                    )
+                                  }
+                                />
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <span className="bb2-muted">
+                            Closed
+                          </span>
+                        )}
+                      </div>
+
+                      {day.enabled &&
+                        !day.is_24_hours && (
+                          <div className="bb2-breaks">
+                            {day.breaks.map(
+                              (breakItem, index) => (
+                                <div key={index}>
+                                  <span>Break</span>
+
+                                  <input
+                                    type="time"
+                                    value={shortTime(
+                                      breakItem.start_time
+                                    )}
+                                    onChange={(event) =>
+                                      updateBreak(
+                                        day.day,
+                                        index,
+                                        'start_time',
+                                        event.target.value
+                                      )
+                                    }
+                                  />
+
+                                  <span>to</span>
+
+                                  <input
+                                    type="time"
+                                    value={shortTime(
+                                      breakItem.end_time
+                                    )}
+                                    onChange={(event) =>
+                                      updateBreak(
+                                        day.day,
+                                        index,
+                                        'end_time',
+                                        event.target.value
+                                      )
+                                    }
+                                  />
+
+                                  <button
+                                    type="button"
+                                    aria-label="Remove break"
+                                    onClick={() =>
+                                      removeBreak(
+                                        day.day,
+                                        index
+                                      )
+                                    }
+                                  >
+                                    <Icon
+                                      name="X"
+                                      size={14}
+                                    />
+                                  </button>
+                                </div>
+                              )
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                addBreak(day.day)
+                              }
+                            >
+                              + Add a break
+                            </button>
+                          </div>
+                        )}
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  className="bb2-main-button"
+                  disabled={saving === 'hours'}
+                  onClick={() =>
+                    saveResource(
+                      'hours',
+                      businessHoursApi,
+                      'PUT',
+                      { days: hours }
+                    )
+                  }
+                >
+                  {saving === 'hours'
+                    ? 'Saving…'
+                    : 'Save hours'}
+                </button>
+              </div>
+
+              <InfoCard title="How hours are used">
+                When a customer asks whether you're
+                open, the AI checks these hours.
+                Mark 24 hours for an always-open day,
+                or add breaks to block times.
+              </InfoCard>
+            </div>
+          </section>
+
+          <section className="bb2-two-panels bb2-divider-section">
+            <div className="bb2-card">
+              <h2>Booking rules</h2>
+
+              <p className="bb2-muted">
+                How opening hours become the times
+                offered to customers.
+              </p>
+
+              {errors.rules && (
+                <p className="bb2-error">
+                  {errors.rules}
+                </p>
+              )}
+
+              <div className="bb2-form-grid">
+                <Field title="Offer a time">
+                  <SelectField
+                    value={rules.offer_time}
+                    choices={[
+                      "Each service's own length",
+                      'First available',
+                      '15 minutes',
+                      '30 minutes',
+                      '60 minutes',
+                    ]}
+                    onChange={(value) =>
+                      setRules((current) => ({
+                        ...current,
+                        offer_time: value,
+                      }))
+                    }
+                  />
+                </Field>
+
+                <Field title="Gap between appointments">
+                  <SelectField
+                    value={rules.booking_gap}
+                    choices={[
+                      'No gap',
+                      '5 minutes',
+                      '10 minutes',
+                      '15 minutes',
+                      '30 minutes',
+                    ]}
+                    onChange={(value) =>
+                      setRules((current) => ({
+                        ...current,
+                        booking_gap: value,
+                      }))
+                    }
+                  />
+                </Field>
+
+                <Field title="Minimum notice">
+                  <SelectField
+                    value={rules.minimum_notice}
+                    choices={[
+                      'No minimum',
+                      '1 hour',
+                      '2 hours',
+                      '4 hours',
+                      '24 hours',
+                    ]}
+                    onChange={(value) =>
+                      setRules((current) => ({
+                        ...current,
+                        minimum_notice: value,
+                      }))
+                    }
+                  />
+                </Field>
+
+                <Field title="How far ahead">
+                  <SelectField
+                    value={rules.book_ahead}
+                    choices={[
+                      'No limit',
+                      '7 days',
+                      '14 days',
+                      '30 days',
+                      '60 days',
+                    ]}
+                    onChange={(value) =>
+                      setRules((current) => ({
+                        ...current,
+                        book_ahead: value,
+                      }))
+                    }
+                  />
+                </Field>
+
+                <Field title="Customers at the same time">
+                  <input
+                    className="bb2-control"
+                    type="number"
+                    min={1}
+                    value={
+                      rules.concurrent_customers || 1
+                    }
+                    onChange={(event) =>
+                      setRules((current) => ({
+                        ...current,
+                        concurrent_customers:
+                          event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+              </div>
+
+              <button
+                type="button"
+                className="bb2-main-button"
+                disabled={saving === 'rules'}
+                onClick={() =>
+                  saveResource(
+                    'rules',
+                    bookingRulesApi,
+                    'PUT',
+                    rules
+                  )
+                }
+              >
+                Save booking rules
+              </button>
+            </div>
+
+            <div className="bb2-card">
+              <h2>Closed days and special hours</h2>
+
+              <p className="bb2-muted">
+                A date that differs from your weekly
+                hours, such as a holiday or a shorter
+                day.
+              </p>
+
+              {closedDates.map((item) => (
+                <div
+                  className="bb2-saved-row"
+                  key={item.id || item.date}
+                >
+                  <span>
+                    {item.date} ·{' '}
+                    {item.reason ||
+                      item.day_type ||
+                      'Closed'}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={saving === 'delete-date'}
+                    onClick={async () => {
+                      if (!item.id) {
+                        showNotice(
+                          'This date has no backend identifier.'
+                        );
+                        return;
+                      }
+
+                      setSaving('delete-date');
+
+                      try {
+                        await closedDatesApi.request({
+                          method: 'DELETE',
+                          id: item.id,
+                        });
+
+                        setClosedDates((current) =>
+                          current.filter(
+                            (entry) => entry !== item
+                          )
+                        );
+
+                        showNotice('Date deleted.');
+                      } catch (error) {
+                        showNotice(getError(error));
+                      } finally {
+                        setSaving('');
+                      }
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+
+              <form
+                className="bb2-form-grid"
+                onSubmit={(event) => {
+                  event.preventDefault();
+
+                  saveResource(
+                    'date',
+                    closedDatesApi,
+                    'POST',
+                    dateForm,
+                    (response) => {
+                      const created =
+                        response?.date || response;
+
+                      if (
+                        created?.id ||
+                        created?.date
+                      ) {
+                        setClosedDates((current) => [
+                          ...current,
+                          created,
+                        ]);
+                      }
+
+                      setDateForm({
+                        date: '',
+                        day_type: 'Closed all day',
+                        reason: '',
+                      });
+                    }
+                  );
+                }}
+              >
+                <Field title="Date">
+                  <input
+                    className="bb2-control"
+                    type="date"
+                    required
+                    value={dateForm.date}
+                    onChange={(event) =>
+                      setDateForm((current) => ({
+                        ...current,
+                        date: event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+
+                <Field title="That day">
+                  <SelectField
+                    value={dateForm.day_type}
+                    choices={[
+                      'Closed all day',
+                      'Special opening hours',
+                    ]}
+                    onChange={(value) =>
+                      setDateForm((current) => ({
+                        ...current,
+                        day_type: value,
+                      }))
+                    }
+                  />
+                </Field>
+
+                <Field
+                  title="Note for customers (optional)"
+                  wide
+                >
+                  <input
+                    className="bb2-control"
+                    placeholder="e.g. Public holiday"
+                    value={dateForm.reason}
+                    onChange={(event) =>
+                      setDateForm((current) => ({
+                        ...current,
+                        reason: event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+
+                <button
+                  className="bb2-soft-button"
+                  disabled={saving === 'date'}
+                >
+                  Add date
+                </button>
+              </form>
+            </div>
+          </section>
+
+          <section className="bb2-section bb2-divider-section">
+            <div className="bb2-heading-with-action">
+              <div>
+                <h2>Staff members</h2>
+                <p className="bb2-muted">
+                  Staff the AI can assign appointments
+                  to and answer questions about.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="bb2-main-button"
+                onClick={() => setModal('staff')}
+              >
+                <Icon name="Plus" size={16} />
+                Add staff
+              </button>
+            </div>
+
+            {errors.staff && (
+              <p className="bb2-error">
+                {errors.staff}
+              </p>
+            )}
+
+            {staff.length > 0 ? (
+              staff.map((person) => (
+                <div
+                  className="bb2-saved-row"
+                  key={
+                    person.id ||
+                    person.staff_id ||
+                    person.name
+                  }
+                >
+                  <span>
+                    {person.name} ·{' '}
+                    {person.role || 'Staff'}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="bb2-empty">
+                <Icon name="Users" size={26} />
+                <strong>No staff members yet</strong>
+                <p>
+                  Add staff so the AI can assign
+                  appointments.
+                </p>
+
+                <button
+                  type="button"
+                  className="bb2-main-button"
+                  onClick={() => setModal('staff')}
+                >
+                  Add first staff member
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
+      {/* LOCATIONS */}
+      {tab === 'locations' && (
+        <div className="bb2-brain-page-content">
+          <div className="bb2-heading-with-action">
+            <div>
+              <h2>Business locations</h2>
+              <p className="bb2-muted">
+                Branches or places your AI can suggest
+                to customers.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="bb2-main-button"
+              onClick={() => setModal('location')}
+            >
+              <Icon name="Plus" size={16} />
+              Add location
+            </button>
+          </div>
+
+          {errors.locations && (
+            <p className="bb2-error">
+              {errors.locations}
+            </p>
+          )}
+
+          {locations.length ? (
+            <div className="bb2-knows-grid">
+              {locations.map((location) => (
+                <article
+                  className="bb2-know-card"
+                  key={
+                    location.id ||
+                    location.location_id ||
+                    location.name
+                  }
+                >
+                  <strong>{location.name}</strong>
+                  <p>{location.address}</p>
+                  <small>{location.phone || ''}</small>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="bb2-empty">
+              <Icon name="MapPin" size={26} />
+              <strong>No locations yet</strong>
+              <p>Add your first business location.</p>
+
+              <button
+                type="button"
+                className="bb2-main-button"
+                onClick={() => setModal('location')}
+              >
+                Add first location
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* KNOWLEDGE */}
+      {tab === 'knowledge' && (
+        <div className="bb2-brain-page-content">
+          <div className="bb2-knowledge-stats">
+            {knowledgeTabs.map(([name, icon]) => {
+              const countMap = {
+                FAQs: overview?.faqs_count,
+                Promotions: overview?.promotions_count,
+                Documents: overview?.documents_count,
+                Website: overview?.website_count,
+                'Chat Training':
+                  overview?.chat_training_count,
+              };
+
+              return (
+                <article key={name}>
+                  <div>
+                    <Icon name={icon} size={15} />
+                    {name}
+                  </div>
+
+                  <strong>
+                    {countMap[name] ?? '—'}
+                  </strong>
+
+                  {name === 'Website' &&
+                    !overview?.website_connected && (
+                      <small>Not connected</small>
+                    )}
+                </article>
+              );
+            })}
+          </div>
+
+          <nav
+            className="bb2-knowledge-tabs"
+            aria-label="Knowledge categories"
+          >
+            {knowledgeTabs.map(([name, icon]) => (
+              <button
+                type="button"
+                key={name}
+                className={
+                  knowledgeSection === name
+                    ? 'active'
+                    : ''
+                }
+                onClick={() =>
+                  setKnowledgeSection(name)
+                }
+              >
+                <Icon name={icon} size={15} />
+                {name}
+              </button>
+            ))}
+          </nav>
+
+          <section className="bb2-section">
+            <h2>{knowledgeSection}</h2>
+
+            <p className="bb2-muted">
+              {knowledgeSection === 'FAQs'
+                ? 'Frequently asked questions the AI will answer directly from its knowledge base.'
+                : knowledgeSection === 'Promotions'
+                  ? 'Active offers your AI mentions when customers ask about pricing or discounts.'
+                  : knowledgeSection === 'Documents'
+                    ? 'Upload PDFs or images. Your AI reads the content and can send files to customers on request.'
+                    : knowledgeSection === 'Website'
+                      ? 'Connect your website so the AI can answer questions from its content.'
+                      : 'Teach the AI from customer conversations and corrections.'}
+            </p>
+
+            <button
+              type="button"
+              className="bb2-text-link"
+              onClick={() => {
+                setNotApplicable((current) => ({
+                  ...current,
+                  [knowledgeSection]:
+                    !current[knowledgeSection],
+                }));
+
+                showNotice(
+                  'This preference is local until a backend setting is available.'
+                );
+              }}
+            >
+              {notApplicable[knowledgeSection]
+                ? 'Mark as applicable'
+                : 'Not applicable to my business'}
+            </button>
+
+            {errors.entries &&
+              knowledgeSection !== 'Documents' && (
+                <p className="bb2-error">
+                  {errors.entries}
+                </p>
+              )}
+
+            {!notApplicable[knowledgeSection] &&
+              knowledgeSection === 'FAQs' && (
+                <>
+                  <form
+                    className="bb2-knowledge-form"
+                    onSubmit={submitKnowledge}
+                  >
+                    <Field title="Question *">
+                      <input
+                        className="bb2-control"
+                        required
+                        placeholder="What are your opening hours?"
+                        value={editor.question}
+                        onChange={(event) =>
+                          updateEditor(
+                            'question',
+                            event.target.value
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <Field title="Answer *">
+                      <textarea
+                        className="bb2-control"
+                        required
+                        rows={3}
+                        value={editor.answer}
+                        onChange={(event) =>
+                          updateEditor(
+                            'answer',
+                            event.target.value
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <button
+                      className="bb2-main-button"
+                      disabled={saving === 'knowledge'}
+                    >
+                      <Icon name="Plus" size={16} />
+                      Save FAQ
+                    </button>
+                  </form>
+
+                  <div className="bb2-knowledge-list">
+                    {entries.map((item) => (
+                      <div key={item.id || item.question}>
+                        <strong>
+                          {item.question || item.title}
+                        </strong>
+
+                        <p>
+                          {item.answer || item.content}
+                        </p>
+                      </div>
+                    ))}
+
+                    {!entries.length && (
+                      <p className="bb2-muted">
+                        No FAQs yet. Add your first FAQ
+                        above.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="bb2-divider" />
+
+                  <h2>Q&amp;A log</h2>
+
+                  <p className="bb2-muted">
+                    Questions the AI couldn't answer.
+                    Review them and teach your AI.
+                  </p>
+
+                  <div className="bb2-empty">
+                    <Icon name="Brain" size={24} />
+                    <strong>
+                      Questions will appear here when
+                      provided by the backend.
+                    </strong>
+                  </div>
+                </>
+              )}
+
+            {!notApplicable[knowledgeSection] &&
+              knowledgeSection === 'Promotions' && (
+                <form
+                  className="bb2-knowledge-form"
+                  onSubmit={submitKnowledge}
+                >
+                  <p className="bb2-muted">
+                    Active promotions can be mentioned
+                    when customers ask about pricing
+                    or services.
+                  </p>
+
+                  <Field title="Title *">
+                    <input
+                      className="bb2-control"
+                      required
+                      value={editor.title}
+                      placeholder="e.g. Eid Special, 20% off all services"
+                      onChange={(event) =>
+                        updateEditor(
+                          'title',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </Field>
+
+                  <Field title="Details">
+                    <textarea
+                      className="bb2-control"
+                      rows={3}
+                      maxLength={2000}
+                      value={editor.content}
+                      placeholder="e.g. Book before 30 June to avail…"
+                      onChange={(event) =>
+                        updateEditor(
+                          'content',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </Field>
+
+                  <Field title="Valid until">
+                    <input
+                      className="bb2-control"
+                      type="date"
+                      value={editor.valid_until}
+                      onChange={(event) =>
+                        updateEditor(
+                          'valid_until',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </Field>
+
+                  <button
+                    className="bb2-main-button"
+                    disabled={saving === 'knowledge'}
+                  >
+                    <Icon name="Plus" size={16} />
+                    Add promotion
+                  </button>
+                </form>
+              )}
+
+            {!notApplicable[knowledgeSection] &&
+              knowledgeSection === 'Documents' && (
+                <div className="bb2-form-with-help">
+                  <form
+                    className="bb2-knowledge-form"
+                    onSubmit={uploadDocument}
+                  >
+                    <Field title="Title *">
+                      <input
+                        className="bb2-control"
+                        required
+                        value={editor.document_title}
+                        onChange={(event) =>
+                          updateEditor(
+                            'document_title',
+                            event.target.value
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <Field title="Description">
+                      <textarea
+                        className="bb2-control"
+                        rows={2}
+                        maxLength={1000}
+                        value={
+                          editor.document_description
+                        }
+                        placeholder="Send this when customers ask for the menu…"
+                        onChange={(event) =>
+                          updateEditor(
+                            'document_description',
+                            event.target.value
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <Field title="File (max 10 MB) *">
+                      <input
+                        className="bb2-control"
+                        type="file"
+                        required={!documentFile}
+                        accept=".pdf,.png,.jpg,.jpeg"
+                        onChange={(event) =>
+                          setDocumentFile(
+                            event.target.files?.[0] ||
+                              null
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <label className="bb2-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={
+                          editor.share_on_whatsapp
+                        }
+                        onChange={(event) =>
+                          updateEditor(
+                            'share_on_whatsapp',
+                            event.target.checked
+                          )
+                        }
+                      />
+
+                      Allow this document to be sent to
+                      customers on WhatsApp
+                    </label>
+
+                    <button
+                      className="bb2-main-button"
+                      disabled={saving === 'document'}
+                    >
+                      <Icon name="Upload" size={16} />
+                      Upload document
+                    </button>
+
+                    {errors.documents && (
+                      <p className="bb2-error">
+                        {errors.documents}
+                      </p>
+                    )}
+
+                    {documents.map((item) => (
+                      <p
+                        className="bb2-saved-row"
+                        key={
+                          item.id ||
+                          item.document_id ||
+                          item.title
+                        }
+                      >
+                        {item.title || item.file_name}
+                      </p>
+                    ))}
+                  </form>
+
+                  <InfoCard title="How documents work">
+                    Uploaded files are indexed so
+                    your AI can answer questions from
+                    menus, price lists and catalogues.
+                    Sharing a file through WhatsApp
+                    requires backend support.
+                  </InfoCard>
+                </div>
+              )}
+
+            {!notApplicable[knowledgeSection] &&
+              knowledgeSection === 'Website' && (
+                <div className="bb2-form-with-help">
+                  <form
+                    className="bb2-knowledge-form"
+                    onSubmit={submitKnowledge}
+                  >
+                    <p className="bb2-muted">
+                      Your AI can read website pages
+                      and index the content after
+                      crawling succeeds.
+                    </p>
+
+                    <Field title="Website URL *">
+                      <input
+                        type="url"
+                        required
+                        className="bb2-control"
+                        placeholder="https://yourbusiness.com"
+                        value={editor.website_url}
+                        onChange={(event) =>
+                          updateEditor(
+                            'website_url',
+                            event.target.value
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <button
+                      className="bb2-main-button"
+                      disabled={saving === 'knowledge'}
+                    >
+                      <Icon name="Globe" size={16} />
+                      Crawl website
+                    </button>
+                  </form>
+
+                  <InfoCard title="Website crawling">
+                    Page limits and crawling behavior
+                    depend on your backend. Re-crawl
+                    whenever website content changes.
+                  </InfoCard>
+                </div>
+              )}
+
+            {!notApplicable[knowledgeSection] &&
+              knowledgeSection === 'Chat Training' && (
+                <form
+                  className="bb2-knowledge-form"
+                  onSubmit={submitKnowledge}
+                >
+                  <Field title="Training title *">
+                    <input
+                      className="bb2-control"
+                      required
+                      value={editor.title}
+                      onChange={(event) =>
+                        updateEditor(
+                          'title',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </Field>
+
+                  <Field title="Correct response or training notes *">
+                    <textarea
+                      className="bb2-control"
+                      rows={5}
+                      required
+                      value={editor.content}
+                      onChange={(event) =>
+                        updateEditor(
+                          'content',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </Field>
+
+                  <button
+                    className="bb2-main-button"
+                    disabled={saving === 'knowledge'}
+                  >
+                    Save training
+                  </button>
+                </form>
+              )}
+          </section>
+        </div>
+      )}
+
+      {/* REQUESTS */}
+      {tab === 'requests' && (
+        <div className="bb2-brain-page-content">
+          <div className="bb2-heading-with-action">
+            <div>
+              <h2>Request types</h2>
+              <p className="bb2-muted">
+                Tell your AI which details to collect
+                when customers make an enquiry.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="bb2-main-button"
+              onClick={() => setModal('request')}
+            >
+              <Icon name="Plus" size={16} />
+              Add Request Type
+            </button>
+          </div>
+
+          {errors.requests && (
+            <p className="bb2-error">
+              {errors.requests}
+            </p>
+          )}
+
+          {requests.length ? (
+            requests.map((item) => (
+              <article
+                className="bb2-saved-row"
+                key={
+                  item.id ||
+                  item.request_type_id ||
+                  item.name
+                }
+              >
+                <span>
+                  <b>{item.name}</b>
+                  {' · '}
+                  {item.details_to_collect ||
+                    'No additional details'}
+                </span>
+              </article>
+            ))
+          ) : (
+            <div className="bb2-empty">
+              <Icon name="ClipboardList" size={26} />
+
+              <strong>Nothing to collect yet</strong>
+
+              <p>
+                Your AI will collect the information
+                you specify when a customer sends a
+                request.
+              </p>
+
+              <button
+                type="button"
+                className="bb2-main-button"
+                onClick={() => setModal('request')}
+              >
+                Add Request Type
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TEST AI */}
+      {tab === 'test-ai' && (
+        <div className="bb2-test-area">
+          <div className="bb2-test-head">
+            <p>
+              A test conversation with your AI.
+              Nothing is sent over WhatsApp.
+              Test orders and appointments should not
+              trigger real couriers or payments.
+            </p>
+
+            <button
+              type="button"
+              className="bb2-soft-button"
+              disabled={testSending}
+              onClick={() => {
+                setTestMessages([]);
+                setTestText('');
+              }}
+            >
+              <Icon name="RotateCcw" size={15} />
+              Reset
+            </button>
+          </div>
+
+          <ChatPanel
+            emptyText="Say hello to start testing your AI."
+            messages={testMessages}
+            sending={testSending}
+            text={testText}
+            setText={setTestText}
+            submit={submitTest}
+            reset={() => setTestMessages([])}
+            disabled={checkingPlan}
+          />
+
+          {!isConfigured(testAiApi) && (
+            <p className="bb2-error">
+              Test AI API is not configured.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* ADD STAFF / LOCATION / REQUEST MODAL */}
+      {modal && (
+        <Modal
+          title={
+            modal === 'staff'
+              ? 'Add staff member'
+              : modal === 'location'
+                ? 'Add location'
+                : 'Add Request Type'
+          }
+          onClose={closeModal}
+          footer={
+            <>
+              <button
+                type="button"
+                className="bb2-soft-button"
+                onClick={closeModal}
+                disabled={Boolean(saving)}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                form="bb2-brain-modal"
+                className="bb2-main-button"
+                disabled={Boolean(saving)}
+              >
+                {saving ? 'Saving…' : 'Save'}
+              </button>
+            </>
+          }
+        >
+          <form
+            id="bb2-brain-modal"
+            className="bb2-form-grid"
+            onSubmit={saveModal}
+          >
+            {(
+              modal === 'staff'
+                ? [
+                    ['name', 'Name'],
+                    ['role', 'Role'],
+                    ['phone', 'Phone'],
+                  ]
+                : modal === 'location'
+                  ? [
+                      ['name', 'Location name'],
+                      ['address', 'Address'],
+                      ['phone', 'Phone'],
+                      ['notes', 'Notes'],
+                    ]
+                  : [
+                      ['name', 'Name'],
+                      [
+                        'detailsToCollect',
+                        'Details to collect',
+                      ],
+                      [
+                        'whatHappensNext',
+                        'What happens next',
+                      ],
+                    ]
+            ).map(([key, title]) => {
+              const current =
+                modal === 'staff'
+                  ? staffForm
+                  : modal === 'location'
+                    ? locationForm
+                    : requestForm;
+
+              const setCurrent =
+                modal === 'staff'
+                  ? setStaffForm
+                  : modal === 'location'
+                    ? setLocationForm
+                    : setRequestForm;
+
+              return (
+                <Field key={key} title={title}>
+                  <input
+                    className="bb2-control"
+                    required={
+                      key !== 'phone' &&
+                      key !== 'notes'
+                    }
+                    value={current[key] || ''}
+                    onChange={(event) =>
+                      setCurrent((value) => ({
+                        ...value,
+                        [key]: event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+              );
+            })}
+
+            {modal === 'staff' && (
+              <Field title="Working hours">
+                <SelectField
+                  value={staffForm.hours_mode}
+                  choices={[
+                    [
+                      'business',
+                      'Same as business',
+                    ],
+                    ['own', 'Own hours'],
+                  ]}
+                  onChange={(value) =>
+                    setStaffForm((current) => ({
+                      ...current,
+                      hours_mode: value,
+                    }))
+                  }
+                />
+              </Field>
+            )}
           </form>
-          <div id="ai-behaviour" className="dp-brain-tab-heading dp-brain-tab-heading-spaced"><div><span className="dp-section-kicker">AI BEHAVIOUR</span><h2>How your AI speaks</h2><p>Choose the style and language your assistant uses with customers.</p></div><Bot size={21} /></div>
-          <form className="dp-form-grid dp-brain-form" onSubmit={saveSetup}>
-            <FormField label="AI assistant name"><FieldInput value={setup.agent_name || ''} onChange={(event) => updateSetup('agent_name', event.target.value)} placeholder="e.g. Ayesha" /></FormField>
-            <FormField label="Gender"><FieldSelect value={setup.agent_gender || 'Not set'} onChange={(event) => updateSetup('agent_gender', event.target.value)}><option>Not set</option><option>Female</option><option>Male</option><option>Neutral</option></FieldSelect></FormField>
-            <FormField label="Reply language"><FieldSelect value={setup.reply_language || 'Automatic'} onChange={(event) => updateSetup('reply_language', event.target.value)}><option>Automatic</option><option>English</option><option>Urdu</option><option>Roman Urdu</option><option>English and Urdu</option></FieldSelect></FormField>
-            <FormField label="Tone"><FieldSelect value={setup.tone || 'Friendly'} onChange={(event) => updateSetup('tone', event.target.value)}><option>Friendly</option><option>Professional</option><option>Casual</option><option>Warm</option><option>Concise</option></FieldSelect></FormField>
-            <FormField label="Reply length"><FieldSelect value={setup.reply_length || 'Balanced'} onChange={(event) => updateSetup('reply_length', event.target.value)}><option>Short</option><option>Balanced</option><option>Detailed</option></FieldSelect></FormField>
-            <FormField label="Goodbye message (optional)"><FieldInput value={setup.goodbye_message || ''} onChange={(event) => updateSetup('goodbye_message', event.target.value)} placeholder="A short closing message" /></FormField>
-            <FormField label="Custom instructions" className="dp-form-full"><FieldTextarea rows={4} value={setup.custom_instructions || ''} onChange={(event) => updateSetup('custom_instructions', event.target.value)} placeholder="Add specific instructions your AI should follow…" /></FormField>
-            <div className="dp-form-full dp-settings-save-row"><span className="dp-muted">Changes are sent to the AI setup API.</span><button type="submit" className="dp-primary-button" disabled={setupSaving || setupLoading}>{setupSaving ? 'Saving…' : 'Save AI behaviour'}</button></div>
-          </form>
-          <div className="dp-brain-info-grid"><InfoCard title="Why this matters" text="Clear business details help your AI give accurate answers and set expectations." /><InfoCard title="Tone & language" text="Automatic language follows the customer's message. Set a preferred tone for consistent replies." /><InfoCard title="Custom instructions" text="Use this for policies, details and response rules that are unique to your business." /></div>
-        </section>}
-
-        {tab === 'hours-staff' && <section className="dp-brain-tab-content">
-          <div className="dp-brain-tab-heading"><div><span className="dp-section-kicker">AVAILABILITY</span><h2>Hours & Staff</h2><p>Set when customers can book and which staff members are available.</p></div><CalendarDays size={21} /></div>
-          {sectionErrors.hours && <div className="dp-inline-notice dp-api-error" role="status">{sectionErrors.hours}</div>}
-          {hoursLoading ? <div className="dp-api-empty-state">Loading saved opening hours…</div> : <Panel className="dp-brain-subpanel"><div className="dp-panel-heading"><div><h3>Working hours</h3><p className="dp-panel-description">Set the hours customers can request an appointment.</p></div><button type="button" className="dp-secondary-button" onClick={copyMondayHours}><Copy size={14} /> Copy Monday to Tue–Sat</button></div>
-            <div className="dp-week-hours-list">{hours.map((day, index) => <article className="dp-week-hours-row" key={day.day}><label className="dp-week-day-toggle"><input type="checkbox" checked={Boolean(day.enabled)} onChange={(event) => updateHour(index, 'enabled', event.target.checked)} /><strong>{day.day}</strong></label>{day.enabled ? <div className="dp-week-hours-controls"><label><input type="checkbox" checked={Boolean(day.is_24_hours)} onChange={(event) => updateHour(index, 'is_24_hours', event.target.checked)} /> 24 hours</label>{!day.is_24_hours && <><FieldInput type="time" aria-label={`${day.day} opening time`} value={day.start_time} onChange={(event) => updateHour(index, 'start_time', event.target.value)} /><span>to</span><FieldInput type="time" aria-label={`${day.day} closing time`} value={day.end_time} onChange={(event) => updateHour(index, 'end_time', event.target.value)} /></>}{day.breaks.map((pause, pauseIndex) => <div className="dp-week-break-row" key={pauseIndex}><span>Break</span><FieldInput type="time" aria-label="Break start" value={pause.start_time} onChange={(event) => updateBreak(index, pauseIndex, 'start_time', event.target.value)} /><FieldInput type="time" aria-label="Break end" value={pause.end_time} onChange={(event) => updateBreak(index, pauseIndex, 'end_time', event.target.value)} /><button type="button" className="dp-icon-action" onClick={() => updateHour(index, 'breaks', day.breaks.filter((_, itemIndex) => itemIndex !== pauseIndex))} aria-label="Remove break"><X size={13} /></button></div>)}<button type="button" className="dp-text-button" onClick={() => addBreak(index)}>+ Add break</button></div> : <strong className="dp-closed-label">Closed</strong>}</article>)}</div>
-            <div className="dp-settings-save-row"><span className="dp-muted">Save your weekly availability.</span><button type="button" className="dp-primary-button" onClick={saveHours} disabled={hoursSaving}>{hoursSaving ? 'Saving…' : 'Save hours'}</button></div>
-          </Panel>}
-          <Panel className="dp-brain-subpanel"><div className="dp-panel-heading"><div><h3>Booking rules</h3><p className="dp-panel-description">Control the options your AI offers when customers book.</p></div></div>
-            <div className="dp-form-grid"><FormField label="Offer a time"><FieldSelect value={rules.offer_time} onChange={(event) => setRules((current) => ({ ...current, offer_time: event.target.value }))}><option>First available</option><option>Ask customer for preferred time</option><option>Show available slots</option></FieldSelect></FormField><FormField label="Gap between bookings"><FieldSelect value={rules.booking_gap} onChange={(event) => setRules((current) => ({ ...current, booking_gap: event.target.value }))}>{['No gap', '5 minutes', '10 minutes', '15 minutes', '30 minutes', '60 minutes'].map((value) => <option key={value}>{value}</option>)}</FieldSelect></FormField><FormField label="Minimum notice"><FieldSelect value={rules.minimum_notice} onChange={(event) => setRules((current) => ({ ...current, minimum_notice: event.target.value }))}>{['No minimum', '1 hour', '2 hours', '4 hours', '12 hours', '24 hours'].map((value) => <option key={value}>{value}</option>)}</FieldSelect></FormField><FormField label="How far ahead can customers book?"><FieldSelect value={rules.book_ahead} onChange={(event) => setRules((current) => ({ ...current, book_ahead: event.target.value }))}>{['7 days', '14 days', '30 days', '60 days', '90 days'].map((value) => <option key={value}>{value}</option>)}</FieldSelect></FormField><FormField label="Concurrent customers"><FieldSelect value={rules.concurrent_customers} onChange={(event) => setRules((current) => ({ ...current, concurrent_customers: event.target.value }))}>{['1', '2', '3', '4', '5', '10'].map((value) => <option key={value}>{value}</option>)}</FieldSelect></FormField></div>
-            {sectionErrors.rules && <p className="dp-form-note dp-api-error">{sectionErrors.rules}</p>}<button type="button" className="dp-primary-button dp-settings-save" onClick={saveRules} disabled={rulesSaving}>{rulesSaving ? 'Saving…' : 'Save booking rules'}</button>
-          </Panel>
-          <Panel className="dp-brain-subpanel"><div className="dp-panel-heading"><div><h3>Special closed dates</h3><p className="dp-panel-description">Add holidays and dates when your business will be unavailable.</p></div></div><form className="dp-special-date-form" onSubmit={addClosedDate}><FieldInput type="date" value={closedDate.date} onChange={(event) => setClosedDate((current) => ({ ...current, date: event.target.value }))} required /><FieldInput value={closedDate.reason} onChange={(event) => setClosedDate((current) => ({ ...current, reason: event.target.value }))} placeholder="Reason (optional)" /><button type="submit" className="dp-secondary-button"><Plus size={14} /> Add date</button></form>{closedDates.map((item) => <div className="dp-brain-list-row" key={item.id || item.date}><span><strong>{item.date}</strong><small>{item.reason || 'Closed'}</small></span><button type="button" className="dp-icon-action" onClick={() => deleteResource('closedDates', item, setClosedDates, 'closed_date')} aria-label="Remove closed date"><Trash2 size={14} /></button></div>)}</Panel>
-          <Panel className="dp-brain-subpanel"><div className="dp-panel-heading"><div><h3>Staff members</h3><p className="dp-panel-description">Manage your staff and their appointment availability.</p></div><button type="button" className="dp-primary-button" onClick={() => setStaffModal(true)}><Plus size={14} /> Add staff</button></div>{staff.length ? staff.map((person) => <div className="dp-brain-list-row" key={person.id || person.staff_id}><span><strong>{person.name || person.full_name}</strong><small>{person.role || 'Staff'} · {person.phone || 'No phone number'}</small></span><button type="button" className="dp-icon-action" onClick={() => deleteResource('staff', person, setStaff, 'staff')} aria-label="Remove staff member"><Trash2 size={14} /></button></div>) : <EmptyState icon={Users} title="No staff members yet" description="Add team members to manage who can take appointments." buttonText="Add staff member" onAction={() => setStaffModal(true)} />}</Panel>
-          <div className="dp-brain-footer-actions"><button type="button" className="dp-secondary-button" onClick={() => { setTabToLocations(setSearchParams, searchParams); }}><MapPin size={14} /> Add Location</button><span className="dp-muted">Staff may have their own working hours when the staff API supports it.</span></div>
-        </section>}
-
-        {tab === 'locations' && <section className="dp-brain-tab-content">
-          <div className="dp-brain-tab-heading"><div><span className="dp-section-kicker">BUSINESS LOCATIONS</span><h2>Locations</h2><p>Add branches and tell your AI where each service is available.</p></div><button type="button" className="dp-primary-button" onClick={() => setLocationModal(true)}><Plus size={14} /> Add location</button></div>
-          {sectionErrors.locations && <div className="dp-inline-notice dp-api-error" role="status">{sectionErrors.locations}</div>}
-          {locations.length ? <div className="dp-location-grid">{locations.map((location) => <Panel className="dp-location-card" key={location.id || location.location_id}><div className="dp-panel-heading"><MapPin size={18} /><button type="button" className="dp-icon-action" onClick={() => deleteResource('locations', location, setLocations, 'location')} aria-label="Delete location"><Trash2 size={14} /></button></div><h3>{location.name}</h3><p>{location.address || 'No address added'}</p><small>{location.phone || ''}</small></Panel>)}</div> : sectionErrors.locations ? <div className="dp-api-empty-state"><MapPin size={22} /><strong>Locations are ready to connect</strong><p>Connect the locations API to load and manage business branches.</p></div> : <EmptyState icon={MapPin} title="No locations yet" description="Add your first business location to help the AI direct customers to the right branch." buttonText="Add location" onAction={() => setLocationModal(true)} />}
-        </section>}
-
-        {tab === 'knowledge' && <section className="dp-brain-tab-content">
-          <div className="dp-brain-tab-heading"><div><span className="dp-section-kicker">REFERENCE MATERIAL</span><h2>Knowledge library</h2><p>Upload documents your AI can look up when a customer asks a related question.</p></div><FileText size={21} /></div>
-          {sectionErrors.knowledge && <div className="dp-inline-notice dp-api-error" role="status">{sectionErrors.knowledge}</div>}
-          <Panel className="dp-brain-subpanel"><form className="dp-knowledge-upload-form" onSubmit={saveKnowledgeFile}><label className="dp-knowledge-file-picker"><input type="file" accept=".pdf,.doc,.docx,.txt,.csv" onChange={(event) => setKnowledgeFile(event.target.files?.[0] || null)} /><span><Plus size={18} />{knowledgeFile ? knowledgeFile.name : 'Choose a document to upload'}</span><small>PDF, DOC, DOCX, TXT or CSV</small></label><button type="submit" className="dp-primary-button" disabled={!knowledgeFile || savingModal}>{savingModal ? 'Uploading…' : 'Upload document'}</button></form></Panel>
-          <Panel className="dp-brain-subpanel"><div className="dp-panel-heading"><div><h3>Saved documents</h3><p className="dp-panel-description">Only uploaded documents returned by your knowledge API are shown.</p></div><span className="dp-count-badge">{knowledge.length} documents</span></div>{knowledge.length ? knowledge.map((item) => <div className="dp-brain-list-row" key={item.id || item.document_id}><span><strong>{item.name || item.filename || item.title}</strong><small>{item.status || item.indexing_status || 'Saved'} · {item.size_label || ''}</small></span><button type="button" className="dp-icon-action" onClick={() => deleteResource('knowledge', item, setKnowledge, 'document')} aria-label="Delete document"><Trash2 size={14} /></button></div>) : !sectionErrors.knowledge && <EmptyState icon={FileText} title="No documents yet" description="Upload your menu, price list, catalogue or business information to build your reference knowledge." />}</Panel>
-          <Panel className="dp-brain-subpanel"><div className="dp-panel-heading"><div><h3>Try a question</h3><p className="dp-panel-description">Check whether your saved knowledge contains the answer.</p></div><Search size={18} /></div><form className="dp-special-date-form" onSubmit={checkKnowledge}><FieldInput value={knowledgeSearch} onChange={(event) => setKnowledgeSearch(event.target.value)} placeholder="Ask something about your business…" /><button type="submit" className="dp-secondary-button" disabled={searchingKnowledge || !knowledgeSearch.trim()}>{searchingKnowledge ? 'Checking…' : 'Check'}</button></form>{searchResult && <div className="dp-knowledge-search-result">{searchResult}</div>}<button type="button" className="dp-text-button dp-rules-toggle" onClick={() => setShowRules((value) => !value)}>{showRules ? 'Hide' : 'Show'} knowledge rules</button>{showRules && <div className="dp-knowledge-rules"><p>Your AI looks up reference documents when a customer asks something related. Core business details remain available in every conversation.</p></div>}</Panel>
-        </section>}
-
-        {tab === 'requests' && <section className="dp-brain-requests">
-          <div className="dp-brain-requests-heading"><div><span className="dp-section-kicker">LEAD COLLECTION</span><h2>Request types</h2><p>Tell your AI which details to collect when customers make an enquiry.</p></div><button type="button" className="dp-primary-button" onClick={() => setRequestModal(true)}><Plus size={15} /> Add Request Type</button></div>
-          {requestError && <div className="dp-inline-notice dp-api-error" role="status">{requestError}</div>}
-          {isRequestLoading ? <div className="dp-api-empty-state">Loading request types…</div> : requestTypes.length ? <div className="dp-brain-request-list">{requestTypes.map((item) => <article className="dp-brain-request-row" key={item.id || item.request_type_id || item.name}><div><strong>{item.name}</strong><p>{item.details_to_collect || item.details || 'No additional details specified.'}</p><small>{item.collect_phone_from_whatsapp !== false ? 'Phone number is collected from the WhatsApp conversation.' : 'Phone number is not collected automatically.'}</small></div><span className={`dp-status-pill ${item.is_active === false ? 'neutral' : 'success'}`}>{item.is_active === false ? 'Inactive' : 'Active'}</span></article>)}</div> : requestError ? <div className="dp-api-empty-state">Request types are ready to connect. Add the request types API to load your saved forms.</div> : <EmptyState icon={Users} title="Nothing to collect yet" description="Add the enquiry types your team follows up personally. Your AI will collect the details and save them as leads." buttonText="Add Request Type" onAction={() => setRequestModal(true)} />}
-        </section>}
-
-        {tab === 'test-ai' && <TestAIContent question={question} setQuestion={setQuestion} messages={testMessages} isSending={isSendingTest} isCheckingPlan={isCheckingPlan} onSubmit={handleTestSubmit} />}
-      </Panel>
-
-      {staffModal && <Modal title="Add staff member" description="Add a person who can take appointments." onClose={() => !savingModal && setStaffModal(false)} footer={<><button type="button" className="dp-secondary-button" onClick={() => setStaffModal(false)} disabled={savingModal}>Cancel</button><button type="submit" form="brain-staff-form" className="dp-primary-button" disabled={savingModal}>{savingModal ? 'Saving…' : 'Add staff member'}</button></>}>
-        <form id="brain-staff-form" className="dp-form-grid" onSubmit={saveStaff}><FormField label="Name"><FieldInput value={staffForm.name} onChange={(event) => setStaffForm((current) => ({ ...current, name: event.target.value }))} required /></FormField><FormField label="Role"><FieldInput value={staffForm.role} onChange={(event) => setStaffForm((current) => ({ ...current, role: event.target.value }))} placeholder="e.g. Stylist" required /></FormField><FormField label="Phone"><FieldInput value={staffForm.phone} onChange={(event) => setStaffForm((current) => ({ ...current, phone: event.target.value }))} /></FormField><FormField label="Working hours"><FieldSelect value={staffForm.hours_mode} onChange={(event) => setStaffForm((current) => ({ ...current, hours_mode: event.target.value }))}><option value="business">Same as the business</option><option value="own">Own hours</option></FieldSelect></FormField>{staffForm.hours_mode === 'own' && <><FormField label="Start time"><FieldInput type="time" value={staffForm.start_time} onChange={(event) => setStaffForm((current) => ({ ...current, start_time: event.target.value }))} required /></FormField><FormField label="End time"><FieldInput type="time" value={staffForm.end_time} onChange={(event) => setStaffForm((current) => ({ ...current, end_time: event.target.value }))} required /></FormField></>}<div className="dp-form-full"><button type="button" className="dp-secondary-button" onClick={() => { setStaffModal(false); setLocationModal(true); }}><MapPin size={14} /> Add Location</button></div></form>
-      </Modal>}
-
-      {locationModal && <Modal title="Add location" description="Add a business branch or service location." onClose={() => !savingModal && setLocationModal(false)} footer={<><button type="button" className="dp-secondary-button" onClick={() => setLocationModal(false)} disabled={savingModal}>Cancel</button><button type="submit" form="brain-location-form" className="dp-primary-button" disabled={savingModal}>{savingModal ? 'Saving…' : 'Add location'}</button></>}>
-        <form id="brain-location-form" className="dp-form-grid" onSubmit={saveLocation}><FormField label="Location name"><FieldInput value={locationForm.name} onChange={(event) => setLocationForm((current) => ({ ...current, name: event.target.value }))} required /></FormField><FormField label="Phone"><FieldInput value={locationForm.phone} onChange={(event) => setLocationForm((current) => ({ ...current, phone: event.target.value }))} /></FormField><FormField label="Address" className="dp-form-full"><FieldTextarea value={locationForm.address} onChange={(event) => setLocationForm((current) => ({ ...current, address: event.target.value }))} rows={2} required /></FormField><FormField label="Notes" className="dp-form-full"><FieldTextarea value={locationForm.notes} onChange={(event) => setLocationForm((current) => ({ ...current, notes: event.target.value }))} rows={2} /></FormField></form>
-      </Modal>}
-
-      {requestModal && <Modal title="Add Request Type" description="Choose what your AI should collect from a customer." onClose={() => !savingModal && setRequestModal(false)} footer={<><button type="button" className="dp-secondary-button" onClick={() => setRequestModal(false)} disabled={savingModal}>Cancel</button><button type="submit" form="brain-request-form" className="dp-primary-button" disabled={savingModal || !requestForm.name.trim() || !requestForm.detailsToCollect.trim() || !requestForm.whatHappensNext.trim()}>{savingModal ? 'Saving…' : 'Add Request Type'}</button></>}>
-        <form id="brain-request-form" className="dp-form-grid" onSubmit={saveRequestType}><FormField label="Name" className="dp-form-full"><FieldInput value={requestForm.name} onChange={(event) => setRequestForm((current) => ({ ...current, name: event.target.value }))} placeholder="e.g. Wedding enquiry" required maxLength={120} /></FormField><FormField label="Details to collect" className="dp-form-full" hint="The customer's phone number is added automatically from their WhatsApp conversation."><FieldTextarea rows={4} value={requestForm.detailsToCollect} onChange={(event) => setRequestForm((current) => ({ ...current, detailsToCollect: event.target.value }))} placeholder="e.g. Event date, guest count and preferred package" required maxLength={1000} /></FormField><FormField label="What happens next (your AI tells the customer this)" className="dp-form-full"><FieldTextarea rows={3} value={requestForm.whatHappensNext} onChange={(event) => setRequestForm((current) => ({ ...current, whatHappensNext: event.target.value }))} placeholder="e.g. Our team will review your enquiry and get back to you shortly." required maxLength={1000} /></FormField>{requestError && <p className="dp-form-note dp-api-error dp-form-full">{requestError}</p>}</form>
-      </Modal>}
-    </>
-  );
-}
-
-function BrainAssistantPanel({ messages, value, onChange, onSubmit, isSending, tokensRemaining, suggestions, onReset }) {
-  const noTokens = tokensRemaining !== undefined && tokensRemaining !== null && Number(tokensRemaining) <= 0;
-  return <aside className="dp-brain-assistant dp-brain-assistant-side">
-    <div className="dp-brain-assistant-head"><div><span className="dp-section-kicker">BELLBEE</span><h2>Brain Assistant</h2><p>Ask questions or get help improving your AI setup.</p></div><button type="button" className="dp-icon-action" onClick={onReset} aria-label="Reset assistant conversation"><RotateCcw size={14} /></button></div>
-    {noTokens && <div className="dp-token-warning">You are out of AI tokens, so the assistant cannot reply. <a href="/dashboard/billing">Add tokens</a></div>}
-    <div className="dp-assistant-messages-scroll">{messages.length ? messages.map((message, index) => <div key={index} className={`dp-assistant-message ${message.role}`}><span>{message.role === 'assistant' ? 'B' : 'You'}</span><p>{message.text}</p></div>) : <div className="dp-assistant-welcome"><span className="dp-assistant-welcome-icon"><Bot size={22} /></span><strong>Hi! I'm your Brain Assistant.</strong><p>Ask me about your business setup or how to make your AI more helpful.</p></div>}
-      {(Array.isArray(suggestions) ? suggestions : []).slice(0, 3).map((suggestion, index) => <button type="button" className="dp-assistant-suggestion" key={index} onClick={() => onChange(typeof suggestion === 'string' ? suggestion : suggestion.prompt || suggestion.text)}>{typeof suggestion === 'string' ? suggestion : suggestion.label || suggestion.prompt || suggestion.text}</button>)}
+        </Modal>
+      )}
     </div>
-    <form className="dp-assistant-compose" onSubmit={onSubmit}><input className="dp-brain-assistant-input" value={value} onChange={(event) => onChange(event.target.value)} placeholder="Ask your AI…" disabled={noTokens} /><button type="submit" disabled={!value.trim() || isSending || noTokens} aria-label="Send message"><Send size={15} /></button></form>
-    <small className="dp-assistant-connect-note">{brainAssistantApi.isConfigured() ? (isSending ? 'Thinking…' : 'Your changes are not saved until you approve them.') : 'Assistant API not connected yet.'}</small>
-  </aside>;
-}
-
-function TestAIContent({ question, setQuestion, messages, isSending, isCheckingPlan, onSubmit }) {
-  return <div className="dp-test-ai"><span className="dp-section-kicker">AI PLAYGROUND</span><h2>Try a customer question</h2><p>Send a test message to check how your AI responds using your saved business information.</p><div className="dp-test-ai-conversation">{messages.map((message, index) => <div key={`${message.role}-${index}`} className={`dp-test-ai-message ${message.role}`}><strong>{message.role === 'user' ? 'You' : 'AI'}</strong><p>{message.text}</p></div>)}</div><form className="dp-test-ai-form" onSubmit={onSubmit}><input value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); onSubmit(event); } }} placeholder="Ask your AI a question…" aria-label="Test AI message" /><button type="submit" disabled={!question.trim() || isSending || isCheckingPlan}><Send size={15} /> {isCheckingPlan ? 'Checking plan…' : isSending ? 'Sending…' : 'Send'}</button></form></div>;
-}
-
-function InfoCard({ title, text }) {
-  return <article className="dp-brain-info-card"><span><Lightbulb size={17} /></span><div><strong>{title}</strong><p>{text}</p></div></article>;
-}
-
-function setTabToLocations(setSearchParams, searchParams) {
-  const params = new URLSearchParams(searchParams);
-  params.set('tab', 'locations');
-  setSearchParams(params, { replace: true });
+  );
 }

@@ -1,152 +1,538 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
-.dp-campaigns-panel {
+
+/* =========================================
+   BELLBEE CAMPAIGNS
+   Existing font and colors preserved
+========================================= */
+
+.cp-page {
+  width: 100%;
+  max-width: 1220px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 0 0 36px;
+  color: var(--db-green);
+  font-family: inherit;
+}
+
+.cp-page *,
+.cp-page *::before,
+.cp-page *::after {
+  box-sizing: border-box;
+}
+
+.cp-page button,
+.cp-page input,
+.cp-page select,
+.cp-page textarea {
+  font: inherit;
+}
+
+.cp-page button {
+  cursor: pointer;
+}
+
+.cp-page :is(
+  button,
+  input,
+  select,
+  textarea
+):focus-visible {
+  outline: 2px solid var(--db-coral);
+  outline-offset: 2px;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.cp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cp-header h1 {
+  margin: 0 0 5px;
+  color: var(--db-green);
+  font-size: clamp(29px, 3vw, 37px);
+  font-weight: 800;
+  letter-spacing: -1.1px;
+  line-height: 1.15;
+}
+
+.cp-header p {
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.cp-primary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 37px;
+  padding: 9px 16px;
+  border: 1px solid var(--db-coral);
+  border-radius: 9px;
+  background: var(--db-coral);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cp-primary:hover {
+  filter: brightness(.96);
+}
+
+.cp-primary:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.cp-secondary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 37px;
   padding: 8px 16px;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  background: var(--db-cream);
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.dp-campaign-list {
-  width: 100%; overflow-x: auto;
+.cp-secondary:hover {
+  border-color: var(--db-coral);
 }
 
-.dp-campaign-list-head {
-  display: grid; grid-template-columns: 1.2fr 1.1fr .7fr .75fr .9fr .8fr; align-items: center; gap: 11px; min-width: 760px; padding: 12px 7px; border-bottom: 1px solid var(--db-border);
+.cp-secondary:disabled {
+  opacity: .5;
+  cursor: not-allowed;
 }
 
-.dp-campaign-row {
-  display: grid; grid-template-columns: 1.2fr 1.1fr .7fr .75fr .9fr .8fr; align-items: center; gap: 11px; min-width: 760px; padding: 12px 7px; border-bottom: 1px solid var(--db-border);
+/* =========================================
+   API ERRORS
+========================================= */
+
+.cp-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 122, 89, .27);
+  border-radius: 9px;
+  background: #fff2ec;
+  color: #ac4e39;
+  font-size: 11px;
 }
 
-.dp-campaign-list-head {
-  color: var(--db-muted); font-size: 8px; font-weight: 850; letter-spacing: .6px; text-transform: uppercase;
+.cp-error button {
+  padding: 6px 12px;
+  border: 1px solid var(--db-border);
+  border-radius: 7px;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 11px;
 }
 
-.dp-campaign-row {
-  color: var(--db-muted); font-size: 8px;
+/* =========================================
+   NEW CAMPAIGN FORM
+========================================= */
+
+.cp-editor {
+  width: 100%;
+  margin: 0 0 27px;
+  padding: 17px 16px 16px;
+  border: 1px solid var(--db-border);
+  border-radius: 14px;
+  background: var(--db-white);
 }
 
-.dp-campaign-row > strong {
-  color: var(--db-green); font-size: 9px;
+.cp-editor h2 {
+  margin: 0 0 17px;
+  color: var(--db-green);
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.dp-campaign-stepper {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
+.cp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+  gap: 17px 16px;
 }
 
-.dp-campaign-stepper span {
-  display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid var(--db-border); border-radius: 50%; color: var(--db-muted); font-size: 8px; font-weight: 800;
+.cp-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  min-width: 0;
+  color: var(--db-green);
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.dp-campaign-stepper span.active {
-  border-color: var(--db-green); background: var(--db-green); color: var(--db-white);
+.cp-field > span {
+  display: block;
 }
 
-.dp-campaign-step {
-  display: flex; flex-direction: column; gap: 13px; min-height: 155px;
+.cp-field b {
+  color: #da4747;
 }
 
-.dp-campaign-no-templates {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 170px; padding: 20px; border: 1px dashed var(--db-border); border-radius: 11px; text-align: center;
+.cp-field input,
+.cp-field select,
+.cp-field textarea {
+  display: block;
+  width: 100%;
+  min-height: 39px;
+  padding: 9px 12px;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  outline: none;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 12px;
+  font-weight: 400;
 }
 
-.dp-campaign-no-templates > svg {
-  margin-bottom: 9px; color: #a5684d;
+.cp-field select {
+  background-color: var(--db-cream);
 }
 
-.dp-campaign-no-templates strong {
-  color: var(--db-green); font-size: 11px;
+.cp-field textarea {
+  min-height: 99px;
+  resize: vertical;
+  line-height: 1.55;
 }
 
-.dp-campaign-no-templates p {
-  margin: 5px 0 10px; color: var(--db-muted); font-size: 8px;
+.cp-field input::placeholder,
+.cp-field textarea::placeholder {
+  color: var(--db-muted);
+  opacity: .85;
 }
 
-.dp-campaign-audience-options {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px;
+.cp-field small {
+  color: var(--db-muted);
+  font-size: 10px;
+  line-height: 1.5;
 }
 
-.dp-campaign-audience-options label {
-  display: flex; align-items: flex-start; gap: 9px; padding: 13px; border: 1px solid var(--db-border); border-radius: 10px; color: var(--db-green);
+.cp-full {
+  grid-column: 1 / -1;
 }
 
-.dp-campaign-audience-options label.selected {
-  border-color: var(--db-coral); background: rgba(255,122,89,.08);
+.cp-audience-field {
+  grid-column: span 1;
 }
 
-.dp-campaign-schedule-options label.selected {
-  border-color: var(--db-coral); background: rgba(255,122,89,.08);
+.cp-form-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.dp-campaign-audience-options label > input {
-  accent-color: var(--db-green);
+/* =========================================
+   SPECIFIC CUSTOMERS PICKER
+========================================= */
+
+.cp-customer-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  max-width: 100%;
+  padding: 13px;
+  border: 1px solid var(--db-border);
+  border-radius: 10px;
+  background: var(--db-cream);
 }
 
-.dp-campaign-schedule-options input {
-  accent-color: var(--db-green);
+.cp-customer-picker > strong {
+  font-size: 12px;
 }
 
-.dp-campaign-audience-options label > svg {
-  flex: 0 0 auto; color: #a5684d;
+.cp-customer-picker > small {
+  color: var(--db-muted);
+  font-size: 10px;
 }
 
-.dp-campaign-audience-options label > span {
-  display: flex; flex-direction: column; gap: 4px;
-}
-
-.dp-campaign-audience-options strong {
-  font-size: 9px;
-}
-
-.dp-campaign-audience-options small {
-  color: var(--db-muted); font-size: 8px; line-height: 1.5;
-}
-
-.dp-campaign-schedule-options {
-  display: flex; gap: 9px;
-}
-
-.dp-campaign-schedule-options label {
-  display: flex; align-items: center; gap: 7px; padding: 11px 13px; border: 1px solid var(--db-border); border-radius: 9px; color: var(--db-green); font-size: 9px;
-}
-
-.dp-campaign-review h3 {
-  margin: 0 0 10px; color: var(--db-green); font-size: 12px;
-}
-
-.dp-campaign-review-row {
-  display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--db-border); font-size: 9px;
-}
-
-.dp-campaign-review-row span {
+.cp-customer-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--db-border);
+  border-radius: 8px;
+  background: var(--db-white);
   color: var(--db-muted);
 }
 
-.dp-campaign-review-row strong {
-  color: var(--db-green); text-align: right;
-}
-
-@media (max-width: 760px) {
-.dp-campaign-audience-options {
-  grid-template-columns: 1fr;
-}
-.dp-campaign-schedule-options {
-  flex-direction: column;
-}
-
-}
-
-@media (max-width: 760px) {
-.dp-campaign-list-head {
-  font-size: 10px;
-}
-.dp-campaign-row {
-  font-size: 10px;
-}
-.dp-campaign-row > strong {
+.cp-customer-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--db-green);
   font-size: 11px;
 }
-.dp-campaign-list {
-  max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+
+.cp-customer-results {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 170px;
+  overflow-y: auto;
 }
 
+.cp-customer-results label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 32px;
+  padding: 6px 7px;
+  border-radius: 7px;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 11px;
+}
+
+.cp-customer-results input {
+  accent-color: var(--db-green);
+}
+
+.cp-customer-results p {
+  color: var(--db-muted);
+  font-size: 11px;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.cp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 350px;
+  padding: 64px 18px 30px;
+  color: var(--db-muted);
+  text-align: center;
+}
+
+.cp-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 13px;
+  border-radius: 50%;
+  background: var(--db-cream);
+  color: var(--db-muted);
+}
+
+.cp-empty strong {
+  color: var(--db-green);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.cp-empty p {
+  margin: 7px 0 16px;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.cp-empty small {
+  margin-top: 13px;
+  color: var(--db-muted);
+  font-size: 10px;
+}
+
+/* =========================================
+   CAMPAIGN LIST
+========================================= */
+
+.cp-campaigns-section {
+  margin-top: 10px;
+  border: 1px solid var(--db-border);
+  border-radius: 14px;
+  background: var(--db-white);
+  overflow: hidden;
+}
+
+.cp-list-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 17px;
+}
+
+.cp-list-top h2 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 15px;
+}
+
+.cp-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border: 1px solid var(--db-border);
+  border-radius: 8px;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 11px;
+}
+
+.cp-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.cp-table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.cp-table thead {
+  background: var(--db-cream);
+}
+
+.cp-table th {
+  padding: 12px 14px;
+  border-top: 1px solid var(--db-border);
+  border-bottom: 1px solid var(--db-border);
+  color: var(--db-muted);
+  font-size: 9px;
+  text-align: left;
+  font-weight: 800;
+}
+
+.cp-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--db-border);
+  color: var(--db-muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.cp-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cp-table td strong {
+  color: var(--db-green);
+  font-weight: 750;
+}
+
+/* =========================================
+   CAMPAIGN STATUS
+========================================= */
+
+.cp-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 18px;
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: capitalize;
+}
+
+.cp-status-neutral {
+  background: var(--db-cream);
+  color: var(--db-green);
+}
+
+.cp-status-success {
+  background: #e1f2e7;
+  color: #267c4b;
+}
+
+.cp-status-pending {
+  background: #fff1cb;
+  color: #916a14;
+}
+
+.cp-status-danger {
+  background: #ffe5de;
+  color: #aa4940;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+  .cp-header h1 {
+    font-size: 29px;
+  }
+
+  .cp-form-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .cp-audience-field {
+    grid-column: 1 / -1;
+  }
+
+  .cp-editor {
+    padding: 15px 12px;
+  }
+
+  .cp-empty {
+    padding-top: 52px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cp-header {
+    align-items: flex-start;
+  }
+
+  .cp-header .cp-primary {
+    min-height: 36px;
+  }
+
+  .cp-field {
+    font-size: 11px;
+  }
+
+  .cp-field input,
+  .cp-field select,
+  .cp-field textarea {
+    font-size: 11px;
+  }
+
+  .cp-form-actions {
+    gap: 8px;
+  }
 }

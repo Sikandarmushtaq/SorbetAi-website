@@ -1,0 +1,4 @@
+/* Additional product editor controls inherit Bellbee dashboard theme. */
+.dp-product-photo-preview { display:block; width:100px; height:100px; border:1px solid var(--db-border); border-radius:10px; object-fit:cover; margin-top:10px; }
+.dp-product-active-toggle { display:flex; gap:10px; align-items:center; font-size:10px; color:var(--db-green); }
+.dp-product-active-toggle input { accent-color:var(--db-green); }

@@ -1,82 +1,991 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
-.dp-support-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+
+/* ==========================================
+   BELLBEE SUPPORT PAGE
+   Existing theme and font preserved
+========================================== */
+
+.sp-page {
+  width: 100%;
+  min-width: 0;
+  color: var(--db-green);
+  font-family: inherit;
 }
 
-.dp-ticket-preview {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 210px; padding: 20px; border-left: 1px solid var(--db-border); color: #a5684d; text-align: center;
+.sp-page *,
+.sp-page *::before,
+.sp-page *::after {
+  box-sizing: border-box;
 }
 
-.dp-ticket-preview h3 {
-  margin: 10px 0 0; color: var(--db-green); font-size: 14px;
+.sp-page button,
+.sp-page input,
+.sp-page select,
+.sp-page textarea {
+  font-family: inherit;
 }
 
-.dp-ticket-preview p {
-  max-width: 270px; margin: 6px 0 0; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+.sp-page button {
+  cursor: pointer;
 }
 
-.dp-ticket-preview small {
-  margin-top: 8px; color: var(--db-muted); font-size: 8px;
+.sp-page button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
-.dp-ticket-list {
-  display: flex; flex-direction: column; gap: 6px;
+.sp-page button:focus-visible,
+.sp-page input:focus-visible,
+.sp-page textarea:focus-visible,
+.sp-page select:focus-visible {
+  outline: 2px solid var(--db-coral);
+  outline-offset: 2px;
 }
 
-.dp-ticket-row {
-  display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px; border: 1px solid var(--db-border); border-radius: 9px; background: transparent; color: #a5684d; text-align: left;
+/* ==========================================
+   PAGE HEADER
+========================================== */
+
+.sp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 17px;
 }
 
-.dp-ticket-row.active {
-  background: #f8f3e9; border-color: var(--db-coral);
+.sp-header h1 {
+  margin: 0 0 5px;
+  color: var(--db-green);
+  font-size: clamp(27px, 3vw, 37px);
+  font-weight: 800;
+  letter-spacing: -1.1px;
+  line-height: 1.15;
 }
 
-.dp-ticket-row:hover {
-  background: #f8f3e9; border-color: var(--db-coral);
+.sp-header p {
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
-.dp-ticket-row span {
-  display: flex; flex-direction: column; gap: 3px;
-}
+/* ==========================================
+   PRIMARY BUTTON
+========================================== */
 
-.dp-ticket-row strong {
-  color: var(--db-green); font-size: 9px;
-}
-
-.dp-ticket-row small {
-  color: var(--db-muted); font-size: 8px;
-}
-
-@media (max-width: 760px) {
-.dp-support-grid {
-  grid-template-columns: 1fr;
-}
-.dp-ticket-preview {
-  min-height: 170px; border-top: 1px solid var(--db-border); border-left: 0;
-}
-
-}
-
-.dp-ticket-reply {
-  margin-top: 12px; padding: 10px; border: 1px solid var(--db-border); border-radius: 9px; background: var(--db-cream);
-}
-
-.dp-ticket-reply strong {
-  color: var(--db-muted); font-size: 8px;
-}
-
-.dp-ticket-reply small {
-  color: var(--db-muted); font-size: 8px;
-}
-
-.dp-ticket-reply p {
-  color: var(--db-green); font-size: 9px; white-space: pre-wrap;
-}
-
-@media (max-width: 760px) {
-.dp-ticket-preview p {
+.sp-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 9px 15px;
+  border: 1px solid var(--db-green);
+  border-radius: 8px;
+  background: var(--db-green);
+  color: var(--db-white);
   font-size: 11px;
-    line-height: 1.6;
+  font-weight: 800;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+.sp-primary-button:hover:not(:disabled) {
+  background: #1b5140;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(16, 55, 42, 0.13);
+}
+
+.sp-primary-button svg {
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   MAIN INBOX
+========================================== */
+
+.sp-inbox {
+  display: grid;
+  grid-template-columns: 308px minmax(0, 1fr);
+  width: 100%;
+  min-height: 605px;
+  overflow: hidden;
+  border: 1px solid var(--db-border);
+  border-radius: 13px;
+  background: var(--db-white);
+}
+
+/* ==========================================
+   LEFT SIDEBAR
+========================================== */
+
+.sp-ticket-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-right: 1px solid var(--db-border);
+}
+
+.sp-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px;
+  border-bottom: 1px solid var(--db-border);
+}
+
+/* SEARCH */
+
+.sp-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 39px;
+  padding: 0 11px;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  background: var(--db-white);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.sp-search:focus-within {
+  border-color: var(--db-coral);
+  box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.09);
+}
+
+.sp-search svg {
+  flex: 0 0 17px;
+  color: var(--db-muted);
+}
+
+.sp-search input {
+  width: 100%;
+  min-width: 0;
+  height: 37px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--db-green);
+  font-size: 12px;
+}
+
+.sp-search input::placeholder {
+  color: #9b9eaa;
+}
+
+/* STATUS SELECT */
+
+.sp-status-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.sp-status-select select {
+  appearance: none;
+  width: 100%;
+  min-height: 39px;
+  padding: 8px 35px 8px 12px;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  outline: 0;
+  background: var(--db-cream);
+  color: var(--db-green);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sp-status-select svg {
+  position: absolute;
+  right: 12px;
+  color: var(--db-muted);
+  pointer-events: none;
+}
+
+/* ==========================================
+   TICKET LIST
+========================================== */
+
+.sp-ticket-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.sp-ticket-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--db-border);
+  background: transparent;
+  color: var(--db-green);
+  text-align: left;
+}
+
+.sp-ticket-item:hover {
+  background: var(--db-cream);
+}
+
+.sp-ticket-item.active {
+  background: rgba(255, 122, 89, 0.09);
+  box-shadow: inset 3px 0 var(--db-coral);
+}
+
+.sp-ticket-item-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 9px;
+  background: var(--db-cream);
+  color: var(--db-green);
+}
+
+.sp-ticket-item-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sp-ticket-item-copy strong {
+  overflow: hidden;
+  color: var(--db-green);
+  font-size: 12px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-ticket-item-copy small {
+  color: var(--db-muted);
+  font-size: 10px;
+}
+
+/* ==========================================
+   LEFT EMPTY STATE
+========================================== */
+
+.sp-empty-sidebar {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 18px;
+  color: #9b9faa;
+  text-align: center;
+}
+
+.sp-empty-sidebar > svg {
+  margin-bottom: 14px;
+  color: #9b9faa;
+  stroke-width: 1.7;
+}
+
+.sp-empty-sidebar h3 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sp-empty-sidebar p {
+  max-width: 250px;
+  margin: 7px 0 15px;
+  color: var(--db-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/* ==========================================
+   RIGHT CONVERSATION AREA
+========================================== */
+
+.sp-ticket-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--db-white);
+}
+
+.sp-empty-preview {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 30px;
+  text-align: center;
+}
+
+.sp-empty-preview > svg {
+  margin-bottom: 15px;
+  color: #a1a4af;
+  stroke-width: 1.65;
+}
+
+.sp-empty-preview h3 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.sp-empty-preview p {
+  max-width: 350px;
+  margin: 10px 0 0;
+  color: var(--db-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/* ==========================================
+   SELECTED TICKET THREAD
+========================================== */
+
+.sp-thread {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sp-thread-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px;
+  border-bottom: 1px solid var(--db-border);
+}
+
+.sp-thread-header h2 {
+  margin: 0 0 5px;
+  color: var(--db-green);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.sp-thread-header p {
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 10px;
+}
+
+.sp-ticket-status,
+[class^="sp-ticket-status-"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 11px;
+  border-radius: 100px;
+  background: #fff0cd;
+  color: #99721b;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.sp-ticket-status-resolved,
+.sp-ticket-status-closed {
+  background: #e3f5e8;
+  color: #2b8751;
+}
+
+.sp-ticket-status-in-progress {
+  background: #e5edff;
+  color: #3c6eb4;
+}
+
+/* MESSAGES */
+
+.sp-thread-messages {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  padding: 20px;
+}
+
+.sp-message {
+  width: fit-content;
+  max-width: 85%;
+  padding: 13px 15px;
+  border: 1px solid var(--db-border);
+  border-radius: 13px;
+  background: var(--db-cream);
+}
+
+.sp-message-user {
+  align-self: flex-end;
+  background: rgba(255, 122, 89, 0.1);
+}
+
+.sp-message-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.sp-message-title strong {
+  color: var(--db-green);
+  font-size: 11px;
+}
+
+.sp-message-title small {
+  color: var(--db-muted);
+  font-size: 9px;
+}
+
+.sp-message p {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* ==========================================
+   API ERROR / LOADING
+========================================== */
+
+.sp-api-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+  padding: 11px 13px;
+  border: 1px solid #efc9be;
+  border-radius: 9px;
+  background: #fff0e9;
+  color: #a34c3b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.sp-api-error button {
+  padding: 6px 12px;
+  border: 1px solid #efc9be;
+  border-radius: 7px;
+  background: var(--db-white);
+  color: #a34c3b;
+}
+
+.sp-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 10px;
+  min-height: 220px;
+  color: var(--db-muted);
+  font-size: 11px;
+}
+
+.sp-spin {
+  animation: sp-rotate 1s linear infinite;
+}
+
+@keyframes sp-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   MODAL BACKDROP
+========================================== */
+
+.sp-modal-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(18, 25, 22, 0.54);
+}
+
+.sp-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 512px);
+  max-height: 92vh;
+  max-height: 92svh;
+  overflow: hidden;
+  border: 1px solid var(--db-border);
+  border-radius: 14px;
+  background: var(--db-white);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
+}
+
+/* ==========================================
+   MODAL HEADER
+========================================== */
+
+.sp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 68px;
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--db-border);
+}
+
+.sp-modal-header h2 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.sp-close-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--db-muted);
+}
+
+.sp-close-button:hover {
+  background: var(--db-cream);
+  color: var(--db-green);
+}
+
+/* ==========================================
+   FORM AND INPUTS
+========================================== */
+
+.sp-modal form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sp-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 16px 11px;
+  overflow-y: auto;
+}
+
+.sp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.sp-form-group > label {
+  color: var(--db-green);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.sp-form-group > label span {
+  color: #e44a43;
+  font-weight: 800;
+}
+
+.sp-control {
+  width: 100%;
+  min-height: 39px;
+  padding: 10px 12px;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  outline: 0;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 12px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.sp-control:focus {
+  border-color: var(--db-coral);
+  box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.11);
+}
+
+.sp-control::placeholder {
+  color: #a0a4af;
+}
+
+.sp-textarea {
+  min-height: 118px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   CUSTOM CATEGORY DROPDOWN
+========================================== */
+
+.sp-category {
+  position: relative;
+  width: 100%;
+}
+
+.sp-category-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 39px;
+  padding: 9px 12px;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  background: var(--db-cream);
+  color: var(--db-green);
+  font-size: 12px;
+  text-align: left;
+}
+
+.sp-category-trigger:hover,
+.sp-category-trigger.open {
+  border-color: var(--db-coral);
+}
+
+.sp-category-trigger svg {
+  color: var(--db-muted);
+  transition: transform 0.2s ease;
+}
+
+.sp-category-trigger svg.rotated {
+  transform: rotate(180deg);
+}
+
+.sp-category-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+  overflow: hidden;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  background: var(--db-white);
+  box-shadow: 0 12px 25px rgba(16, 55, 42, 0.16);
+}
+
+.sp-category-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 0;
+  background: transparent;
+  color: var(--db-green);
+  font-size: 12px;
+  text-align: left;
+}
+
+.sp-category-option:hover {
+  background: var(--db-cream);
+}
+
+.sp-category-option.selected {
+  background: rgba(255, 122, 89, 0.12);
+  color: var(--db-green);
+  font-weight: 800;
+}
+
+.sp-category-option.selected svg {
+  color: var(--db-coral);
+}
+
+/* ==========================================
+   FILE UPLOAD / DRAG AND DROP
+========================================== */
+
+.sp-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.sp-hidden-file {
+  display: none;
+}
+
+.sp-upload-area {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px dashed transparent;
+  border-radius: 8px;
+}
+
+.sp-upload-area.dragging {
+  padding: 4px 8px;
+  border-color: var(--db-coral);
+  background: rgba(255, 122, 89, 0.08);
+}
+
+.sp-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sp-upload-button:hover:not(:disabled) {
+  color: var(--db-coral);
+}
+
+.sp-upload-button svg {
+  flex: 0 0 16px;
+  color: var(--db-muted);
+}
+
+.sp-file-counter {
+  color: var(--db-muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.sp-upload-hint {
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.sp-selected-files {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.sp-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--db-border);
+  border-radius: 8px;
+  background: var(--db-cream);
+}
+
+.sp-file-item > svg {
+  color: var(--db-muted);
+  flex: 0 0 14px;
+}
+
+.sp-file-item > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--db-green);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-file-item button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--db-muted);
+}
+
+.sp-file-item button:hover {
+  background: rgba(255, 122, 89, 0.13);
+  color: #c33d31;
+}
+
+/* ==========================================
+   MODAL FOOTER
+========================================== */
+
+.sp-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 17px;
+  margin-top: 8px;
+  padding: 14px 16px 16px;
+  border-top: 1px solid transparent;
+}
+
+.sp-cancel-button {
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--db-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.sp-cancel-button:hover:not(:disabled) {
+  background: var(--db-cream);
+  color: var(--db-green);
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1050px) {
+  .sp-inbox {
+    grid-template-columns: 270px minmax(0, 1fr);
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 760px) {
+  .sp-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .sp-header h1 {
+    font-size: 28px;
+  }
+
+  .sp-header p {
+    font-size: 11px;
+  }
+
+  .sp-inbox {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .sp-ticket-sidebar {
+    min-height: 275px;
+    max-height: 440px;
+    border-right: 0;
+    border-bottom: 1px solid var(--db-border);
+  }
+
+  .sp-empty-sidebar {
+    min-height: 230px;
+  }
+
+  .sp-ticket-content {
+    min-height: 290px;
+  }
+
+  .sp-empty-preview {
+    min-height: 290px;
+  }
+
+  .sp-thread-messages {
+    padding: 13px;
+  }
+
+  .sp-modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .sp-modal {
+    width: 100%;
+    max-height: 94vh;
+    max-height: 94svh;
+    border-radius: 17px 17px 0 0;
+  }
+
+  .sp-modal-body {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sp-header {
+    flex-wrap: wrap;
+  }
+
+  .sp-header h1 {
+    font-size: 27px;
+  }
+
+  .sp-header-new {
+    padding: 9px 11px;
+    font-size: 10px;
+  }
+
+  .sp-thread-header {
+    padding: 14px;
+  }
+
+  .sp-thread-header h2 {
+    font-size: 14px;
+  }
+
+  .sp-message {
+    max-width: 95%;
+  }
+
+  .sp-modal-header h2 {
+    font-size: 15px;
+  }
+
+  .sp-form-group > label {
+    font-size: 12px;
+  }
+
+  .sp-control,
+  .sp-category-trigger {
+    font-size: 12px;
+  }
 }

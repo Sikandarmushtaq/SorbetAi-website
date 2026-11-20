@@ -1,0 +1,43 @@
+/* Add-ons-only overrides; original global Bellbee typography, colors and sidebar are untouched. */
+.dp-addon-page { max-width: 1120px; margin: 0 auto; }
+.dp-addon-back { display: inline-flex; align-items: center; gap: 6px; padding: 0; margin: 0 0 14px; border: 0; background: transparent; color: var(--db-muted); font: inherit; font-size: 10px; cursor: pointer; }
+.dp-addon-back:hover { color: var(--db-green); }
+.dp-addon-heading { margin-bottom: 22px; }
+.dp-addon-heading h1 { margin: 0 0 5px; color: var(--db-green); font-size: clamp(27px, 3vw, 36px); font-weight: 800; line-height: 1.1; letter-spacing: -.7px; }
+.dp-addon-heading p { margin: 0; color: var(--db-muted); font-size: 11px; line-height: 1.6; }
+.dp-addon-page .dp-addon-grid-four { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.dp-addon-page .dp-addon-card { position: relative; align-items: stretch; min-height: 238px; margin: 0; padding: 18px; }
+.dp-addon-page .dp-addon-card-top { display: flex; align-items: flex-start; justify-content: space-between; min-height: 40px; margin-bottom: 9px; }
+.dp-addon-page .dp-addon-icon { margin: 0; }
+.dp-addon-page .dp-addon-icon-active { background: #dcf4e7; color: #25985c; }
+.dp-addon-page .dp-addon-card h3 { margin: 0 0 5px; font-size: 12px; }
+.dp-addon-page .dp-addon-card p { flex: 1; margin: 0 0 11px; font-size: 10px; line-height: 1.6; }
+.dp-addon-page .dp-addon-card > strong { display: block; margin: 0 0 10px; color: #7452b4; font-size: 17px; line-height: 1.2; }
+.dp-addon-page .dp-addon-actions { display: flex; align-items: center; gap: 8px; width: 100%; }
+.dp-addon-page .dp-addon-actions button { min-width: 0; font-size: 10px; }
+.dp-addon-page .dp-addon-add-button { flex: 1; }
+.dp-addon-page .dp-addon-manage-button { flex: 1; }
+.dp-addon-page .dp-addon-cancel-button { flex: 1; color: #d24541; }
+.dp-addon-page .dp-addon-manage-button + .dp-addon-cancel-button { flex: 0 0 auto; }
+.dp-addon-page .dp-addon-is-active { border-color: #b9ebcc; background: #f4fbf6; }
+.dp-addon-page .dp-addon-active-badge { padding: 5px 9px; border-radius: 20px; background: #daf8e5; color: #15974d; font-size: 9px; font-weight: 800; }
+.dp-addon-page .dp-addon-support { margin-top: 2px; }
+.dp-addon-page .dp-addon-support .dp-secondary-button { flex-shrink: 0; }
+.dp-addon-toast { position: fixed; z-index: 600; top: 95px; right: 16px; display: flex; align-items: flex-start; gap: 12px; width: min(370px, calc(100vw - 30px)); padding: 16px; border: 1px solid var(--db-border); border-left: 3px solid #21bf64; border-radius: 12px; background: var(--db-white); box-shadow: 0 12px 40px rgba(0,0,0,.13); color: var(--db-green); font-size: 12px; line-height: 1.55; }
+.dp-addon-toast svg:first-child { flex-shrink: 0; color: #20b562; }
+.dp-addon-toast-error { border-left-color: #ed4848; }
+.dp-addon-toast-error svg:first-child { color: #ed4848; }
+.dp-addon-toast-info { border-left-color: #5989db; }
+.dp-addon-toast-info svg:first-child { color: #5989db; }
+.dp-addon-toast span { flex: 1; }
+.dp-addon-toast button { display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--db-muted); cursor: pointer; }
+.dp-addon-confirm-details { display: flex; flex-direction: column; gap: 10px; color: var(--db-muted); font-size: 12px; }
+.dp-addon-confirm-details p { margin: 0; line-height: 1.7; }
+.dp-addon-confirm-details strong { color: var(--db-green); }
+/* Limit only this confirmation dialog; all other dashboard modals keep their original dimensions. */
+.dp-modal:has(.dp-addon-confirm-details) { width: min(100%, 390px); }
+.dp-modal:has(.dp-addon-confirm-details) .dp-modal-footer { background: var(--db-white); }
+.dp-addon-danger-button { display: inline-flex; align-items: center; justify-content: center; min-height: 37px; padding: 0 13px; border: 1px solid #ef4545; border-radius: 8px; background: #ef4545; color: #fff; font: inherit; font-size: 10px; font-weight: 800; cursor: pointer; }
+.dp-addon-danger-button:disabled, .dp-addon-actions button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 1050px) { .dp-addon-page .dp-addon-grid-four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .dp-addon-page .dp-addon-grid-four { grid-template-columns: 1fr; } .dp-addon-page .dp-addon-card { min-height: 200px; } .dp-addon-toast { top: 75px; } .dp-addon-page .dp-addon-support { flex-direction: column; align-items: stretch; } }

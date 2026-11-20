@@ -1,202 +1,1107 @@
-import { chatsApi } from '../../../services/dashboard/chats.api.js';
+
 import './ChatsPage.css';
-import { useEffect, useMemo, useState } from 'react';
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+
 import { useSearchParams } from 'react-router-dom';
-import { ArrowLeft, MessageCircle, Paperclip, Search, Send } from 'lucide-react';
-import { EmptyState, PageHeader, Panel, Tabs, useNotice } from '../../../components/dashboard/common/DashboardUI';
-const channelTabs = [
+
+import {
+  ArrowLeft,
+  FileText,
+  MessageCircle,
+  Paperclip,
+  Search,
+  Send,
+  X,
+} from 'lucide-react';
+
+import { chatsApi } from '../../../services/dashboard/chats.api.js';
+
+import {
+  useNotice,
+} from '../../../components/dashboard/common/DashboardUI';
+
+const CHANNEL_TABS = [
   { label: 'All', value: 'all' },
   { label: 'WhatsApp', value: 'whatsapp' },
   { label: 'Website Chat', value: 'website' },
 ];
 
-function chatRecords(response) {
-  return Array.isArray(response) ? response : response?.items || response?.results || response?.conversations || response?.chats || [];
+/* ==========================================
+   API RESPONSE HELPERS
+========================================== */
+
+function unwrapResponse(response) {
+  return response?.data?.data ?? response?.data ?? response;
 }
 
-function chatId(chat) {
-  return String(chat.id || chat.chat_id || chat.conversation_id || '');
+function getChatRecords(response) {
+  const data = unwrapResponse(response);
+
+  if (Array.isArray(data)) return data;
+
+  const records =
+    data?.items ??
+    data?.results ??
+    data?.conversations ??
+    data?.chats ??
+    [];
+
+  return Array.isArray(records) ? records : [];
 }
 
-function customerId(chat) {
-  return String(chat.customer_id || chat.customer?.id || '');
+function getChatDetails(response) {
+  const data = unwrapResponse(response);
+
+  return data?.conversation ?? data?.chat ?? data ?? {};
 }
 
-function chatName(chat) {
-  return chat.customer_name || chat.customer?.full_name || chat.customer?.name || chat.name || 'Customer';
+function getChatId(chat) {
+  return String(
+    chat?.id ??
+    chat?.chat_id ??
+    chat?.conversation_id ??
+    ''
+  );
 }
 
-function lastMessage(chat) {
-  const message = chat.last_message || chat.latest_message || chat.messages?.[chat.messages.length - 1];
-  return typeof message === 'string' ? message : message?.text || message?.body || message?.content || 'No messages yet';
+function getCustomerId(chat) {
+  return String(
+    chat?.customer_id ??
+    chat?.customer?.id ??
+    ''
+  );
 }
 
-function formatChatTime(value) {
+function getCustomerName(chat) {
+  return (
+    chat?.customer_name ||
+    chat?.customer?.full_name ||
+    chat?.customer?.name ||
+    chat?.name ||
+    'Customer'
+  );
+}
+
+function getCustomerInitial(chat) {
+  const name = getCustomerName(chat);
+  return name.trim().charAt(0).toUpperCase() || 'C';
+}
+
+function messageContent(message) {
+  if (typeof message === 'string') return message;
+
+  const content =
+    message?.text ??
+    message?.body ??
+    message?.content ??
+    message?.message ??
+    '';
+
+  return typeof content === 'string' ? content : '';
+}
+
+function getLastMessage(chat) {
+  const messages = Array.isArray(chat?.messages)
+    ? chat.messages
+    : [];
+
+  const last =
+    chat?.last_message ??
+    chat?.latest_message ??
+    messages[messages.length - 1];
+
+  return (
+    messageContent(last) ||
+    (last?.attachment ? 'Attachment' : 'No messages yet')
+  );
+}
+
+function getChatChannel(chat) {
+  const source =
+    chat?.channel ??
+    chat?.channel_type ??
+    chat?.provider ??
+    '';
+
+  return String(
+    typeof source === 'object'
+      ? source?.type || source?.name || ''
+      : source
+  ).toLowerCase();
+}
+
+function formatTime(value) {
   if (!value) return '';
+
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
 }
 
-// Loads real customer conversations and keeps channel, search and selected chat in the URL.
-export default function ChatsPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const channel = channelTabs.some((tab) => tab.value === searchParams.get('channel')) ? searchParams.get('channel') : 'all';
-  const query = searchParams.get('q') || '';
-  const requestedCustomerId = searchParams.get('customer') || '';
-  const selectedChatId = searchParams.get('chat') || '';
-  const [conversations, setConversations] = useState([]);
-  const [selectedDetails, setSelectedDetails] = useState(null);
-  const [messageText, setMessageText] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSending, setIsSending] = useState(false);
-  const [loadError, setLoadError] = useState('');
-  const [sendError, setSendError] = useState('');
-  const { showNotice, Notice } = useNotice();
+function getMessages(conversation) {
+  const records =
+    conversation?.messages ??
+    conversation?.message_items ??
+    [];
 
-  useEffect(() => {
-    let active = true;
-    setIsLoading(true);
-    setLoadError('');
+  return Array.isArray(records) ? records : [];
+}
+
+/* ==========================================
+   EMPTY STATES
+========================================== */
+
+function NoChatsState({ error }) {
+  return (
+    <div className="dp-chat-empty-list">
+      <div className="dp-chat-empty-icon">
+        <MessageCircle size={23} strokeWidth={1.7} />
+      </div>
+
+      <h3>
+        {error ? 'Chats unavailable' : 'No chats yet'}
+      </h3>
+
+      <p>
+        {error ||
+          'Customer chats from your connected channels show up here.'}
+      </p>
+    </div>
+  );
+}
+
+function NoConversationState() {
+  return (
+    <div className="dp-chat-placeholder">
+      <div className="dp-chat-placeholder-icon">
+        <MessageCircle size={27} strokeWidth={1.8} />
+      </div>
+
+      <h3>Select a conversation</h3>
+
+      <p>
+        Pick a chat from the list to start replying
+      </p>
+    </div>
+  );
+}
+
+/* ==========================================
+   MAIN CHATS PAGE
+========================================== */
+
+export default function ChatsPage() {
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+
+  const requestedChannel =
+    searchParams.get('channel') || 'all';
+
+  const channel = CHANNEL_TABS.some(
+    (tab) => tab.value === requestedChannel
+  )
+    ? requestedChannel
+    : 'all';
+
+  const query = searchParams.get('q') || '';
+
+  const selectedChatId =
+    searchParams.get('chat') || '';
+
+  const requestedCustomerId =
+    searchParams.get('customer') || '';
+
+  const [conversations, setConversations] =
+    useState([]);
+
+  const [selectedDetails, setSelectedDetails] =
+    useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [isDetailLoading, setIsDetailLoading] =
+    useState(false);
+
+  const [isSending, setIsSending] = useState(false);
+
+  const [loadError, setLoadError] = useState('');
+
+  const [sendError, setSendError] = useState('');
+
+  const [messageText, setMessageText] = useState('');
+
+  const [attachment, setAttachment] = useState(null);
+
+  const attachmentInputRef = useRef(null);
+
+  const messagesContainerRef = useRef(null);
+
+  const { Notice, showNotice } = useNotice();
+
+  /* ========================================
+     LOAD CUSTOMER CONVERSATIONS
+  ======================================== */
+
+  const loadChats = useCallback(async () => {
     if (!chatsApi.isConfigured()) {
       setConversations([]);
-      setLoadError('The chats API is not configured yet. Connect the conversations endpoint to load customer messages.');
+      setLoadError(
+        'Connect the Chats API to load customer conversations.'
+      );
       setIsLoading(false);
-      return () => { active = false; };
+      return;
     }
 
-    chatsApi.request({
-      query: {
-        channel: channel === 'all' ? undefined : channel,
-        search: query || undefined,
-        customer_id: requestedCustomerId || undefined,
-      },
-    })
-      .then((response) => {
-        if (!active) return;
-        const records = chatRecords(response);
-        setConversations(records);
-        if (requestedCustomerId && !selectedChatId) {
-          const match = records.find((chat) => customerId(chat) === requestedCustomerId);
-          if (match && chatId(match)) {
-            const next = new URLSearchParams(searchParams);
-            next.set('chat', chatId(match));
-            setSearchParams(next, { replace: true });
-          }
-        }
-      })
-      .catch((error) => { if (active) { setConversations([]); setLoadError(error.message); } })
-      .finally(() => { if (active) setIsLoading(false); });
+    setIsLoading(true);
+    setLoadError('');
 
-    return () => { active = false; };
-  }, [channel, query, requestedCustomerId, selectedChatId, searchParams, setSearchParams]);
+    try {
+      const response = await chatsApi.request({
+        query: {
+          channel:
+            channel === 'all' ? undefined : channel,
+          search: query || undefined,
+          customer_id:
+            requestedCustomerId || undefined,
+        },
+      });
+
+      setConversations(getChatRecords(response));
+    } catch (error) {
+      setLoadError(error.message);
+      setConversations([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [channel, query, requestedCustomerId]);
+
+  useEffect(() => {
+    loadChats();
+  }, [loadChats]);
+
+  /* ========================================
+     FILTER CONVERSATIONS
+  ======================================== */
+
+  const visibleConversations = useMemo(() => {
+    const normalizedQuery = query
+      .trim()
+      .toLowerCase();
+
+    return conversations.filter((chat) => {
+      const chatChannel = getChatChannel(chat);
+
+      let matchesChannel = true;
+
+      if (channel !== 'all' && chatChannel) {
+        if (channel === 'website') {
+          matchesChannel =
+            chatChannel.includes('website') ||
+            chatChannel.includes('webchat') ||
+            chatChannel.includes('web_chat');
+        } else {
+          matchesChannel =
+            chatChannel.includes(channel);
+        }
+      }
+
+      const searchable = [
+        getCustomerName(chat),
+        getLastMessage(chat),
+        chat?.phone,
+        chat?.customer?.phone,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      const matchesSearch =
+        !normalizedQuery ||
+        searchable.includes(normalizedQuery);
+
+      return matchesChannel && matchesSearch;
+    });
+  }, [conversations, channel, query]);
+
+  /* ========================================
+     AUTO SELECT CUSTOMER FROM URL
+  ======================================== */
+
+  useEffect(() => {
+    if (
+      !requestedCustomerId ||
+      selectedChatId ||
+      conversations.length === 0
+    ) {
+      return;
+    }
+
+    const matchingChat = conversations.find(
+      (chat) =>
+        getCustomerId(chat) === requestedCustomerId
+    );
+
+    if (!matchingChat || !getChatId(matchingChat)) {
+      return;
+    }
+
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+
+        next.set('chat', getChatId(matchingChat));
+
+        return next;
+      },
+      { replace: true }
+    );
+  }, [
+    conversations,
+    requestedCustomerId,
+    selectedChatId,
+    setSearchParams,
+  ]);
+
+  /* ========================================
+     UPDATE URL FILTER
+  ======================================== */
+
+  const updateFilter = (key, value) => {
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+
+        if (
+          !value ||
+          (key === 'channel' && value === 'all')
+        ) {
+          next.delete(key);
+        } else {
+          next.set(key, value);
+        }
+
+        if (key === 'channel' || key === 'q') {
+          next.delete('chat');
+          next.delete('customer');
+        }
+
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  /* ========================================
+     SELECT A CONVERSATION
+  ======================================== */
+
+  const selectConversation = (chat) => {
+    const id = getChatId(chat);
+
+    if (!id) {
+      showNotice(
+        'This conversation has no valid ID.'
+      );
+      return;
+    }
+
+    setSelectedDetails(null);
+    setSendError('');
+    setAttachment(null);
+    setMessageText('');
+
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+
+        next.set('chat', id);
+
+        if (getCustomerId(chat)) {
+          next.set('customer', getCustomerId(chat));
+        } else {
+          next.delete('customer');
+        }
+
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const backToChats = () => {
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+
+        next.delete('chat');
+        next.delete('customer');
+
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  /* ========================================
+     SELECTED CHAT
+  ======================================== */
 
   const selectedConversation = useMemo(() => {
-    return conversations.find((chat) => chatId(chat) === selectedChatId) ||
-      conversations.find((chat) => requestedCustomerId && customerId(chat) === requestedCustomerId) || null;
-  }, [conversations, selectedChatId, requestedCustomerId]);
+    return (
+      conversations.find(
+        (chat) =>
+          getChatId(chat) === selectedChatId
+      ) || null
+    );
+  }, [conversations, selectedChatId]);
+
+  /* ========================================
+     LOAD SELECTED CHAT DETAILS
+  ======================================== */
 
   useEffect(() => {
     let active = true;
+
     setSelectedDetails(null);
     setSendError('');
-    setMessageText('');
-    if (!selectedChatId || !chatsApi.isConfigured()) return undefined;
-    chatsApi.request({ id: selectedChatId })
-      .then((response) => { if (active) setSelectedDetails(response?.conversation || response?.chat || response); })
-      .catch((error) => { if (active) setSendError(error.message); });
-    return () => { active = false; };
+
+    if (!selectedChatId || !chatsApi.isConfigured()) {
+      setIsDetailLoading(false);
+      return undefined;
+    }
+
+    setIsDetailLoading(true);
+
+    chatsApi
+      .request({ id: selectedChatId })
+      .then((response) => {
+        if (!active) return;
+
+        const details = getChatDetails(response);
+
+        setSelectedDetails({
+          ...details,
+          id: getChatId(details) || selectedChatId,
+        });
+      })
+      .catch((error) => {
+        if (active) {
+          setSendError(error.message);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setIsDetailLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, [selectedChatId]);
 
-  const activeConversation = selectedDetails || selectedConversation;
-  const messages = activeConversation?.messages || activeConversation?.message_items || [];
+  const activeConversation = selectedChatId
+    ? (
+        selectedDetails &&
+        getChatId(selectedDetails) === selectedChatId
+          ? {
+              ...selectedConversation,
+              ...selectedDetails,
+            }
+          : selectedConversation
+      )
+    : null;
 
-  const updateParam = (key, value) => {
-    const next = new URLSearchParams(searchParams);
-    if (!value || (key === 'channel' && value === 'all')) next.delete(key);
-    else next.set(key, value);
-    if (key === 'customer' || key === 'channel' || key === 'q') next.delete('chat');
-    setSearchParams(next, { replace: true });
+  const messages = getMessages(activeConversation);
+
+  /* ========================================
+     SCROLL TO LATEST MESSAGE
+  ======================================== */
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+
+    if (!container) return;
+
+    container.scrollTop = container.scrollHeight;
+  }, [selectedChatId, messages.length]);
+
+  /* ========================================
+     REFRESH INCOMING MESSAGES
+  ======================================== */
+
+  useEffect(() => {
+    if (!chatsApi.isConfigured()) return undefined;
+
+    let active = true;
+
+    const refresh = async () => {
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+
+      try {
+        const [listResponse, detailResponse] =
+          await Promise.all([
+            chatsApi.request({
+              query: {
+                channel:
+                  channel === 'all'
+                    ? undefined
+                    : channel,
+                search: query || undefined,
+                customer_id:
+                  requestedCustomerId || undefined,
+              },
+            }),
+
+            selectedChatId
+              ? chatsApi.request({
+                  id: selectedChatId,
+                })
+              : Promise.resolve(null),
+          ]);
+
+        if (!active) return;
+
+        setConversations(
+          getChatRecords(listResponse)
+        );
+
+        if (detailResponse && selectedChatId) {
+          const details =
+            getChatDetails(detailResponse);
+
+          setSelectedDetails({
+            ...details,
+            id:
+              getChatId(details) ||
+              selectedChatId,
+          });
+        }
+      } catch {
+        // Keep the latest successfully loaded data.
+      }
+    };
+
+    const interval = window.setInterval(
+      refresh,
+      30000
+    );
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [
+    channel,
+    query,
+    requestedCustomerId,
+    selectedChatId,
+  ]);
+
+  /* ========================================
+     ATTACH FILE
+  ======================================== */
+
+  const chooseAttachment = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    if (!file) return;
+
+    const maximumSize = 10 * 1024 * 1024;
+
+    if (file.size > maximumSize) {
+      showNotice(
+        'Maximum attachment size is 10 MB.'
+      );
+
+      event.target.value = '';
+      return;
+    }
+
+    const allowedTypes = [
+      'application/pdf',
+      'text/plain',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+
+    const isImage = file.type.startsWith('image/');
+
+    const allowed =
+      isImage || allowedTypes.includes(file.type);
+
+    if (!allowed) {
+      showNotice(
+        'Select an image, PDF, TXT, DOC or DOCX file.'
+      );
+
+      event.target.value = '';
+      return;
+    }
+
+    setAttachment(file);
   };
 
-  const selectConversation = (chat) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('chat', chatId(chat));
-    if (customerId(chat)) next.set('customer', customerId(chat));
-    setSearchParams(next, { replace: true });
-  };
+  /* ========================================
+     SEND MESSAGE
+  ======================================== */
 
   const sendMessage = async (event) => {
     event.preventDefault();
-    if (!messageText.trim() || !activeConversation || isSending) return;
-    const id = chatId(activeConversation);
+
+    const text = messageText.trim();
+
+    if (
+      (!text && !attachment) ||
+      !selectedChatId ||
+      isSending
+    ) {
+      return;
+    }
+
     setIsSending(true);
     setSendError('');
+
     try {
-      await chatsApi.request({ method: 'POST', id, action: 'messages', body: { text: messageText.trim() } });
+      let body;
+
+      if (attachment) {
+        body = new FormData();
+
+        body.append('text', text);
+        body.append('attachment', attachment);
+      } else {
+        body = { text };
+      }
+
+      await chatsApi.request({
+        method: 'POST',
+        id: selectedChatId,
+        action: 'messages',
+        body,
+      });
+
       setMessageText('');
-      const response = await chatsApi.request({ id });
-      const latest = response?.conversation || response?.chat || response;
-      setSelectedDetails(latest);
-      setConversations((current) => current.map((chat) => chatId(chat) === id ? { ...chat, ...latest } : chat));
+      setAttachment(null);
+
+      if (attachmentInputRef.current) {
+        attachmentInputRef.current.value = '';
+      }
+
+      try {
+        const response = await chatsApi.request({
+          id: selectedChatId,
+        });
+
+        const details = getChatDetails(response);
+
+        setSelectedDetails({
+          ...details,
+          id:
+            getChatId(details) ||
+            selectedChatId,
+        });
+      } catch {
+        showNotice(
+          'Message sent. The conversation will refresh shortly.'
+        );
+      }
     } catch (error) {
-      setSendError(error.message);
+      setSendError(
+        error.message || 'Unable to send message.'
+      );
     } finally {
       setIsSending(false);
     }
   };
 
-  const activeChannelLabel = channelTabs.find((tab) => tab.value === channel)?.label || 'All';
+  /* ========================================
+     RENDER
+  ======================================== */
 
   return (
-    <>
-      <PageHeader eyebrow="COMMUNICATE" title="Chats" description="Manage customer conversations from your connected channels." actions={<span className="dp-count-badge">{conversations.length} conversations</span>} />
+    <div className="dp-chats-screen">
       {Notice}
-      {loadError && <div className="dp-inline-notice dp-api-error" role="status">{loadError}</div>}
-      <section className={`dp-chat-layout ${activeConversation ? 'has-chat-selection' : ''}`}>
-        <Panel className="dp-chat-list">
-          <div className="dp-chat-list-top">
-            <label className="dp-search-input"><Search size={16} /><input type="search" placeholder="Search conversations..." value={query} onChange={(event) => updateParam('q', event.target.value)} /></label>
-          </div>
-          <Tabs items={channelTabs.map((tab) => tab.label)} active={activeChannelLabel} onChange={(label) => updateParam('channel', channelTabs.find((tab) => tab.label === label)?.value || 'all')} />
-          <div className="dp-chat-rows">
-            {isLoading ? <div className="dp-api-empty-state">Loading conversations…</div> : conversations.length ? conversations.map((chat) => {
-              const id = chatId(chat);
-              const unread = Number(chat.unread_count || 0) > 0 || chat.is_read === false;
-              return (
-                <button type="button" className={`dp-chat-row ${id === selectedChatId ? 'active' : ''}`} key={id} onClick={() => selectConversation(chat)}>
-                  <span className="dp-customer-avatar">{chatName(chat).charAt(0).toUpperCase()}</span>
-                  <span className="dp-chat-row-copy"><strong>{chatName(chat)}</strong><small>{lastMessage(chat)}</small></span>
-                  <span className="dp-chat-row-meta"><time>{formatChatTime(chat.last_message_at || chat.updated_at || chat.created_at)}</time>{unread && <i aria-label="Unread" />}</span>
-                </button>
-              );
-            }) : loadError ? <div className="dp-api-empty-state"><MessageCircle size={22} /><strong>Conversations are not connected</strong><p>Connect the chats API to load conversations from your channels.</p></div> : <EmptyState icon={MessageCircle} title="No chats yet" description="Customer chats from your connected channels will show up here." />}
-          </div>
-        </Panel>
 
-        <Panel className="dp-chat-conversation">
-          {activeConversation ? (
+      <div
+        className={`dp-chat-layout ${
+          selectedChatId
+            ? 'has-chat-selection'
+            : ''
+        }`}
+      >
+        {/* LEFT SIDE: CHAT LIST */}
+
+        <aside className="dp-chat-list">
+          <div className="dp-chat-list-heading">
+            <h2>Chats</h2>
+
+            <span>
+              {isLoading
+                ? '...'
+                : `${visibleConversations.length} total`}
+            </span>
+          </div>
+
+          {/* SEARCH */}
+
+          <div className="dp-chat-search-area">
+            <label className="dp-chat-search">
+              <Search size={17} />
+
+              <input
+                type="search"
+                placeholder="Search customers..."
+                value={query}
+                onChange={(event) =>
+                  updateFilter(
+                    'q',
+                    event.target.value
+                  )
+                }
+                aria-label="Search customers"
+              />
+            </label>
+          </div>
+
+          {/* CHANNEL FILTERS */}
+
+          <div
+            className="dp-chat-channel-tabs"
+            role="tablist"
+            aria-label="Chat channels"
+          >
+            {CHANNEL_TABS.map((tab) => (
+              <button
+                type="button"
+                role="tab"
+                key={tab.value}
+                aria-selected={
+                  channel === tab.value
+                }
+                className={
+                  channel === tab.value
+                    ? 'active'
+                    : ''
+                }
+                onClick={() =>
+                  updateFilter(
+                    'channel',
+                    tab.value
+                  )
+                }
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* CONVERSATION RECORDS */}
+
+          <div className="dp-chat-rows">
+            {isLoading ? (
+              <div className="dp-chat-loading">
+                Loading conversations...
+              </div>
+            ) : loadError ? (
+              <NoChatsState error={loadError} />
+            ) : visibleConversations.length === 0 ? (
+              <NoChatsState />
+            ) : (
+              visibleConversations.map((chat, index) => {
+                const id = getChatId(chat);
+
+                const unread =
+                  Number(chat?.unread_count || 0) > 0 ||
+                  chat?.is_read === false;
+
+                const active =
+                  id === selectedChatId;
+
+                return (
+                  <button
+                    type="button"
+                    key={id || `chat-${index}`}
+                    className={`dp-chat-row ${
+                      active ? 'active' : ''
+                    }`}
+                    onClick={() =>
+                      selectConversation(chat)
+                    }
+                  >
+                    <span className="dp-chat-avatar">
+                      {getCustomerInitial(chat)}
+                    </span>
+
+                    <span className="dp-chat-row-copy">
+                      <strong>
+                        {getCustomerName(chat)}
+                      </strong>
+
+                      <small>
+                        {getLastMessage(chat)}
+                      </small>
+                    </span>
+
+                    <span className="dp-chat-row-meta">
+                      <time>
+                        {formatTime(
+                          chat?.last_message_at ||
+                          chat?.updated_at ||
+                          chat?.created_at
+                        )}
+                      </time>
+
+                      {unread && (
+                        <i
+                          aria-label="Unread message"
+                        />
+                      )}
+                    </span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </aside>
+
+        {/* RIGHT SIDE: CONVERSATION */}
+
+        <main className="dp-chat-conversation">
+          {!selectedChatId ? (
+            <NoConversationState />
+          ) : activeConversation ? (
             <div className="dp-chat-active-view">
-              <div className="dp-chat-active-header">
-                <button type="button" className="dp-chat-back-button" onClick={() => { const next = new URLSearchParams(searchParams); next.delete('chat'); next.delete('customer'); setSearchParams(next, { replace: true }); }}><ArrowLeft size={15} /> Back to chats</button>
-                <span className="dp-customer-avatar">{chatName(activeConversation).charAt(0).toUpperCase()}</span>
-                <div><strong>{chatName(activeConversation)}</strong><small>{activeConversation.phone || activeConversation.customer?.phone || activeConversation.channel || 'Customer conversation'}</small></div>
+              {/* CUSTOMER HEADER */}
+
+              <header className="dp-chat-active-header">
+                <button
+                  type="button"
+                  className="dp-chat-back-button"
+                  onClick={backToChats}
+                  aria-label="Back to chats"
+                >
+                  <ArrowLeft size={19} />
+                </button>
+
+                <span className="dp-chat-avatar">
+                  {getCustomerInitial(
+                    activeConversation
+                  )}
+                </span>
+
+                <div className="dp-chat-header-user">
+                  <strong>
+                    {getCustomerName(
+                      activeConversation
+                    )}
+                  </strong>
+
+                  <small>
+                    {activeConversation?.phone ||
+                      activeConversation?.customer
+                        ?.phone ||
+                      getChatChannel(
+                        activeConversation
+                      ) ||
+                      'Customer conversation'}
+                  </small>
+                </div>
+              </header>
+
+              {/* MESSAGES */}
+
+              <div
+                className="dp-chat-message-list"
+                ref={messagesContainerRef}
+              >
+                {isDetailLoading &&
+                  messages.length === 0 && (
+                    <div className="dp-chat-loading">
+                      Loading messages...
+                    </div>
+                  )}
+
+                {!isDetailLoading &&
+                  messages.length === 0 && (
+                    <div className="dp-chat-message-empty">
+                      <MessageCircle size={29} />
+
+                      <h3>No messages yet</h3>
+
+                      <p>
+                        Customer messages will appear
+                        here.
+                      </p>
+                    </div>
+                  )}
+
+                {messages.map((message, index) => {
+                  const outbound =
+                    message?.direction ===
+                      'outbound' ||
+                    message?.role ===
+                      'assistant' ||
+                    message?.role === 'agent' ||
+                    message?.is_from_business ===
+                      true;
+
+                  return (
+                    <article
+                      key={
+                        message?.id ||
+                        message?.message_id ||
+                        `message-${index}`
+                      }
+                      className={`dp-chat-message-bubble ${
+                        outbound
+                          ? 'outbound'
+                          : 'inbound'
+                      }`}
+                    >
+                      <p>
+                        {messageContent(message) ||
+                          (message?.attachment
+                            ? 'Attachment'
+                            : '')}
+                      </p>
+
+                      <time>
+                        {formatTime(
+                          message?.created_at ||
+                          message?.sent_at
+                        )}
+                      </time>
+                    </article>
+                  );
+                })}
               </div>
-              <div className="dp-chat-message-list">
-                {messages.length ? messages.map((message, index) => <article className={`dp-chat-message-bubble ${message.direction === 'outbound' || message.role === 'assistant' || message.is_from_business ? 'outbound' : 'inbound'}`} key={message.id || message.message_id || index}><p>{message.text || message.body || message.content || ''}</p><time>{formatChatTime(message.created_at || message.sent_at)}</time></article>) : <div className="dp-chat-placeholder"><div className="dp-empty-icon"><MessageCircle size={27} /></div><h3>No messages in this conversation</h3><p>Messages will appear here after they are received from the connected channel.</p></div>}
-              </div>
-              <form className="dp-chat-compose" onSubmit={sendMessage}>
-                <button type="button" className="dp-icon-action" aria-label="Attach a file" onClick={() => showNotice('File attachments need to be enabled by the chat messages API.')}><Paperclip size={16} /></button>
-                <input value={messageText} onChange={(event) => setMessageText(event.target.value)} placeholder="Write a reply…" aria-label="Write a reply" />
-                <button type="submit" className="dp-primary-button" disabled={!messageText.trim() || isSending}>{isSending ? 'Sending…' : <Send size={15} />}</button>
+
+              {/* ATTACHMENT PREVIEW */}
+
+              {attachment && (
+                <div className="dp-chat-file-pill">
+                  <FileText size={16} />
+
+                  <span>{attachment.name}</span>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setAttachment(null)
+                    }
+                    aria-label="Remove attachment"
+                  >
+                    <X size={17} />
+                  </button>
+                </div>
+              )}
+
+              {/* MESSAGE COMPOSER */}
+
+              <form
+                className="dp-chat-compose"
+                onSubmit={sendMessage}
+              >
+                <input
+                  ref={attachmentInputRef}
+                  type="file"
+                  className="dp-chat-hidden-input"
+                  accept="image/*,.pdf,.txt,.doc,.docx"
+                  onChange={chooseAttachment}
+                />
+
+                <button
+                  type="button"
+                  className="dp-chat-attach-button"
+                  title="Attach file"
+                  aria-label="Attach file"
+                  onClick={() =>
+                    attachmentInputRef.current?.click()
+                  }
+                >
+                  <Paperclip size={18} />
+                </button>
+
+                <input
+                  type="text"
+                  value={messageText}
+                  onChange={(event) =>
+                    setMessageText(
+                      event.target.value
+                    )
+                  }
+                  placeholder="Write a reply..."
+                  aria-label="Write a reply"
+                />
+
+                <button
+                  type="submit"
+                  className="dp-chat-send-button"
+                  disabled={
+                    isSending ||
+                    (!messageText.trim() &&
+                      !attachment)
+                  }
+                  aria-label="Send message"
+                >
+                  {isSending ? (
+                    <span className="dp-chat-sending">
+                      ...
+                    </span>
+                  ) : (
+                    <Send size={19} />
+                  )}
+                </button>
               </form>
-              {sendError && <p className="dp-form-note dp-api-error" role="alert">{sendError}</p>}
+
+              {sendError && (
+                <div
+                  className="dp-chat-send-error"
+                  role="alert"
+                >
+                  {sendError}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="dp-chat-placeholder"><div className="dp-empty-icon"><MessageCircle size={27} /></div><h3>Select a conversation</h3><p>Pick a chat from the list to start replying.</p></div>
+            <div className="dp-chat-placeholder">
+              <MessageCircle size={29} />
+
+              <h3>Conversation unavailable</h3>
+
+              <p>
+                {sendError ||
+                  'Unable to load this conversation.'}
+              </p>
+
+              <button
+                type="button"
+                className="dp-chat-back-inline"
+                onClick={backToChats}
+              >
+                Back to chats
+              </button>
+            </div>
           )}
-        </Panel>
-      </section>
-    </>
+        </main>
+      </div>
+    </div>
   );
 }

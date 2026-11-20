@@ -1,88 +1,556 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
-.dp-danger-button {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 37px; padding: 0 12px; border-radius: 9px; font-size: 10px; font-weight: 800; transition: transform .18s ease, background .18s ease, border-color .18s ease;
+
+/* =========================================
+   BELLBEE PROFILE PAGE
+   Existing Bellbee theme colors preserved
+========================================= */
+
+.dp-profile-page {
+  width: 100%;
+  max-width: 1200px;
+  min-width: 0;
+  margin: 0 auto;
+  padding-bottom: 34px;
 }
 
-.dp-danger-button {
-  border: 1px solid #ba463a; background: #ba463a; color: white;
+.dp-profile-page .dp-page-header {
+  margin-bottom: 26px;
 }
 
-.dp-device-row {
-  display: flex; align-items: center; gap: 10px; margin: 14px 0; padding: 12px; border: 1px solid var(--db-border); border-radius: 10px; color: #a5684d;
+.dp-profile-page .dp-page-header h1 {
+  font-size: clamp(29px, 3vw, 35px);
+  font-weight: 750;
+  letter-spacing: -0.8px;
 }
 
-.dp-device-row > div {
-  display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0;
+.dp-profile-page .dp-page-description {
+  color: var(--db-muted);
+  font-size: 13px;
 }
 
-.dp-device-row strong {
-  color: var(--db-green); font-size: 9px;
-}
-
-.dp-device-row small {
-  color: var(--db-muted); font-size: 8px;
-}
-
-.dp-danger-zone {
-  display: flex; align-items: center; justify-content: space-between; gap: 14px; border-color: rgba(186,70,58,.28);
-}
-
-.dp-danger-zone h2 {
-  margin: 0; color: #a63c32; font-size: 15px;
-}
-
-.dp-danger-zone p {
-  margin: 5px 0 0; color: var(--db-muted); font-size: 9px;
-}
-
-.dp-mini-badge {
-  display: inline-block; margin-left: 5px; padding: 4px 6px; border-radius: 30px; background: var(--db-yellow); color: var(--db-green); font-size: 7px; text-transform: uppercase;
-}
-
-@media (max-width: 480px) {
-.dp-danger-zone {
-  align-items: flex-start; flex-direction: column;
-}
-
-}
-
-@media (max-width: 760px) {
-.dp-danger-button {
+.dp-profile-loading {
+  color: var(--db-muted);
   font-size: 12px;
 }
 
+/* MAIN COLUMN */
+
+.dp-profile-column {
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+  width: min(100%, 660px);
 }
 
-@media (max-width: 420px) {
-.dp-danger-zone {
+/* CARDS */
+
+.dp-profile-card {
   min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--db-border);
+  border-radius: 14px;
+  background: var(--db-white);
+  color: var(--db-green);
 }
 
+/* ACCOUNT AND BUSINESS HEADINGS */
+
+.dp-profile-section-title {
+  margin: 0 0 20px;
+  padding: 3px 0 13px;
+  border-bottom: 1px solid var(--db-border);
+  color: var(--db-green);
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 800;
 }
 
-.dp-profile-toggle-list {
-  display: flex; flex-direction: column; margin: 12px 0;
+.dp-profile-business-title {
+  margin-top: 29px;
 }
 
-.dp-delete-confirm {
-  display: flex; align-items: flex-start; gap: 12px; padding: 13px; border: 1px solid rgba(186,70,58,.2); border-radius: 11px; background: #fff1ee; color: #a63c32;
+/* FORM GRID */
+
+.dp-profile-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 18px;
 }
 
-.dp-delete-confirm p {
-  margin: 0; color: #6e4b47; font-size: 10px; line-height: 1.7;
+.dp-profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  color: var(--db-green);
 }
 
-.dp-profile-panel.dp-danger-zone {
+.dp-profile-field.full {
+  grid-column: 1 / -1;
+}
+
+.dp-profile-field-label {
+  display: block;
+  color: var(--db-green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* INPUTS */
+
+.dp-profile-field > input,
+.dp-profile-field > select,
+.dp-profile-field > textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid var(--db-border);
+  border-radius: 10px;
+  outline: none;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.dp-profile-field > select {
+  padding-right: 28px;
+  background: var(--db-cream);
+  cursor: pointer;
+}
+
+.dp-profile-field > textarea {
+  min-height: 56px;
+  resize: vertical;
+}
+
+.dp-profile-field > input:focus,
+.dp-profile-field > select:focus,
+.dp-profile-field > textarea:focus {
+  border-color: var(--db-coral);
+  box-shadow: 0 0 0 2px rgba(255, 122, 89, 0.1);
+}
+
+.dp-profile-field > input:disabled {
+  background: var(--db-cream);
+  color: var(--db-muted);
+  cursor: not-allowed;
+}
+
+.dp-profile-field > small {
+  display: block;
+  margin-top: 0;
+  color: var(--db-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* SAVE CHANGES */
+
+.dp-profile-save-button {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  margin-top: 18px;
+  padding: 8px 15px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
 }
 
-.dp-profile-panel.dp-danger-zone > div {
+.dp-profile-save-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   PROFILE PICTURE - NEW FIELD
+========================================= */
+
+.dp-profile-photo-field {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.dp-profile-photo-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 13px;
+}
+
+.dp-profile-photo-preview {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  flex: 0 0 70px;
+  overflow: hidden;
+  border: 1px solid var(--db-border);
+  border-radius: 50%;
+  background: var(--db-lavender);
+  color: var(--db-green);
+  font-size: 23px;
+  font-weight: 850;
+}
+
+.dp-profile-photo-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dp-profile-photo-actions {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   min-width: 0;
 }
+
+.dp-profile-photo-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dp-profile-photo-buttons .dp-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid var(--db-border);
+  border-radius: 8px;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 12px;
+}
+
+.dp-profile-photo-actions small {
+  color: var(--db-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.dp-profile-hidden-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* =========================================
+   COMPACT SETTINGS CARDS
+========================================= */
+
+.dp-profile-compact-card {
+  padding: 16px;
+}
+
+.dp-profile-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 28px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--db-border);
+}
+
+.dp-profile-heading-row h2 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.dp-profile-text-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--db-coral);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.dp-profile-text-action:hover {
+  text-decoration: underline;
+}
+
+.dp-profile-text-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.dp-profile-muted {
+  margin: 12px 0 0;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* PASSWORD */
+
+.dp-profile-password-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.dp-profile-password-form .dp-primary-button {
+  justify-self: start;
+}
+
+/* =========================================
+   DEVICES
+========================================= */
+
+.dp-profile-device-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  padding: 16px 0;
+  color: var(--db-muted);
+}
+
+.dp-profile-device-row + .dp-profile-device-row {
+  border-top: 1px solid var(--db-border);
+}
+
+.dp-profile-device-row > svg {
+  flex: 0 0 auto;
+}
+
+.dp-profile-device-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.dp-profile-device-row strong {
+  display: inline-block;
+  color: var(--db-green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dp-profile-device-row small {
+  display: block;
+  margin-top: 3px;
+  color: var(--db-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.dp-profile-current-device {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: #dff9e8;
+  color: #16a34a;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.dp-profile-device-footer {
+  padding-top: 16px;
+  border-top: 1px solid var(--db-border);
+}
+
+.dp-profile-device-footer .dp-profile-muted {
+  margin-top: 8px;
+}
+
+/* =========================================
+   NOTIFICATION SWITCH
+========================================= */
+
+.dp-profile-notifications-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+}
+
+.dp-profile-notifications-row .dp-profile-muted {
+  margin: 0;
+}
+
+.dp-profile-switch {
+  position: relative;
+  flex: 0 0 39px;
+  width: 39px;
+  height: 21px;
+  border: 0;
+  border-radius: 30px;
+  background: #cfcfcf;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dp-profile-switch > span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s ease;
+}
+
+.dp-profile-switch.on {
+  background: var(--db-green);
+}
+
+.dp-profile-switch.on > span {
+  transform: translateX(18px);
+}
+
+.dp-profile-switch:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+/* =========================================
+   DELETE ACCOUNT
+========================================= */
+
+.dp-profile-delete-link {
+  color: #ba463a;
+}
+
+.dp-profile-delete-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 15px;
+}
+
+.dp-profile-delete-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.dp-profile-delete-columns strong {
+  color: var(--db-green);
+  font-size: 12px;
+}
+
+.dp-profile-delete-columns ul {
+  margin: 7px 0 0;
+  padding-left: 18px;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.dp-profile-delete-columns li {
+  margin: 2px 0;
+}
+
+.dp-profile-delete-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-top: 6px;
+}
+
+.dp-danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.dp-danger-button:hover {
+  background: #d93131;
+}
+
+.dp-danger-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
 
 @media (max-width: 760px) {
-.dp-profile-panel.dp-danger-zone {
-  align-items: flex-start; flex-direction: column;
+  .dp-profile-column {
+    width: min(100%, 660px);
+    gap: 18px;
+  }
+
+  .dp-profile-page .dp-page-header {
+    margin-bottom: 18px;
+  }
+
+  .dp-profile-card {
+    padding: 15px;
+  }
 }
 
+@media (max-width: 480px) {
+  .dp-profile-fields {
+    grid-template-columns: 1fr;
+    row-gap: 14px;
+  }
+
+  .dp-profile-field.full,
+  .dp-profile-photo-field {
+    grid-column: 1;
+  }
+
+  .dp-profile-delete-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .dp-profile-heading-row {
+    flex-wrap: wrap;
+  }
+
+  .dp-profile-current-device {
+    margin-left: 4px;
+  }
+
+  .dp-profile-photo-preview {
+    width: 60px;
+    height: 60px;
+    flex-basis: 60px;
+  }
+
+  .dp-profile-notifications-row .dp-profile-muted {
+    max-width: 240px;
+  }
 }

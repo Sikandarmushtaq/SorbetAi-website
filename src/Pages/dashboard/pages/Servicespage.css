@@ -1,0 +1,109 @@
+/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+.dp-danger-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 37px; padding: 0 12px; border-radius: 9px; font-size: 10px; font-weight: 800; transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.dp-danger-button {
+  border: 1px solid #ba463a; background: #ba463a; color: white;
+}
+
+.dp-device-row {
+  display: flex; align-items: center; gap: 10px; margin: 14px 0; padding: 12px; border: 1px solid var(--db-border); border-radius: 10px; color: #a5684d;
+}
+
+.dp-device-row > div {
+  display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0;
+}
+
+.dp-device-row strong {
+  color: var(--db-green); font-size: 9px;
+}
+
+.dp-device-row small {
+  color: var(--db-muted); font-size: 8px;
+}
+
+.dp-danger-zone {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; border-color: rgba(186,70,58,.28);
+}
+
+.dp-danger-zone h2 {
+  margin: 0; color: #a63c32; font-size: 15px;
+}
+
+.dp-danger-zone p {
+  margin: 5px 0 0; color: var(--db-muted); font-size: 9px;
+}
+
+.dp-mini-badge {
+  display: inline-block; margin-left: 5px; padding: 4px 6px; border-radius: 30px; background: var(--db-yellow); color: var(--db-green); font-size: 7px; text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+.dp-danger-zone {
+  align-items: flex-start; flex-direction: column;
+}
+
+}
+
+@media (max-width: 760px) {
+.dp-danger-button {
+  font-size: 12px;
+}
+
+}
+
+@media (max-width: 420px) {
+.dp-danger-zone {
+  min-width: 0;
+}
+
+}
+
+.dp-profile-toggle-list {
+  display: flex; flex-direction: column; margin: 12px 0;
+}
+
+.dp-delete-confirm {
+  display: flex; align-items: flex-start; gap: 12px; padding: 13px; border: 1px solid rgba(186,70,58,.2); border-radius: 11px; background: #fff1ee; color: #a63c32;
+}
+
+.dp-delete-confirm p {
+  margin: 0; color: #6e4b47; font-size: 10px; line-height: 1.7;
+}
+
+.dp-profile-panel.dp-danger-zone {
+  align-items: center;
+}
+
+.dp-profile-panel.dp-danger-zone > div {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+.dp-profile-panel.dp-danger-zone {
+  align-items: flex-start; flex-direction: column;
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Service form feature additions use existing dashboard colors and type. */
+.dp-service-toggles, .dp-service-staff, .dp-service-intake, .dp-service-options { display:flex; flex-direction:column; gap:9px; padding:12px; border:1px solid var(--db-border); border-radius:10px; }
+.dp-service-toggles label, .dp-service-staff label { display:flex; gap:9px; align-items:center; color:var(--db-green); font-size:10px; }
+.dp-service-toggles input, .dp-service-staff input { accent-color:var(--db-green); }
+.dp-service-options > strong, .dp-service-staff > strong, .dp-service-intake > strong { font-size:11px; color:var(--db-green); }
+.dp-service-options > button { align-self:flex-start; }
+.dp-service-option-row { display:grid; grid-template-columns:1fr 1fr auto; align-items:center; gap:9px; }
+.dp-service-intake > div { display:flex; gap:8px; }
+.dp-service-intake p, .dp-service-staff small { color:var(--db-muted); font-size:10px; }
+@media(max-width:580px) { .dp-service-option-row { grid-template-columns:1fr 1fr; } .dp-service-intake > div { flex-direction:column; } }

@@ -1,125 +1,571 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
-.dp-plan-free-card {
-  padding: 22px; border-color: rgba(255,122,89,.32); background: #fff3eb;
-}
 
-.dp-plan-free-top {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-}
+/* ==========================================
+   BELLBEE — CHOOSE A PLAN
+   Existing Bellbee colors and fonts
+========================================== */
 
-.dp-plan-free-content {
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
-}
-
-.dp-plan-free-content h2 {
-  margin: 7px 0 5px; color: var(--db-green); font-size: 21px; font-weight: 850;
-}
-
-.dp-plan-free-content p {
-  max-width: 570px; margin: 0; color: var(--db-muted); font-size: 10px; line-height: 1.7;
-}
-
-.dp-plan-free-content .dp-plan-feature-list {
-  margin-bottom: 0;
-}
-
-.dp-plan-catalogue-heading {
-  display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 24px 0 10px; padding: 0 2px; color: var(--db-green);
-}
-
-.dp-plan-catalogue-heading h2 {
-  margin: 3px 0; font-size: 18px; font-weight: 850;
-}
-
-.dp-plan-catalogue-heading p {
-  margin: 0; color: var(--db-muted); font-size: 9px;
-}
-
-.dp-plan-catalogue-card {
-  display: grid; grid-template-columns: minmax(0,1fr) 220px; gap: 25px; padding: 22px;
-}
-
-.dp-plan-catalogue-copy h2 {
-  margin: 12px 0 7px; font-size: 22px; font-weight: 850;
-}
-
-.dp-plan-catalogue-copy p {
-  max-width: 740px; margin: 0; color: var(--db-muted); font-size: 10px; line-height: 1.7;
-}
-
-.dp-plan-catalogue-features {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 15px; margin-top: 17px;
-}
-
-.dp-plan-catalogue-features span {
-  display: flex; align-items: flex-start; gap: 7px; color: var(--db-green); font-size: 9px; line-height: 1.5;
-}
-
-.dp-plan-catalogue-features svg {
-  flex: 0 0 14px; color: #43865c;
-}
-
-.dp-plan-catalogue-action {
-  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 9px; padding: 16px; border-radius: 12px; background: var(--db-cream); color: var(--db-green);
-}
-
-.dp-plan-catalogue-action > strong {
-  font-size: 16px;
-}
-
-.dp-plan-catalogue-action small {
-  color: var(--db-muted); font-size: 8px; line-height: 1.6;
-}
-
-.dp-plan-extra-grid {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-top: 12px;
-}
-
-.dp-plan-extra-card {
-  margin: 0;
-}
-
-.dp-plan-extra-card h3 {
-  margin: 6px 0; font-size: 15px; font-weight: 800;
-}
-
-.dp-plan-extra-card > strong {
-  font-size: 14px;
-}
-
-.dp-plan-extra-card p {
-  color: var(--db-muted); font-size: 9px; line-height: 1.6;
-}
-
-.dp-plan-security-note {
-  display: flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--db-muted); font-size: 9px;
-}
-
-.dp-plan-security-note svg {
+.cp-page {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 0 0 38px;
   color: var(--db-green);
+  font-family: inherit;
 }
 
-@media (max-width: 760px) {
-.dp-plan-catalogue-features {
-  grid-template-columns: 1fr;
+.cp-page *,
+.cp-page *::before,
+.cp-page *::after {
+  box-sizing: border-box;
 }
-.dp-plan-catalogue-card {
-  grid-template-columns: 1fr;
+
+.cp-page button,
+.cp-page input {
+  font-family: inherit;
 }
-.dp-plan-free-content {
-  grid-template-columns: 1fr;
+
+.cp-page button {
+  cursor: pointer;
 }
-.dp-plan-extra-grid {
-  grid-template-columns: 1fr;
+
+.cp-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
-.dp-plan-free-content {
-  display: flex; align-items: stretch; flex-direction: column;
+
+.cp-page button:focus-visible,
+.cp-page input:focus-visible {
+  outline: 2px solid var(--db-coral);
+  outline-offset: 2px;
 }
-.dp-plan-catalogue-card {
-  display: flex; flex-direction: column;
+
+/* ==========================================
+   PAGE HEADER
+========================================== */
+
+.cp-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
 }
-.dp-plan-catalogue-action {
+
+.cp-page-header h1 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: clamp(29px, 3vw, 37px);
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  line-height: 1.15;
+}
+
+.cp-back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--db-muted);
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.cp-back-button:hover {
+  color: var(--db-coral);
+}
+
+/* ==========================================
+   EARLY BIRD OFFER
+========================================== */
+
+.cp-early-bird {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-height: 133px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid rgba(205, 189, 255, 0.75);
+  border-radius: 13px;
+  background: #f5f2fc;
+}
+
+.cp-gift-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--db-coral);
+}
+
+.cp-early-bird-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.cp-early-bird-content h2 {
+  margin: 2px 0 6px;
+  color: var(--db-green);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.cp-early-bird-content p {
+  max-width: 900px;
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cp-setup-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--db-coral);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.cp-setup-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ==========================================
+   PROMO CODE CARD
+========================================== */
+
+.cp-promo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 17px 16px;
+  border: 1px solid var(--db-border);
+  border-radius: 13px;
+  background: var(--db-white);
+}
+
+.cp-promo-card > label {
+  color: var(--db-coral);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.cp-promo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cp-promo-row input {
+  flex: 1;
+  min-width: 0;
+  min-height: 39px;
+  padding: 9px 12px;
+  border: 1px solid var(--db-border);
+  border-radius: 9px;
+  outline: 0;
+  background: #ffffff;
+  color: var(--db-green);
+  font-size: 12px;
+  line-height: 1.4;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cp-promo-row input::placeholder {
+  color: #a0a4aa;
+  font-size: 11px;
+}
+
+.cp-promo-row input:focus {
+  border-color: var(--db-coral);
+  box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.1);
+}
+
+.cp-apply-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 68px;
+  min-height: 39px;
+  padding: 0 13px;
+  border: 1px solid var(--db-border);
+  border-radius: 8px;
+  background: var(--db-cream);
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.cp-apply-button:hover:not(:disabled) {
+  border-color: var(--db-coral);
+  background: var(--db-white);
+}
+
+.cp-promo-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  color: #347c4d;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.cp-promo-feedback svg {
+  flex: 0 0 13px;
+  margin-top: 1px;
+}
+
+/* ==========================================
+   ALL IN ONE PLAN
+========================================== */
+
+.cp-plans-section {
+  display: flex;
+  align-items: flex-start;
   width: 100%;
 }
 
+.cp-plan-card {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 395px);
+  min-height: 470px;
+  padding: 17px 16px 16px;
+  border: 1px solid var(--db-border);
+  border-radius: 14px;
+  background: var(--db-white);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cp-plan-card:hover {
+  border-color: rgba(255, 122, 89, 0.5);
+  box-shadow: 0 7px 24px rgba(16, 55, 42, 0.06);
+}
+
+.cp-plan-card > h2 {
+  margin: 0 0 7px;
+  color: var(--db-coral);
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.cp-plan-description {
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.62;
+}
+
+/* ==========================================
+   PRICE
+========================================== */
+
+.cp-price-block {
+  margin-top: 15px;
+}
+
+.cp-price-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.cp-price-line strong {
+  color: var(--db-coral);
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.5px;
+}
+
+.cp-price-line span {
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.cp-price-note {
+  margin: 4px 0 0;
+  color: var(--db-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.cp-token-text {
+  margin: 18px 0 17px;
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   PLAN FEATURES
+========================================== */
+
+.cp-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+  margin-bottom: 16px;
+}
+
+.cp-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.cp-feature svg {
+  flex: 0 0 17px;
+  margin-top: 1px;
+  color: #22b467;
+  stroke-width: 2.2;
+}
+
+.cp-feature span {
+  color: var(--db-green);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   START FREE TRIAL / UPGRADE
+========================================== */
+
+.cp-start-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 39px;
+  margin-top: auto;
+  padding: 9px 14px;
+  border: 1px solid var(--db-green);
+  border-radius: 9px;
+  background: var(--db-green);
+  color: var(--db-white);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cp-start-button:hover:not(:disabled) {
+  background: #1b5140;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(16, 55, 42, 0.16);
+}
+
+.cp-start-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cp-active-plan-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: #347c4d;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.cp-active-plan-note svg {
+  color: #22b467;
+}
+
+/* ==========================================
+   API / SECURITY NOTICES
+========================================== */
+
+.cp-api-note,
+.cp-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 850px;
+  margin: 17px 0 0;
+  color: var(--db-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.cp-api-note svg,
+.cp-security-note svg {
+  flex: 0 0 15px;
+  margin-top: 1px;
+  color: var(--db-green);
+}
+
+.cp-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #efc5c0;
+  border-radius: 9px;
+  background: #fff0ed;
+  color: #a23e38;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   LOADING SPINNER
+========================================== */
+
+.cp-spin {
+  animation: cp-rotation 1s linear infinite;
+}
+
+@keyframes cp-rotation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 900px) {
+  .cp-page {
+    max-width: 100%;
+  }
+
+  .cp-early-bird {
+    padding: 17px;
+  }
+
+  .cp-promo-card {
+    padding: 16px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 760px) {
+  .cp-page {
+    padding-bottom: 28px;
+  }
+
+  .cp-page-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .cp-page-header h1 {
+    font-size: 29px;
+  }
+
+  .cp-early-bird {
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .cp-early-bird-content h2 {
+    font-size: 14px;
+  }
+
+  .cp-early-bird-content p {
+    font-size: 11px;
+  }
+
+  .cp-promo-card {
+    margin-bottom: 18px;
+  }
+
+  .cp-plan-card {
+    width: min(100%, 450px);
+  }
+}
+
+@media (max-width: 480px) {
+  .cp-page-header h1 {
+    font-size: 27px;
+  }
+
+  .cp-back-button {
+    font-size: 10px;
+  }
+
+  .cp-early-bird {
+    padding: 14px;
+  }
+
+  .cp-gift-icon {
+    width: 35px;
+    height: 35px;
+    flex-basis: 35px;
+  }
+
+  .cp-early-bird-content h2 {
+    font-size: 13px;
+  }
+
+  .cp-setup-link {
+    font-size: 11px;
+  }
+
+  .cp-promo-card {
+    padding: 13px;
+  }
+
+  .cp-promo-row {
+    gap: 6px;
+  }
+
+  .cp-promo-row input {
+    font-size: 11px;
+  }
+
+  .cp-apply-button {
+    min-width: 59px;
+    padding: 0 10px;
+  }
+
+  .cp-plan-card {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .cp-plan-description {
+    font-size: 11px;
+  }
+
+  .cp-feature span {
+    font-size: 11px;
+  }
 }

@@ -1,142 +1,828 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
-.dp-chart-section {
-  margin-top: 10px;
+
+/* ==========================================
+   BELLBEE — ANALYTICS PAGE
+   Existing font and color theme preserved
+========================================== */
+
+.an-page {
+  width: 100%;
+  max-width: 1220px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 3px 0 35px;
+  color: var(--db-green);
+  font-family: inherit;
 }
 
-.dp-chart-section h2 {
-  margin: 0; color: var(--db-green); font-size: 15px;
+.an-page *,
+.an-page *::before,
+.an-page *::after {
+  box-sizing: border-box;
 }
 
-.dp-chart-section > p {
-  margin: 5px 0 0; color: var(--db-muted); font-size: 9px;
+.an-page button,
+.an-page select {
+  font-family: inherit;
 }
 
-.dp-chart-placeholder {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 245px; margin-top: 12px; border: 1px dashed rgba(16,55,42,.18); border-radius: 12px; background: #fffdf7; color: #a5684d; text-align: center;
+.an-page button {
+  cursor: pointer;
 }
 
-.dp-chart-placeholder h3 {
-  margin: 10px 0 0; color: var(--db-green); font-size: 13px;
+.an-page button:focus-visible,
+.an-page select:focus-visible,
+.an-page a:focus-visible {
+  outline: 2px solid var(--db-coral);
+  outline-offset: 3px;
 }
 
-.dp-chart-placeholder p {
-  max-width: 350px; margin: 6px 0 0; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+/* ==========================================
+   PAGE HEADING
+========================================== */
+
+.an-header {
+  margin-bottom: 24px;
 }
 
-.dp-analytics-lower {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; padding-top: 17px; border-top: 1px solid var(--db-border);
+.an-header h1 {
+  margin: 0 0 6px;
+  color: var(--db-green);
+  font-size: clamp(29px, 3vw, 37px);
+  font-weight: 800;
+  letter-spacing: -1.3px;
+  line-height: 1.12;
 }
 
-.dp-spend-panel > h2 {
-  margin-top: 4px;
+.an-header p {
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 13px;
+  line-height: 1.6;
 }
 
-.dp-spend-panel > p {
-  color: var(--db-muted); font-size: 9px; line-height: 1.6;
-}
+/* ==========================================
+   OVERVIEW / MESSAGES TABS
+========================================== */
 
-@media (max-width: 760px) {
-.dp-analytics-lower {
-  grid-template-columns: 1fr;
-}
-
-}
-
-.dp-analytics-chart {
+.an-tabs {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  min-height: 180px;
-  overflow-x: auto;
-  padding: 18px 4px 4px;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-height: 41px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid var(--db-border);
 }
 
-.dp-analytics-chart-column {
+.an-tabs button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 17px;
+  border: 0;
+  background: transparent;
+  color: var(--db-muted);
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.an-tabs button:hover {
+  color: var(--db-green);
+}
+
+.an-tabs button.active {
+  color: var(--db-coral);
+}
+
+.an-tabs button.active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--db-coral);
+  content: '';
+}
+
+/* ==========================================
+   OVERVIEW PERIOD
+========================================== */
+
+.an-period-label {
+  margin: 0 0 22px;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   OVERVIEW METRIC GRID
+========================================== */
+
+.an-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+.an-metric-card {
   display: flex;
-  flex: 1 0 34px;
-  min-width: 34px;
   flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 147px;
+  padding: 20px;
+  border: 1px solid var(--db-border);
+  border-radius: 13px;
+  background: var(--db-white);
+  box-shadow: 0 2px 5px rgba(16, 55, 42, 0.045);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.an-metric-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 55, 42, 0.18);
+  box-shadow: 0 7px 20px rgba(16, 55, 42, 0.07);
+}
+
+.an-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  flex: 0 0 37px;
+  margin-bottom: 13px;
+  border-radius: 10px;
+}
+
+/* Existing Bellbee colors */
+
+.an-metric-icon.coral {
+  background: rgba(255, 122, 89, 0.14);
+  color: var(--db-coral);
+}
+
+.an-metric-icon.green {
+  background: #dcf5e4;
+  color: #258d50;
+}
+
+.an-metric-icon.yellow {
+  background: #fff2c5;
+  color: #c18b12;
+}
+
+.an-metric-label {
+  margin-bottom: 5px;
+  color: var(--db-muted);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  line-height: 1.45;
+}
+
+.an-metric-value {
+  color: var(--db-green);
+  font-size: clamp(26px, 2.5vw, 32px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   MESSAGES TAB
+========================================== */
+
+.an-messages {
+  width: 100%;
+  margin-top: 0;
+}
+
+.an-volume-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.an-volume-heading h2 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+/* ==========================================
+   DATE RANGE SELECT
+========================================== */
+
+.an-range-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 135px;
+}
+
+.an-range-select select {
+  appearance: none;
+  width: 100%;
+  min-height: 39px;
+  padding: 9px 36px 9px 13px;
+  border: 1px solid var(--db-border);
+  border-radius: 10px;
+  outline: 0;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.an-range-select select:hover {
+  border-color: var(--db-coral);
+}
+
+.an-range-select svg {
+  position: absolute;
+  right: 12px;
+  color: var(--db-muted);
+  pointer-events: none;
+}
+
+/* ==========================================
+   DAILY MESSAGE CHART CARD
+========================================== */
+
+.an-chart-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 155px;
+  margin-bottom: 16px;
+  padding: 15px 20px 18px;
+  border: 1px solid var(--db-border);
+  border-radius: 13px;
+  background: var(--db-white);
+  box-shadow: 0 2px 5px rgba(16, 55, 42, 0.035);
+}
+
+.an-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 95px;
+  padding: 15px;
+  color: var(--db-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ==========================================
+   CHART WITH REAL BACKEND DATA
+========================================== */
+
+.an-chart-viewport {
+  position: relative;
+  width: 100%;
+  min-height: 225px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 15px 0 0 39px;
+}
+
+.an-chart-grid {
+  position: absolute;
+  top: 15px;
+  right: 0;
+  bottom: 27px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.an-chart-grid-line {
+  display: flex;
   align-items: center;
   gap: 8px;
-  height: 160px;
+  width: 100%;
 }
 
-.dp-analytics-bar-stack {
+.an-chart-grid-line small {
+  display: block;
+  width: 30px;
+  flex: 0 0 30px;
+  color: var(--db-muted);
+  font-size: 9px;
+  text-align: right;
+}
+
+.an-chart-grid-line > span {
+  flex: 1;
+  height: 1px;
+  background: rgba(16, 55, 42, 0.08);
+}
+
+.an-chart-bars {
+  position: relative;
+  z-index: 1;
   display: flex;
-  width: min(22px, 100%);
-  height: 100%;
-  flex-direction: column-reverse;
-  justify-content: flex-start;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 12px;
+  min-width: max-content;
+  height: 208px;
+}
+
+.an-chart-day {
+  display: flex;
+  flex: 1 0 37px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  min-width: 37px;
+}
+
+.an-chart-day-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  height: 174px;
+}
+
+.an-chart-bar {
+  display: block;
+  width: 9px;
+  min-height: 0;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.25s ease;
+}
+
+.an-chart-bar.received {
+  background: var(--db-coral);
+}
+
+.an-chart-bar.ai {
+  background: #24b467;
+}
+
+.an-chart-bar.human {
+  background: var(--db-yellow);
+}
+
+.an-chart-day > small {
+  width: 100%;
+  color: var(--db-muted);
+  font-size: 9px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   CHART LEGEND
+========================================== */
+
+.an-chart-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 8px;
+  color: var(--db-muted);
+}
+
+.an-chart-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.an-legend-dot {
+  display: block;
+  width: 11px;
+  height: 11px;
+  flex: 0 0 11px;
+  border-radius: 3px;
+}
+
+.an-legend-dot.received {
+  background: var(--db-coral);
+}
+
+.an-legend-dot.ai {
+  background: #24b467;
+}
+
+.an-legend-dot.human {
+  background: var(--db-yellow);
+}
+
+/* ==========================================
+   MESSAGES BY CHANNEL
+========================================== */
+
+.an-channel-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 165px;
+  margin-bottom: 26px;
+  padding: 20px;
+  border: 1px solid var(--db-border);
+  border-radius: 13px;
+  background: var(--db-white);
+  box-shadow: 0 2px 5px rgba(16, 55, 42, 0.035);
+}
+
+.an-channel-card h3 {
+  margin: 0;
+  color: var(--db-green);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.an-channel-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 104px;
+  padding: 15px;
+  color: var(--db-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ==========================================
+   LIVE CHANNEL ROWS
+========================================== */
+
+.an-channel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  margin-top: 18px;
+}
+
+.an-channel-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.an-channel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.an-channel-top strong {
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: capitalize;
+}
+
+.an-channel-top > span {
+  color: var(--db-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.an-channel-track {
+  width: 100%;
+  height: 9px;
   overflow: hidden;
-  border-radius: 6px 6px 2px 2px;
-  background: var(--db-border, rgba(16, 55, 42, 0.08));
+  border-radius: 20px;
+  background: var(--db-cream);
 }
 
-.dp-analytics-bar {
-  display: block; width: 100%; min-height: 0;
-}
-
-.dp-analytics-bar.received {
-  background: var(--db-green);
-}
-
-.dp-analytics-legend i.received {
-  background: var(--db-green);
-}
-
-.dp-analytics-bar.ai {
+.an-channel-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
   background: var(--db-coral);
+  transition: width 0.3s ease;
 }
 
-.dp-analytics-legend i.ai {
-  background: var(--db-coral);
+.an-channel-row:nth-child(3n + 2)
+.an-channel-track > span {
+  background: #24b467;
 }
 
-.dp-analytics-bar.human {
-  background: var(--db-lavender);
+.an-channel-row:nth-child(3n + 3)
+.an-channel-track > span {
+  background: var(--db-yellow);
 }
 
-.dp-analytics-legend i.human {
-  background: var(--db-lavender);
+/* ==========================================
+   WHATSAPP SPEND
+========================================== */
+
+.an-spend-section {
+  width: 100%;
+  margin-top: 2px;
 }
 
-.dp-analytics-chart-column small {
-  color: var(--db-muted); font-size: 10px; white-space: nowrap;
+.an-spend-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
 }
 
-.dp-analytics-legend {
-  display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; color: var(--db-muted); font-size: 12px;
+.an-spend-heading h2 {
+  margin: 0 0 5px;
+  color: var(--db-green);
+  font-size: 15px;
+  font-weight: 800;
 }
 
-.dp-analytics-legend span {
-  display: inline-flex; align-items: center; gap: 6px;
+.an-spend-heading p {
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 11px;
+  line-height: 1.55;
 }
 
-.dp-analytics-legend i {
-  display: inline-block; width: 8px; height: 8px; border-radius: 2px;
+.an-whatsapp-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.dp-analytics-data-row {
-  display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--db-border);
+.an-whatsapp-link:hover {
+  color: var(--db-coral);
 }
 
-.dp-analytics-data-row:last-child {
-  border-bottom: 0;
+.an-spend-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 103px;
+  padding: 20px;
+  border: 1px solid var(--db-border);
+  border-radius: 13px;
+  background: var(--db-white);
+  box-shadow: 0 2px 5px rgba(16, 55, 42, 0.035);
 }
 
-.dp-whatsapp-spend-value {
-  display: flex; flex-direction: column; gap: 4px; margin: 16px 0; font-size: 26px; font-weight: 700;
+.an-spend-card > p {
+  max-width: 800px;
+  margin: 0;
+  color: var(--db-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
 }
 
-.dp-whatsapp-spend-value small {
-  color: var(--db-muted); font-size: 12px; font-weight: 400;
+/* ==========================================
+   REAL SPEND DATA
+========================================== */
+
+.an-spend-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
 }
+
+.an-spend-data > span {
+  color: var(--db-muted);
+  font-size: 11px;
+}
+
+.an-spend-data > strong {
+  color: var(--db-green);
+  font-size: 28px;
+  font-weight: 850;
+  letter-spacing: -0.7px;
+}
+
+.an-spend-data > small {
+  color: var(--db-muted);
+  font-size: 10px;
+}
+
+/* ==========================================
+   LOADING / ERROR
+========================================== */
+
+.an-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 190px;
+  color: var(--db-muted);
+  font-size: 12px;
+}
+
+.an-spin {
+  color: var(--db-coral);
+  animation: an-rotate 1s linear infinite;
+}
+
+@keyframes an-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.an-api-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 122, 89, 0.35);
+  border-radius: 9px;
+  background: #fff0e9;
+  color: #a44b37;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.an-api-error button {
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 122, 89, 0.4);
+  border-radius: 7px;
+  background: var(--db-white);
+  color: var(--db-green);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.an-api-error button:hover {
+  border-color: var(--db-coral);
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1050px) {
+  .an-metrics-grid {
+    gap: 12px;
+  }
+
+  .an-metric-card {
+    min-height: 140px;
+    padding: 16px;
+  }
+
+  .an-metric-value {
+    font-size: 27px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
 
 @media (max-width: 760px) {
-.dp-analytics-chart {
-  max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .an-page {
+    max-width: 100%;
+    padding-bottom: 27px;
+  }
+
+  .an-header {
+    margin-bottom: 18px;
+  }
+
+  .an-header h1 {
+    font-size: 29px;
+  }
+
+  .an-header p {
+    font-size: 12px;
+  }
+
+  .an-tabs {
+    margin-bottom: 20px;
+  }
+
+  .an-tabs button {
+    font-size: 12px;
+    padding: 8px 13px;
+  }
+
+  .an-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .an-metric-card {
+    min-height: 135px;
+    padding: 13px;
+  }
+
+  .an-metric-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    margin-bottom: 12px;
+  }
+
+  .an-metric-label {
+    font-size: 9px;
+  }
+
+  .an-metric-value {
+    font-size: 25px;
+  }
+
+  .an-volume-heading {
+    flex-wrap: wrap;
+  }
+
+  .an-chart-card,
+  .an-channel-card,
+  .an-spend-card {
+    padding: 15px;
+  }
+
+  .an-spend-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .an-whatsapp-link {
+    justify-content: flex-start;
+  }
+
+  .an-spend-card > p {
+    font-size: 11px;
+  }
+
+  .an-chart-legend {
+    gap: 12px;
+  }
+
+  .an-chart-legend > span {
+    font-size: 10px;
+  }
 }
 
+@media (max-width: 420px) {
+  .an-header h1 {
+    font-size: 27px;
+  }
+
+  .an-metric-value {
+    font-size: 22px;
+  }
+
+  .an-metric-label {
+    font-size: 8.5px;
+  }
+
+  .an-chart-card {
+    padding: 13px 10px;
+  }
+
+  .an-channel-card {
+    padding: 15px 13px;
+  }
+
+  .an-range-select {
+    min-width: 125px;
+  }
+
+  .an-range-select select {
+    font-size: 11px;
+  }
 }

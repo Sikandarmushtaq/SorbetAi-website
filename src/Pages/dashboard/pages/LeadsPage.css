@@ -1,92 +1,41 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
-.dp-leads-panel .dp-tabs {
-  border-radius: 0; border-bottom: 1px solid var(--db-border); background: transparent; padding: 0 0 7px;
+
+/* Set up requests button and empty states */
+
+.dp-leads-panel .dp-empty-state {
+  min-height: 340px;
 }
 
-.dp-leads-panel .dp-tabs button {
-  border-radius: 0; background: transparent;
+.dp-leads-panel .dp-empty-state .dp-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
 }
 
-.dp-leads-panel .dp-tabs button.active {
-  border-bottom: 2px solid var(--db-coral); color: var(--db-green);
+.dp-leads-panel .dp-api-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 340px;
+  text-align: center;
 }
 
-.dp-leads-list {
-  width: 100%; overflow-x: auto;
+.dp-leads-panel .dp-api-empty-state p {
+  max-width: 340px;
+  line-height: 1.7;
 }
 
-.dp-leads-table-head {
-  display: grid; grid-template-columns: 1.1fr .9fr 1.3fr .75fr 1.15fr; align-items: center; gap: 10px; min-width: 750px; padding: 11px 8px; border-bottom: 1px solid var(--db-border);
-}
-
-.dp-lead-row {
-  display: grid; grid-template-columns: 1.1fr .9fr 1.3fr .75fr 1.15fr; align-items: center; gap: 10px; min-width: 750px; padding: 11px 8px; border-bottom: 1px solid var(--db-border);
-}
-
-.dp-leads-table-head {
-  color: var(--db-muted); font-size: 8px; font-weight: 850; letter-spacing: .7px; text-transform: uppercase;
-}
-
-.dp-lead-row {
-  color: var(--db-muted); font-size: 8px;
-}
-
-.dp-lead-row > div:first-child {
-  display: flex; flex-direction: column; gap: 3px;
-}
-
-.dp-lead-row strong {
-  color: var(--db-green); font-size: 9px;
-}
-
-.dp-lead-row small {
-  color: var(--db-muted); font-size: 8px;
-}
-
-.dp-lead-details {
-  max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-
-.dp-lead-actions {
-  display: flex; align-items: center; gap: 5px;
-}
-
-.dp-lead-actions select {
-  min-height: 29px; max-width: 110px; padding: 0 5px; border: 1px solid var(--db-border); border-radius: 7px; background: var(--db-white); color: var(--db-green); font-size: 8px;
-}
-
-.dp-lead-actions .dp-icon-action {
-  width: 29px; height: 29px;
+.dp-leads-panel .dp-api-empty-state .dp-primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
 
 @media (max-width: 760px) {
-.dp-lead-actions {
-  flex-wrap: wrap;
-}
-
-}
-
-@media (max-width: 760px) {
-.dp-leads-table-head {
-  font-size: 10px;
-}
-.dp-lead-row {
-  font-size: 10px;
-}
-.dp-lead-row strong {
-  font-size: 11px;
-}
-.dp-leads-list {
-  max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-.dp-lead-details {
-  height: auto;
-    overflow: visible;
-    overflow-wrap: anywhere;
-    text-overflow: clip;
-    white-space: normal;
-}
-
+  .dp-leads-panel .dp-empty-state,
+  .dp-leads-panel .dp-api-empty-state {
+    min-height: 280px;
+  }
 }

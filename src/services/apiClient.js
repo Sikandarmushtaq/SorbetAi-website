@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const API_BASE_URL = (
   process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'
 ).replace(/\/+$/, '');
@@ -65,6 +67,9 @@ export class DashboardApiError extends Error {
   }
 }
 
+// One Axios transport for auth, dashboard resources and uploads. We manage 401
+// refresh here rather than in a response interceptor to preserve token locking.
+const http = axios.create({ baseURL: API_ORIGIN, validateStatus: () => true });
 let refreshPromise = null;
 
 function getStorage() {
@@ -131,14 +136,12 @@ function isPublicAuthEndpoint(path) {
   return /\/api\/v1\/auth\/(signup|login|google|verify-email|resend-verification|refresh|logout|password\/forgot|password\/reset)$/.test(path);
 }
 
-async function readResponse(response) {
-  const text = await response.text();
-  if (!text) return {};
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { message: text };
-  }
+function readResponse(response) {
+  const value = response.data;
+  if (value === undefined || value === null || value === '') return {};
+  if (typeof value !== 'string') return value;
+  try { return JSON.parse(value); }
+  catch { return { message: value }; }
 }
 
 function logResponse({ endpoint, method, response, payload }) {
@@ -146,7 +149,7 @@ function logResponse({ endpoint, method, response, payload }) {
     method,
     endpoint,
     status: response.status,
-    success: response.ok && payload?.success !== false,
+    success: response.status >= 200 && response.status < 300 && payload?.success !== false,
     code: payload?.code || 'UNKNOWN',
     message: payload?.message || '',
   };
@@ -232,15 +235,18 @@ async function performRequest(path, options, tokenOverride, hasRetried) {
   let response;
   let payload;
   try {
-    response = await fetch(`${API_ORIGIN}${endpoint}`, {
+    // Axios serializes object bodies as JSON; FormData retains its browser
+    // generated multipart boundary. Axios errors become DashboardApiError.
+    response = await http.request({
       ...options,
+      url: endpoint,
       method,
-      headers,
-      body: options.body !== undefined && !isFormData && typeof options.body !== 'string'
-        ? JSON.stringify(options.body)
-        : options.body,
+      headers: Object.fromEntries(headers.entries()),
+      data: options.body,
+      // Preserve the existing fetch-style envelope parsing contract.
+      transformResponse: [(data) => data],
     });
-    payload = await readResponse(response);
+    payload = readResponse(response);
     logResponse({ endpoint, method, response, payload });
   } catch (error) {
     logNetworkError(endpoint, method, error);
@@ -258,7 +264,7 @@ async function performRequest(path, options, tokenOverride, hasRetried) {
     if (token && getStoredToken('access') === token) clearStoredSession();
   }
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new DashboardApiError(
       payload?.message || `Request failed (${response.status}).`,
       payload?.code || 'HTTP_ERROR',
