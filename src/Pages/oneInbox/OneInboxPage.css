@@ -1,0 +1,1365 @@
+
+/* ================================================
+   BELLBEE AI — ONE INBOX PAGE
+   Clean, modern, fully responsive CSS
+   ================================================ */
+
+/* =======================
+   1. MAIN PAGE
+   ======================= */
+
+.oneinbox-page {
+  --oi-bg: var(--bg, #f3ede1);
+  --oi-green: var(--fg, #10372a);
+  --oi-coral: var(--coral, #ff7a59);
+  --oi-lavender: var(--lavender, #cdbdff);
+  --oi-yellow: var(--yellow, #f4c95d);
+  --oi-white: var(--white, #fffaf0);
+  --oi-muted: #607468;
+  --oi-border: rgba(16, 55, 42, 0.12);
+
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  background: var(--oi-bg);
+  color: var(--oi-green);
+  font-family: "Bricolage Grotesque", sans-serif;
+}
+
+.oneinbox-page *,
+.oneinbox-page *::before,
+.oneinbox-page *::after {
+  box-sizing: border-box;
+}
+
+.oneinbox-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.oneinbox-page a {
+  text-decoration: none;
+}
+
+.oneinbox-container {
+  width: min(1320px, calc(100% - 80px));
+  margin-inline: auto;
+}
+
+.oneinbox-section {
+  position: relative;
+  padding: 85px 0;
+}
+
+.oneinbox-section-soft {
+  background: rgba(255, 250, 240, 0.58);
+}
+
+/* =======================
+   2. SHARED HEADINGS
+   ======================= */
+
+.oneinbox-kicker {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 15px;
+  color: #a36148;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.oneinbox-section-heading {
+  max-width: 850px;
+  margin-bottom: 36px;
+}
+
+.oneinbox-section-heading h2 {
+  margin: 0;
+  color: var(--oi-green);
+  font-size: clamp(34px, 4.5vw, 58px);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+}
+
+.oneinbox-section-heading p {
+  max-width: 720px;
+  margin: 16px 0 0;
+  color: var(--oi-muted);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* =======================
+   3. HERO SECTION
+   ======================= */
+
+.oneinbox-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 90px 0 105px;
+  background: var(--oi-bg);
+}
+
+.oneinbox-hero-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.02fr)
+    minmax(0, 0.98fr);
+  align-items: center;
+  gap: clamp(28px, 4vw, 65px);
+}
+
+.oneinbox-hero-copy {
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+}
+
+.oneinbox-hero-copy h1 {
+  max-width: 750px;
+  margin: 0;
+  color: var(--oi-green);
+  font-size: clamp(43px, 5.35vw, 76px);
+  font-weight: 850;
+  line-height: 1.03;
+  letter-spacing: -0.065em;
+  overflow-wrap: break-word;
+}
+
+.oneinbox-hero-copy p {
+  max-width: 550px;
+  margin: 23px 0 0;
+  color: #486455;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* =======================
+   4. HERO BUTTONS
+   ======================= */
+
+.oneinbox-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.oneinbox-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 12px 21px;
+  border: 2px solid transparent;
+  border-radius: 100px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: nowrap;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.oneinbox-btn:hover {
+  transform: translateY(-3px) rotate(-2deg);
+}
+
+.oneinbox-btn-primary {
+  border-color: var(--oi-coral);
+  background: var(--oi-coral);
+  color: var(--oi-green);
+}
+
+.oneinbox-btn-primary:hover {
+  box-shadow: 0 12px 28px rgba(255, 122, 89, 0.25);
+}
+
+.oneinbox-btn-secondary {
+  border-color: var(--oi-green);
+  background: transparent;
+  color: var(--oi-green);
+}
+
+.oneinbox-btn-secondary:hover {
+  background: rgba(16, 55, 42, 0.07);
+}
+
+.oneinbox-inline-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 21px;
+  color: var(--oi-green);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.oneinbox-inline-note svg {
+  flex-shrink: 0;
+  color: #31885c;
+}
+
+/* =====================================
+   5. BACKGROUND BLOBS — FIXED
+
+   IMPORTANT:
+   No negative right positioning.
+   Full lavender shape stays visible.
+   ===================================== */
+
+.oneinbox-blob {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+}
+
+/* Lavender blob */
+
+.oneinbox-blob-lavender {
+  top: 30px;
+  right: 32px;
+  width: min(33vw, 440px);
+  height: auto;
+  aspect-ratio: 1;
+  max-width: none;
+  max-height: none;
+  background: var(--oi-lavender);
+  opacity: 0.75;
+}
+
+/* Yellow blob */
+
+.oneinbox-blob-yellow {
+  bottom: 22px;
+  left: 43%;
+  width: min(19vw, 245px);
+  height: auto;
+  aspect-ratio: 1;
+  max-width: none;
+  max-height: none;
+  background: var(--oi-yellow);
+  opacity: 0.68;
+}
+
+/* =======================
+   6. HERO IMAGE
+   ======================= */
+
+.oneinbox-hero-visual {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-width: 0;
+  max-width: 590px;
+  margin-inline: auto;
+  padding: 43px 12px;
+}
+
+.oneinbox-hero-card {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 13px;
+  overflow: hidden;
+  border: 1px solid rgba(16, 55, 42, 0.08);
+  border-radius: 28px 28px 10px 28px;
+  background: var(--oi-white);
+  box-shadow:
+    0 30px 60px rgba(16, 55, 42, 0.15),
+    0 5px 16px rgba(16, 55, 42, 0.05);
+}
+
+.oneinbox-hero-card img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 19px;
+}
+
+/* =======================
+   7. FLOATING LABELS
+   ======================= */
+
+.oneinbox-floating-tag {
+  position: absolute;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 39px;
+  max-width: 90%;
+  padding: 9px 15px;
+  border-radius: 100px;
+  color: var(--oi-green);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 12px 25px rgba(16, 55, 42, 0.13);
+  pointer-events: none;
+}
+
+.oneinbox-tag-whatsapp {
+  top: 5px;
+  right: 18px;
+  background: var(--oi-coral);
+}
+
+.oneinbox-tag-instagram {
+  top: 28%;
+  left: 0;
+  background: var(--oi-lavender);
+}
+
+.oneinbox-tag-messenger {
+  top: 53%;
+  right: 0;
+  background: var(--oi-yellow);
+}
+
+.oneinbox-tag-website {
+  bottom: 7px;
+  left: 25px;
+  background: var(--oi-white);
+}
+
+/* =======================
+   8. CARD GRID
+   ======================= */
+
+.oneinbox-card-grid {
+  display: grid;
+  gap: 19px;
+}
+
+.oneinbox-card-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.oneinbox-card-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.oneinbox-info-card,
+.oneinbox-channel-card,
+.oneinbox-step-card,
+.oneinbox-list-card,
+.oneinbox-related-card {
+  min-width: 0;
+  border: 1px solid var(--oi-border);
+  background: var(--oi-white);
+  box-shadow: 0 8px 25px rgba(16, 55, 42, 0.035);
+}
+
+/* =======================
+   9. FEATURE CARDS
+   ======================= */
+
+.oneinbox-info-card {
+  padding: 27px;
+  border-radius: 23px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.oneinbox-info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 34px rgba(16, 55, 42, 0.09);
+}
+
+.oneinbox-info-icon {
+  display: grid;
+  place-items: center;
+  width: 51px;
+  height: 51px;
+  margin-bottom: 23px;
+  border-radius: 16px;
+  background: #ffe0d5;
+  color: #9c493b;
+}
+
+.oneinbox-info-icon-yellow {
+  background: #fff0bd;
+  color: #846716;
+}
+
+.oneinbox-info-card h3 {
+  margin: 0 0 10px;
+  color: var(--oi-green);
+  font-size: 20px;
+  font-weight: 850;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+}
+
+.oneinbox-info-card p {
+  margin: 0;
+  color: var(--oi-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* =======================
+   10. HOW IT WORKS
+   ======================= */
+
+.oneinbox-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 19px;
+}
+
+.oneinbox-step-card {
+  padding: 28px;
+  border-radius: 23px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.oneinbox-step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 32px rgba(16, 55, 42, 0.07);
+}
+
+.oneinbox-step-badge {
+  display: grid;
+  place-items: center;
+  width: 49px;
+  height: 49px;
+  margin-bottom: 27px;
+  border-radius: 15px;
+  background: var(--oi-green);
+  color: var(--oi-white);
+  font-size: 21px;
+  font-weight: 850;
+}
+
+.oneinbox-step-card:nth-child(2) .oneinbox-step-badge {
+  background: var(--oi-lavender);
+  color: var(--oi-green);
+}
+
+.oneinbox-step-card:nth-child(3) .oneinbox-step-badge {
+  background: var(--oi-coral);
+  color: var(--oi-green);
+}
+
+.oneinbox-step-card h3 {
+  margin: 0 0 11px;
+  color: var(--oi-green);
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+}
+
+.oneinbox-step-card p {
+  margin: 0;
+  color: var(--oi-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* =======================
+   11. CHANNELS
+   ======================= */
+
+.oneinbox-channel-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 27px;
+  border-radius: 23px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.oneinbox-channel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 34px rgba(16, 55, 42, 0.07);
+}
+
+.oneinbox-channel-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 55px;
+  width: 55px;
+  height: 55px;
+  border-radius: 17px;
+  background: #e8ddfc;
+  color: #7655ae;
+}
+
+.oneinbox-channel-card:nth-child(1) .oneinbox-channel-icon {
+  background: #dcf0e3;
+  color: #238b55;
+}
+
+.oneinbox-channel-card:nth-child(2) .oneinbox-channel-icon {
+  background: #fce0ec;
+  color: #bd4484;
+}
+
+.oneinbox-channel-card:nth-child(3) .oneinbox-channel-icon {
+  background: #e1edff;
+  color: #2878ea;
+}
+
+.oneinbox-channel-card:nth-child(4) .oneinbox-channel-icon {
+  background: #fff0bf;
+  color: #876c1c;
+}
+
+.oneinbox-channel-card h3 {
+  margin: 2px 0 9px;
+  color: var(--oi-green);
+  font-size: 21px;
+  font-weight: 850;
+  letter-spacing: -0.5px;
+}
+
+.oneinbox-channel-card p {
+  margin: 0;
+  color: var(--oi-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* =======================
+   12. REQUIREMENTS
+   ======================= */
+
+.oneinbox-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.oneinbox-list-card {
+  padding: 30px;
+  border-radius: 24px;
+}
+
+.oneinbox-list-card-muted {
+  background: #faf5e9;
+}
+
+.oneinbox-list-card h2 {
+  margin: 0 0 25px;
+  color: var(--oi-green);
+  font-size: clamp(25px, 3vw, 34px);
+  font-weight: 850;
+  letter-spacing: -1px;
+  line-height: 1.15;
+}
+
+.oneinbox-list-card ul {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.oneinbox-list-card li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  color: #4d6658;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.oneinbox-list-card li svg {
+  flex: 0 0 18px;
+  margin-top: 3px;
+  color: #31885b;
+}
+
+.oneinbox-list-card-muted li svg {
+  color: #b3873c;
+}
+
+/* =======================
+   13. TEAM NOTE
+   ======================= */
+
+.oneinbox-note-box {
+  margin-top: 20px;
+  padding: 19px 23px;
+  border: 1px solid rgba(255, 122, 89, 0.22);
+  border-radius: 17px;
+  background: rgba(255, 122, 89, 0.1);
+  color: var(--oi-green);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.oneinbox-note-box strong {
+  font-weight: 850;
+}
+
+/* =======================
+   14. FAQ SECTION
+   ======================= */
+
+.oneinbox-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.oneinbox-faq-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  min-height: 68px;
+  padding: 19px 24px;
+  border: 1px solid var(--oi-border);
+  border-radius: 17px;
+  background: var(--oi-white);
+  color: var(--oi-green);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.5;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.oneinbox-faq-item:hover {
+  background: #fffdf8;
+  border-color: rgba(16, 55, 42, 0.24);
+}
+
+.oneinbox-faq-item svg {
+  flex: 0 0 18px;
+  color: var(--oi-coral);
+}
+
+/* =======================
+   15. RELATED CARDS
+   ======================= */
+
+.oneinbox-related-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  padding: 28px;
+  border-radius: 23px;
+  color: var(--oi-green);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.oneinbox-related-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 36px rgba(16, 55, 42, 0.085);
+}
+
+.oneinbox-related-card h3 {
+  margin: 0 0 10px;
+  color: var(--oi-green);
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.6px;
+  line-height: 1.25;
+}
+
+.oneinbox-related-card p {
+  margin: 0;
+  color: var(--oi-muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.oneinbox-related-card > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+  color: #d16b4e;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.oneinbox-related-card > span svg {
+  transition: transform 0.25s ease;
+}
+
+.oneinbox-related-card:hover > span svg {
+  transform: translateX(4px);
+}
+
+/* =======================
+   16. FINAL CTA
+   ======================= */
+
+.oneinbox-cta {
+  padding: 10px 0 95px;
+}
+
+.oneinbox-cta-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+  min-height: 225px;
+  overflow: hidden;
+  padding: 40px;
+  border-radius: 30px;
+  background: var(--oi-green);
+  color: var(--oi-white);
+  box-shadow: 0 25px 50px rgba(16, 55, 42, 0.13);
+}
+
+.oneinbox-cta-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -125px;
+  right: -65px;
+  width: 295px;
+  height: 295px;
+  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+  background: var(--oi-lavender);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.oneinbox-cta-card .oneinbox-kicker {
+  color: var(--oi-yellow);
+}
+
+.oneinbox-cta-card h2 {
+  max-width: 520px;
+  margin: 0;
+  color: var(--oi-white);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 850;
+  letter-spacing: -0.05em;
+  line-height: 1.08;
+}
+
+.oneinbox-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.oneinbox-cta-card .oneinbox-btn-secondary {
+  border-color: rgba(255, 250, 240, 0.65);
+  color: var(--oi-white);
+}
+
+.oneinbox-cta-card .oneinbox-btn-secondary:hover {
+  background: rgba(255, 250, 240, 0.1);
+}
+
+/* ==========================================
+   17. MEDIUM DESKTOP / LAPTOP
+   ========================================== */
+
+@media (max-width: 1150px) {
+  .oneinbox-container {
+    width: min(1200px, calc(100% - 64px));
+  }
+
+  .oneinbox-hero {
+    padding: 75px 0 90px;
+  }
+
+  .oneinbox-hero-grid {
+    gap: 32px;
+  }
+
+  .oneinbox-hero-copy h1 {
+    font-size: clamp(42px, 5.2vw, 64px);
+  }
+
+  .oneinbox-hero-copy p {
+    font-size: 14px;
+  }
+
+  .oneinbox-info-card,
+  .oneinbox-step-card {
+    padding: 23px;
+  }
+
+  .oneinbox-blob-lavender {
+    width: min(37vw, 390px);
+  }
+}
+
+/* ==========================================
+   18. TABLET
+   ========================================== */
+
+@media (max-width: 900px) {
+  .oneinbox-container {
+    width: calc(100% - 48px);
+  }
+
+  .oneinbox-section {
+    padding: 70px 0;
+  }
+
+  .oneinbox-hero {
+    padding: 60px 0 75px;
+  }
+
+  .oneinbox-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .oneinbox-hero-copy {
+    max-width: 720px;
+  }
+
+  .oneinbox-hero-copy h1 {
+    max-width: 680px;
+    font-size: clamp(44px, 7vw, 66px);
+  }
+
+  .oneinbox-hero-visual {
+    max-width: 650px;
+  }
+
+  /* Tablet blob stays fully in the hero */
+
+  .oneinbox-blob-lavender {
+    top: 32px;
+    right: 24px;
+    width: min(47vw, 350px);
+    opacity: 0.65;
+  }
+
+  .oneinbox-blob-yellow {
+    bottom: 35px;
+    left: 6%;
+    width: 180px;
+  }
+
+  .oneinbox-card-grid-3,
+  .oneinbox-steps-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oneinbox-card-grid-2,
+  .oneinbox-two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oneinbox-cta-card {
+    padding: 32px;
+  }
+}
+
+/* ==========================================
+   19. SMALL TABLET / LARGE MOBILE
+   ========================================== */
+
+@media (max-width: 650px) {
+  .oneinbox-container {
+    width: calc(100% - 36px);
+  }
+
+  .oneinbox-section {
+    padding: 60px 0;
+  }
+
+  .oneinbox-section-heading {
+    margin-bottom: 26px;
+  }
+
+  .oneinbox-section-heading h2 {
+    font-size: clamp(30px, 7.5vw, 44px);
+  }
+
+  .oneinbox-section-heading p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .oneinbox-hero {
+    padding: 44px 0 62px;
+  }
+
+  .oneinbox-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 31px;
+  }
+
+  .oneinbox-hero-copy {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .oneinbox-hero-copy h1 {
+    max-width: 100%;
+    font-size: clamp(39px, 9vw, 54px);
+    line-height: 1.05;
+    letter-spacing: -0.055em;
+  }
+
+  .oneinbox-hero-copy p {
+    max-width: 100%;
+    margin-top: 18px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .oneinbox-hero-actions {
+    gap: 10px;
+    margin-top: 23px;
+  }
+
+  .oneinbox-btn {
+    min-height: 45px;
+    padding: 11px 16px;
+    font-size: 12px;
+  }
+
+  .oneinbox-inline-note {
+    font-size: 12px;
+  }
+
+  /* COMPLETE MOBILE LAVENDER BLOB */
+
+  .oneinbox-blob-lavender {
+    top: 90px;
+    right: 12px;
+    width: min(65vw, 270px);
+    height: auto;
+    aspect-ratio: 1;
+    opacity: 0.45;
+  }
+
+  /* Yellow blob */
+
+  .oneinbox-blob-yellow {
+    top: auto;
+    bottom: 38px;
+    left: 15px;
+    width: min(32vw, 125px);
+    height: auto;
+    aspect-ratio: 1;
+    opacity: 0.45;
+  }
+
+  /* Inbox screenshot fully visible */
+
+  .oneinbox-hero-visual {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 13px 0;
+  }
+
+  .oneinbox-hero-card {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: 100%;
+    padding: 8px;
+    border-radius: 17px;
+  }
+
+  .oneinbox-hero-card img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 11px;
+    object-fit: contain;
+  }
+
+  /* Hide floating tags on narrow screens
+     to avoid hiding the screenshot */
+
+  .oneinbox-floating-tag {
+    display: none;
+  }
+
+  /* All cards in one column */
+
+  .oneinbox-card-grid-3,
+  .oneinbox-card-grid-2,
+  .oneinbox-steps-grid,
+  .oneinbox-two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .oneinbox-info-card,
+  .oneinbox-step-card,
+  .oneinbox-channel-card,
+  .oneinbox-list-card,
+  .oneinbox-related-card {
+    padding: 22px;
+    border-radius: 19px;
+  }
+
+  .oneinbox-info-card h3,
+  .oneinbox-step-card h3,
+  .oneinbox-channel-card h3,
+  .oneinbox-related-card h3 {
+    font-size: 19px;
+  }
+
+  .oneinbox-info-card p,
+  .oneinbox-step-card p,
+  .oneinbox-channel-card p,
+  .oneinbox-list-card li,
+  .oneinbox-related-card p {
+    font-size: 13px;
+  }
+
+  .oneinbox-channel-icon {
+    flex-basis: 47px;
+    width: 47px;
+    height: 47px;
+    border-radius: 14px;
+  }
+
+  .oneinbox-list-card h2 {
+    font-size: 27px;
+  }
+
+  .oneinbox-note-box {
+    padding: 16px;
+    font-size: 13px;
+  }
+
+  .oneinbox-faq-item {
+    min-height: 60px;
+    padding: 17px;
+    font-size: 13px;
+  }
+
+  .oneinbox-related-card {
+    min-height: 195px;
+  }
+
+  .oneinbox-cta {
+    padding: 0 0 65px;
+  }
+
+  .oneinbox-cta-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 23px;
+    min-height: 0;
+    padding: 30px 23px;
+    border-radius: 24px;
+  }
+
+  .oneinbox-cta-card h2 {
+    font-size: clamp(29px, 8vw, 40px);
+  }
+
+  .oneinbox-cta-actions {
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   20. VERY SMALL PHONES
+   ========================================== */
+
+@media (max-width: 380px) {
+  .oneinbox-container {
+    width: calc(100% - 28px);
+  }
+
+  .oneinbox-hero {
+    padding: 35px 0 55px;
+  }
+
+  .oneinbox-hero-copy h1 {
+    font-size: 36px;
+    line-height: 1.06;
+  }
+
+  .oneinbox-hero-copy p {
+    font-size: 13px;
+  }
+
+  .oneinbox-blob-lavender {
+    top: 70px;
+    right: 8px;
+    width: 62vw;
+    opacity: 0.4;
+  }
+
+  .oneinbox-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .oneinbox-hero-actions .oneinbox-btn {
+    width: 100%;
+  }
+
+  .oneinbox-cta-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .oneinbox-cta-actions .oneinbox-btn {
+    width: 100%;
+  }
+
+  .oneinbox-channel-card {
+    gap: 12px;
+  }
+
+  .oneinbox-info-card,
+  .oneinbox-step-card,
+  .oneinbox-channel-card,
+  .oneinbox-list-card,
+  .oneinbox-related-card {
+    padding: 19px;
+  }
+
+  .oneinbox-section-heading h2 {
+    font-size: 29px;
+  }
+}
+
+/* ==========================================
+   21. ACCESSIBILITY
+   ========================================== */
+
+.oneinbox-page a:focus-visible {
+  outline: 3px solid var(--oi-coral);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oneinbox-page *,
+  .oneinbox-page *::before,
+  .oneinbox-page *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================
+   ONE INBOX — INTERACTIVE FAQ ACCORDION
+   ========================================== */
+
+.oneinbox-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Accordion card */
+
+.oneinbox-faq-item {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(16, 55, 42, 0.12);
+  border-radius: 17px;
+  background: var(--oi-white, #fffaf0);
+  color: var(--oi-green, #10372a);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.oneinbox-faq-item:hover {
+  border-color: rgba(16, 55, 42, 0.25);
+}
+
+.oneinbox-faq-item[open] {
+  background: #fffdf8;
+  border-color: rgba(16, 55, 42, 0.2);
+  box-shadow: 0 12px 28px rgba(16, 55, 42, 0.055);
+}
+
+/* Clickable question */
+
+.oneinbox-faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 70px;
+  padding: 19px 23px;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.oneinbox-faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.oneinbox-faq-question::marker {
+  content: "";
+}
+
+.oneinbox-faq-question-text {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+  color: var(--oi-green, #10372a);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+/* 01, 02, 03... */
+
+.oneinbox-faq-number {
+  flex: 0 0 27px;
+  color: #bd8465;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 1px;
+}
+
+/* Chevron icon */
+
+.oneinbox-faq-arrow {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  flex: 0 0 33px;
+  border-radius: 50%;
+  background: rgba(255, 122, 89, 0.12);
+  color: var(--oi-coral, #ff7a59);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.3s ease;
+}
+
+.oneinbox-faq-arrow svg {
+  display: block;
+  color: inherit;
+}
+
+/* Arrow rotates when FAQ opens */
+
+.oneinbox-faq-item[open] .oneinbox-faq-arrow {
+  transform: rotate(180deg);
+  background: var(--oi-coral, #ff7a59);
+  color: var(--oi-green, #10372a);
+}
+
+/* Answer */
+
+.oneinbox-faq-answer {
+  margin: 0 23px 20px 65px;
+  padding: 0 0 0 17px;
+  border-left: 2px solid var(--oi-coral, #ff7a59);
+}
+
+.oneinbox-faq-answer p {
+  max-width: 850px;
+  margin: 0;
+  padding: 2px 0;
+  color: var(--oi-muted, #607468);
+  font-size: 13px;
+  font-weight: 450;
+  line-height: 1.85;
+}
+
+/* Keyboard accessibility */
+
+.oneinbox-faq-question:focus-visible {
+  outline: 3px solid var(--oi-coral, #ff7a59);
+  outline-offset: -4px;
+  border-radius: 14px;
+}
+
+/* ==========================================
+   FAQ RESPONSIVE
+   ========================================== */
+
+@media (max-width: 650px) {
+  .oneinbox-faq-list {
+    gap: 10px;
+  }
+
+  .oneinbox-faq-question {
+    min-height: 64px;
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .oneinbox-faq-question-text {
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .oneinbox-faq-number {
+    flex-basis: 23px;
+    font-size: 10px;
+  }
+
+  .oneinbox-faq-arrow {
+    width: 29px;
+    height: 29px;
+    flex-basis: 29px;
+  }
+
+  .oneinbox-faq-answer {
+    margin: 0 16px 17px 48px;
+    padding-left: 12px;
+  }
+
+  .oneinbox-faq-answer p {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oneinbox-faq-arrow,
+  .oneinbox-faq-item {
+    transition: none;
+  }
+}

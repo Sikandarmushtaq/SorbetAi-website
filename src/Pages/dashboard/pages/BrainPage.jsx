@@ -23,8 +23,8 @@ import {
 
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
 import { getCurrentWorkspace } from '../../../services/dashboardApi';
+import { useAuth } from '../../../context/AuthContext';
 
-import { brainOverviewApi } from '../../../services/dashboard/brain-overview.api.js';
 import { brainSetupApi } from '../../../services/dashboard/brain-setup.api.js';
 import { brainAssistantApi } from '../../../services/dashboard/brain-assistant.api.js';
 import { businessHoursApi } from '../../../services/dashboard/business-hours.api.js';
@@ -78,6 +78,9 @@ const initialSetup = {
   industry: '',
   whatsapp_number: '',
   business_address: '',
+  business_phone: '',
+  address: '',
+  timezone: '',
   business_description: '',
   agent_name: 'Assistant',
   agent_gender: 'Not set',
@@ -101,8 +104,14 @@ const initialStaff = {
   role: '',
   phone: '',
   hours_mode: 'business',
-  start_time: '',
-  end_time: '',
+  location_id: '',
+  is_active: true,
+  custom_hours: [],
+};
+
+const initialLocation = {
+  name: '', address: '', phone: '', notes: '',
+  timezone: '', hours_type: 'same_as_business', is_primary: false,
 };
 
 const initialRequest = {
@@ -121,6 +130,7 @@ const initialEditor = {
   document_title: '',
   document_description: '',
   share_on_whatsapp: false,
+  is_active: true,
 };
 
 function isConfigured(api) {
@@ -129,8 +139,102 @@ function isConfigured(api) {
 }
 
 function getError(error) {
-  return error?.message || 'The request could not be completed.';
+  const fieldMessages = Array.isArray(error?.errors)
+    ? error.errors.map((item) => item?.message).filter(Boolean)
+    : [];
+  return fieldMessages.join(' · ') || error?.message || 'The request could not be completed.';
 }
+
+const timezones = (() => {
+  const defaults = ['Asia/Karachi', 'Asia/Dubai', 'Europe/London', 'America/New_York'];
+  try {
+    const all = Intl.supportedValuesOf?.('timeZone') || [];
+    return [...new Set([...defaults, ...all])].sort();
+  } catch { return defaults; }
+})();
+
+const hoursAsPayload = (rows) => ({
+  schedule: weekDays.map((day) => {
+    const item = rows.find((row) => row.day === day) || {};
+    const closed = !item.enabled;
+    const allDay = !closed && Boolean(item.is_24_hours);
+    const breaks = closed ? [] : (item.breaks || []).map(({ start_time, end_time }) => ({
+      start_time: shortTime(start_time), end_time: shortTime(end_time),
+    }));
+    if (breaks.length > 5) throw new Error(`${day}: maximum five breaks allowed.`);
+    if (!closed && !allDay && (!item.start_time || !item.end_time)) {
+      throw new Error(`${day}: opening and closing times are required.`);
+    }
+    return {
+      day_of_week: day.toLowerCase(),
+      is_closed: closed,
+      is_24_hours: allDay,
+      open_time: closed || allDay ? null : shortTime(item.start_time),
+      close_time: closed || allDay ? null : shortTime(item.end_time),
+      breaks,
+    };
+  }),
+});
+
+const ruleLabels = {
+  offer_time: {
+    service_length: "Each service's own length", first_available: 'First available',
+    '15_min': '15 minutes', '30_min': '30 minutes', '60_min': '60 minutes',
+  },
+};
+function rulesFromApi(data) {
+  return {
+    offer_time: ruleLabels.offer_time[data?.offer_time] || data?.offer_time || initialRules.offer_time,
+    booking_gap: data?.gap_between_appointments ? `${data.gap_between_appointments} minutes` : 'No gap',
+    minimum_notice: data?.minimum_notice_hours ? `${data.minimum_notice_hours} hour${data.minimum_notice_hours === 1 ? '' : 's'}` : 'No minimum',
+    book_ahead: data?.how_far_ahead_days ? `${data.how_far_ahead_days} days` : 'No limit',
+    concurrent_customers: String(data?.customers_at_same_time ?? 1),
+  };
+}
+function rulesAsPayload(form) {
+  const match = Object.entries(ruleLabels.offer_time).find(([, label]) => label === form.offer_time);
+  return {
+    offer_time: match?.[0] || form.offer_time || 'service_length',
+    gap_between_appointments: parseInt(form.booking_gap, 10) || 0,
+    minimum_notice_hours: parseInt(form.minimum_notice, 10) || 0,
+    how_far_ahead_days: parseInt(form.book_ahead, 10) || 0,
+    customers_at_same_time: Number(form.concurrent_customers) || 1,
+  };
+}
+
+function WeeklyHoursEditor({ rows, setRows, disabled = false }) {
+  const changeDay = (name, key, value) => setRows((previous) => previous.map((row) =>
+    row.day === name ? { ...row, [key]: value } : row
+  ));
+  return (
+    <div className="bb2-brain-custom-hours">
+      {rows.map((day) => (
+        <div className="bb2-brain-custom-day" key={day.day}>
+          <label className="bb2-checkbox">
+            <input type="checkbox" checked={Boolean(day.enabled)} disabled={disabled}
+              onChange={(event) => changeDay(day.day, 'enabled', event.target.checked)} />
+            {day.day}
+          </label>
+          {day.enabled ? <>
+            <label className="bb2-checkbox">
+              <input type="checkbox" checked={Boolean(day.is_24_hours)} disabled={disabled}
+                onChange={(event) => changeDay(day.day, 'is_24_hours', event.target.checked)} />24 h
+            </label>
+            {!day.is_24_hours && <>
+              <input type="time" className="bb2-control" disabled={disabled} value={day.start_time || ''}
+                onChange={(event) => changeDay(day.day, 'start_time', event.target.value)} />
+              <span>to</span>
+              <input type="time" className="bb2-control" disabled={disabled} value={day.end_time || ''}
+                onChange={(event) => changeDay(day.day, 'end_time', event.target.value)} />
+            </>}
+          </> : <span className="bb2-muted">Closed</span>}
+        </div>
+      ))}
+      <small className="bb2-muted">For custom staff hours, all seven days are sent. Breaks can be managed from the main weekly schedule.</small>
+    </div>
+  );
+}
+
 
 function records(response, key) {
   if (Array.isArray(response)) return response;
@@ -150,6 +254,7 @@ function shortTime(value) {
 
 function normaliseHours(response) {
   const source =
+    response?.schedule ||
     response?.days ||
     response?.weekly_hours ||
     response?.hours ||
@@ -166,7 +271,7 @@ function normaliseHours(response) {
   return weekDays.map((day) => {
     const match = rows.find(
       (item) =>
-        String(item.day || item.name).toLowerCase()
+        String(item.day || item.day_of_week || item.name).toLowerCase()
         === day.toLowerCase()
     ) || {};
 
@@ -206,11 +311,12 @@ function Field({ title, hint, wide = false, children }) {
   );
 }
 
-function SelectField({ value, onChange, choices }) {
+function SelectField({ value, onChange, choices, disabled = false }) {
   return (
     <select
       className="bb2-control"
       value={value ?? ''}
+      disabled={disabled}
       onChange={(event) => onChange(event.target.value)}
     >
       {choices.map((choice) => {
@@ -515,6 +621,10 @@ export default function BrainPage() {
   } = useFreePlan();
 
   const { Notice, showNotice } = useNotice();
+  const { user } = useAuth();
+  const role = String(user?.workspace_role || user?.current_workspace?.role || user?.role || user?.workspaces?.[0]?.role || '').toLowerCase();
+  const readOnly = role === 'agent';
+
 
   const [overview, setOverview] = useState(null);
   const [overviewLoading, setOverviewLoading] =
@@ -531,6 +641,11 @@ export default function BrainPage() {
   const [closedDates, setClosedDates] = useState([]);
   const [staff, setStaff] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [hoursLocation, setHoursLocation] = useState('');
+  const [websiteDetails, setWebsiteDetails] = useState(null);
+  const [editingStaffId, setEditingStaffId] = useState(null);
+  const [editingLocationId, setEditingLocationId] = useState(null);
+  const [editingKnowledgeId, setEditingKnowledgeId] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [entries, setEntries] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -541,20 +656,15 @@ export default function BrainPage() {
   const [modal, setModal] = useState('');
   const [staffForm, setStaffForm] = useState(initialStaff);
 
-  const [locationForm, setLocationForm] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    notes: '',
-  });
+  const [locationForm, setLocationForm] = useState(initialLocation);
+  const [locationCustomHours, setLocationCustomHours] = useState(() => normaliseHours([]));
 
   const [requestForm, setRequestForm] =
     useState(initialRequest);
 
   const [dateForm, setDateForm] = useState({
-    date: '',
-    day_type: 'Closed all day',
-    reason: '',
+    date: '', day_type: 'Closed all day', reason: '',
+    open_time: '09:00', close_time: '17:00',
   });
 
   const [knowledgeSection, setKnowledgeSection] =
@@ -565,6 +675,8 @@ export default function BrainPage() {
 
   const [editor, setEditor] = useState(initialEditor);
   const [documentFile, setDocumentFile] = useState(null);
+  const [documentEditingId, setDocumentEditingId] = useState(null);
+  const [documentEditForm, setDocumentEditForm] = useState({ title: '', description: '', allow_whatsapp_share: false });
 
   const [knowledgeSearch, setKnowledgeSearch] =
     useState('');
@@ -608,24 +720,26 @@ export default function BrainPage() {
   const loadOverview = useCallback(async () => {
     setOverviewLoading(true);
     setOverviewError('');
-
     try {
-      if (!isConfigured(brainOverviewApi)) {
-        throw new Error(
-          'AI Brain overview API is not configured.'
-        );
-      }
-
-      const result = await brainOverviewApi.request();
-
-      setOverview(
-        result?.overview || result || null
-      );
-    } catch (error) {
-      setOverviewError(getError(error));
-    } finally {
-      setOverviewLoading(false);
-    }
+      const summary = await knowledgeApi.overview();
+      setNotApplicable({
+        FAQs: summary?.faqs?.is_applicable === false,
+        Promotions: summary?.promotions?.is_applicable === false,
+        Documents: summary?.documents?.is_applicable === false,
+        Website: summary?.website?.is_applicable === false,
+        'Chat Training': summary?.chat_training?.is_applicable === false,
+      });
+      // General What AI Knows summary has no Phase 1 endpoint.
+      setOverview({
+        faqs_count: summary?.faqs?.count ?? null,
+        promotions_count: summary?.promotions?.count ?? null,
+        documents_count: summary?.documents?.count ?? null,
+        website_count: summary?.website?.status === 'not_connected' ? 0 : 1,
+        website_connected: summary?.website?.status !== 'not_connected',
+        chat_training_count: summary?.chat_training?.count ?? null,
+      });
+    } catch (error) { setOverviewError(getError(error)); }
+    finally { setOverviewLoading(false); }
   }, []);
 
   useEffect(() => {
@@ -645,14 +759,14 @@ export default function BrainPage() {
       }));
     };
 
-    async function loadResource(api, key, update) {
+    async function loadResource(api, key, update, options = {}) {
       if (!isConfigured(api)) {
         setError(key, 'API is not configured.');
         return;
       }
 
       try {
-        const response = await api.request();
+        const response = await api.request(options);
 
         if (active) {
           update(response);
@@ -681,10 +795,10 @@ export default function BrainPage() {
             setSetup({
               ...initialSetup,
               ...value,
-              business_name:
-                value.business_name ||
-                workspace?.name ||
-                '',
+              business_name: value.business_name || workspace?.name || '',
+              whatsapp_number: value.business_phone || '',
+              business_address: value.address || '',
+              timezone: value.timezone || '',
             });
 
             setError('setup', '');
@@ -702,27 +816,22 @@ export default function BrainPage() {
 
     if (tab === 'hours-staff') {
       loadResource(
-        businessHoursApi,
-        'hours',
-        (response) =>
-          setHours(normaliseHours(response))
+        businessHoursApi, 'hours',
+        (response) => setHours(normaliseHours(response)),
+        hoursLocation ? { query: { location_id: hoursLocation } } : {}
       );
+      loadResource(locationsApi, 'locations', (response) => setLocations(records(response, 'locations')));
 
       loadResource(
         bookingRulesApi,
         'rules',
-        (response) =>
-          setRules({
-            ...initialRules,
-            ...(response?.rules || response),
-          })
+        (response) => setRules(rulesFromApi(response?.rules || response))
       );
 
       loadResource(
-        closedDatesApi,
-        'dates',
-        (response) =>
-          setClosedDates(records(response, 'dates'))
+        closedDatesApi, 'dates',
+        (response) => setClosedDates(records(response, 'dates')),
+        hoursLocation ? { query: { location_id: hoursLocation } } : {}
       );
 
       loadResource(
@@ -743,80 +852,84 @@ export default function BrainPage() {
     }
 
     if (tab === 'knowledge') {
-      loadResource(
-        knowledgeApi,
-        'documents',
-        (response) =>
-          setDocuments(records(response, 'documents'))
-      );
+      knowledgeApi.list('Documents')
+        .then((response) => active && setDocuments(records(response, 'documents')))
+        .catch((error) => setError('documents', getError(error)));
     }
 
-    if (tab === 'requests') {
-      loadResource(
-        requestTypesApi,
-        'requests',
-        (response) =>
-          setRequests(records(response, 'request_types'))
-      );
+    if (tab === 'requests' && isConfigured(requestTypesApi)) {
+      loadResource(requestTypesApi, 'requests', (response) => setRequests(records(response, 'request_types')));
     }
 
     return () => {
       active = false;
     };
-  }, [tab]);
+  }, [tab, hoursLocation]);
 
-  // Load the selected Knowledge subsection.
+  // The Phase 1 backend has separate CRUD paths for every knowledge section.
   useEffect(() => {
-    if (
-      tab !== 'knowledge' ||
-      knowledgeSection === 'Documents' ||
-      !isConfigured(knowledgeApi)
-    ) {
-      return undefined;
-    }
-
+    if (tab !== 'knowledge') return undefined;
     let active = true;
-
-    const type =
-      knowledgeSection === 'FAQs'
-        ? 'faq'
-        : knowledgeSection
-            .toLowerCase()
-            .replace(/\s/g, '_');
-
-    knowledgeApi
-      .request({ query: { type } })
-      .then((response) => {
-        if (!active) return;
-
-        const results = records(response, 'entries');
-
-        setEntries(
-          results.filter(
-            (item) =>
-              !item.type ||
-              String(item.type).toLowerCase() === type
-          )
-        );
-
-        setErrors((current) => ({
-          ...current,
-          entries: '',
-        }));
-      })
-      .catch((error) => {
+    setEditingKnowledgeId(null);
+    setEditor(initialEditor);
+    setEntries([]);
+    if (knowledgeSection === 'Website') {
+      knowledgeApi.website().then((value) => {
         if (active) {
-          setErrors((current) => ({
-            ...current,
-            entries: getError(error),
-          }));
+          setWebsiteDetails(value);
+          setEditor((current) => ({ ...current, website_url: value?.url || '' }));
         }
+      }).catch((error) => {
+        if (active) setErrors((current) => ({ ...current, entries: getError(error) }));
       });
-
-    return () => {
-      active = false;
-    };
+    } else if (knowledgeSection !== 'Documents') {
+      knowledgeApi.list(knowledgeSection).then((response) => {
+        if (active) {
+          setEntries(records(response, 'entries'));
+          setErrors((current) => ({ ...current, entries: '' }));
+        }
+      }).catch((error) => {
+        if (active) setErrors((current) => ({ ...current, entries: getError(error) }));
+      });
+    }
+    return () => { active = false; };
   }, [tab, knowledgeSection]);
+
+  const refreshKnowledgeList = async () => {
+    if (knowledgeSection === 'Website') {
+      const result = await knowledgeApi.website();
+      setWebsiteDetails(result);
+      setEditor((current) => ({ ...current, website_url: result?.url || '' }));
+    } else if (knowledgeSection === 'Documents') {
+      setDocuments(records(await knowledgeApi.list('Documents'), 'documents'));
+    } else {
+      setEntries(records(await knowledgeApi.list(knowledgeSection), 'entries'));
+    }
+    await loadOverview();
+  };
+
+  const beginEditKnowledge = (item) => {
+    setEditingKnowledgeId(item.id);
+    setEditor((current) => ({
+      ...current,
+      question: item.question || '', answer: item.answer || '',
+      title: item.title || '',
+      content: item.details || item.training_notes || '',
+      valid_until: item.valid_until || '',
+      is_active: item.is_active ?? true,
+    }));
+    document.getElementById('bb2-knowledge-entry-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  const removeKnowledgeItem = async (item) => {
+    if (readOnly || !window.confirm('Delete this entry?')) return;
+    setSaving('delete-knowledge');
+    try {
+      await knowledgeApi.remove(knowledgeSection, item.id);
+      await refreshKnowledgeList();
+      showNotice('Entry deleted.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
 
   // Save through existing backend resource APIs.
   const saveResource = async (
@@ -826,6 +939,7 @@ export default function BrainPage() {
     body,
     onSuccess
   ) => {
+    if (readOnly) { showNotice('Agent role has read-only access.'); return; }
     if (!isConfigured(api)) {
       showNotice('This API is not configured yet.');
       return;
@@ -869,6 +983,10 @@ export default function BrainPage() {
   };
 
   const addBreak = (day) => {
+    if (hours.find((row) => row.day === day)?.breaks?.length >= 5) {
+      showNotice('Maximum five breaks are allowed per day.');
+      return;
+    }
     setHours((current) =>
       current.map((entry) =>
         entry.day === day
@@ -939,6 +1057,81 @@ export default function BrainPage() {
             }
       );
     });
+  };
+
+  const hoursReadOnly = readOnly || Boolean(hoursLocation && locations.find(
+    (place) => place.id === hoursLocation
+  )?.hours_type === 'same_as_business');
+
+  const saveHours = async () => {
+    if (hoursReadOnly) return;
+    try {
+      const body = hoursAsPayload(hours);
+      setSaving('hours');
+      await businessHoursApi.request({
+        method: 'PUT', body,
+        query: hoursLocation ? { location_id: hoursLocation } : undefined,
+      });
+      showNotice('Working hours saved.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
+
+  const saveSpecialDate = async (event) => {
+    event.preventDefault();
+    if (readOnly) return;
+    const closed = dateForm.day_type === 'Closed all day';
+    const body = {
+      date: dateForm.date, location_id: hoursLocation || null,
+      is_closed_all_day: closed,
+      open_time: closed ? null : dateForm.open_time,
+      close_time: closed ? null : dateForm.close_time,
+      note: dateForm.reason.trim() || null,
+    };
+    setSaving('date');
+    try {
+      const created = await closedDatesApi.request({ method: 'POST', body });
+      setClosedDates((current) => [...current, created]);
+      setDateForm({ date: '', day_type: 'Closed all day', reason: '', open_time: '09:00', close_time: '17:00' });
+      showNotice('Special date saved.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
+
+  const saveNotApplicable = async () => {
+    if (readOnly) return;
+    const isApplicable = Boolean(notApplicable[knowledgeSection]);
+    setSaving('applicability');
+    try {
+      await knowledgeApi.applicability(knowledgeSection, isApplicable);
+      setNotApplicable((current) => ({ ...current, [knowledgeSection]: !isApplicable }));
+      await loadOverview();
+      showNotice('Knowledge preference saved.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
+
+  const disconnectWebsite = async () => {
+    if (readOnly || !window.confirm('Disconnect this website?')) return;
+    setSaving('website-delete');
+    try {
+      await knowledgeApi.removeWebsite();
+      await refreshKnowledgeList();
+      setEditor((current) => ({ ...current, website_url: '' }));
+      showNotice('Website disconnected.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
+
+  const changePromotionStatus = async (item) => {
+    if (readOnly) return;
+    setSaving('promotion-toggle');
+    try {
+      await knowledgeApi.update('Promotions', item.id, { is_active: !item.is_active });
+      await refreshKnowledgeList();
+      showNotice('Promotion updated.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
   };
 
   const sendAssistant = async (event) => {
@@ -1083,186 +1276,128 @@ export default function BrainPage() {
     sendTestMessage(message);
   };
 
-  const checkKnowledge = async (event) => {
+  // Phase 1 does not expose a knowledge-search API.
+  // Keep the form handler, but do not invoke an unsupported endpoint.
+  const checkKnowledge = (event) => {
     event.preventDefault();
-
     if (!lookup.question.trim()) return;
+    showNotice('Knowledge search is planned for Phase 2.');
+  };
 
-    if (!isConfigured(knowledgeApi)) {
-      showNotice('Knowledge API is not configured.');
-      return;
-    }
-
-    setSaving('lookup');
-
+  const submitKnowledge = async (event) => {
+    event.preventDefault();
+    if (readOnly) { showNotice('Agent role has read-only access.'); return; }
+    setSaving('knowledge');
     try {
-      const response = await knowledgeApi.request({
-        method: 'POST',
-        action: 'search',
-        body: {
-          query: lookup.question.trim(),
-        },
-      });
-
-      setLookup((current) => ({
-        ...current,
-        result:
-          response?.answer ||
-          response?.result ||
-          response?.message ||
-          'No matching knowledge found.',
-      }));
-    } catch (error) {
-      setLookup((current) => ({
-        ...current,
-        result: getError(error),
-      }));
-    } finally {
-      setSaving('');
-    }
-  };
-
-  const submitKnowledge = (event) => {
-    event.preventDefault();
-
-    const type =
-      knowledgeSection === 'FAQs'
-        ? 'faq'
-        : knowledgeSection
-            .toLowerCase()
-            .replace(/\s/g, '_');
-
-    let body;
-
-    if (type === 'faq') {
-      body = {
-        type: 'faq',
-        question: editor.question.trim(),
-        answer: editor.answer.trim(),
-      };
-    } else if (type === 'website') {
-      body = {
-        type: 'website',
-        url: editor.website_url.trim(),
-      };
-    } else if (type === 'promotions') {
-      body = {
-        type: 'promotion',
-        title: editor.title.trim(),
-        details: editor.content.trim(),
-        valid_until: editor.valid_until || null,
-      };
-    } else {
-      body = {
-        type,
-        title: editor.title.trim(),
-        content: editor.content.trim(),
-      };
-    }
-
-    saveResource(
-      'knowledge',
-      knowledgeApi,
-      'POST',
-      body,
-      async (response) => {
-        const created =
-          response?.entry ||
-          response?.knowledge ||
-          response;
-
-        if (
-          created &&
-          (created.id || created.title || created.question)
-        ) {
-          setEntries((current) => [
-            created,
-            ...current,
-          ]);
-        }
-
-        setEditor((current) => ({
-          ...current,
-          question: '',
-          answer: '',
-          title: '',
-          content: '',
-          website_url: '',
-          valid_until: '',
-        }));
+      if (knowledgeSection === 'Website') {
+        await knowledgeApi.saveWebsite(editor.website_url.trim());
+        showNotice('Website saved. AI learning is not active yet (Phase 1).');
+      } else {
+        let body;
+        if (knowledgeSection === 'FAQs') {
+          body = { question: editor.question.trim(), answer: editor.answer.trim() };
+        } else if (knowledgeSection === 'Promotions') {
+          body = {
+            title: editor.title.trim(), details: editor.content.trim(),
+            valid_until: editor.valid_until || null, is_active: editor.is_active,
+          };
+        } else if (knowledgeSection === 'Chat Training') {
+          body = { title: editor.title.trim(), training_notes: editor.content.trim() };
+        } else { throw new Error('This knowledge section does not support this form.'); }
+        if (editingKnowledgeId) await knowledgeApi.update(knowledgeSection, editingKnowledgeId, body);
+        else await knowledgeApi.create(knowledgeSection, body);
+        showNotice(editingKnowledgeId ? 'Entry updated.' : 'Entry created.');
       }
-    );
+      setEditingKnowledgeId(null);
+      setEditor(initialEditor);
+      await refreshKnowledgeList();
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
   };
 
-  const uploadDocument = (event) => {
+  const uploadDocument = async (event) => {
     event.preventDefault();
-
-    if (!documentFile) {
-      showNotice('Select a PDF or image first.');
-      return;
+    if (readOnly) { showNotice('Agent role has read-only access.'); return; }
+    if (!documentFile || !editor.document_title.trim()) {
+      showNotice('Document title and file are required.'); return;
     }
-
     if (documentFile.size > 10 * 1024 * 1024) {
-      showNotice('Maximum file size is 10 MB.');
-      return;
+      showNotice('Maximum file size is 10 MB.'); return;
     }
-
-    const allowedTypes = [
-      'application/pdf',
-      'image/png',
-      'image/jpeg',
-    ];
-
-    if (!allowedTypes.includes(documentFile.type)) {
-      showNotice('Only PDF, PNG and JPG files are allowed.');
-      return;
+    const allowed = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'];
+    if (!allowed.includes(documentFile.type)) {
+      showNotice('Supported files: PDF, PNG, JPG, JPEG and WebP.'); return;
     }
-
     const formData = new FormData();
-
     formData.append('file', documentFile);
-    formData.append(
-      'title',
-      editor.document_title.trim()
-    );
-    formData.append(
-      'description',
-      editor.document_description.trim()
-    );
-    formData.append(
-      'share_on_whatsapp',
-      String(editor.share_on_whatsapp)
-    );
+    formData.append('title', editor.document_title.trim());
+    formData.append('description', editor.document_description.trim());
+    formData.append('allow_whatsapp_share', String(editor.share_on_whatsapp));
+    setSaving('document');
+    try {
+      await knowledgeApi.uploadDocument(formData);
+      setDocumentFile(null);
+      setEditor((current) => ({ ...current, document_title: '', document_description: '', share_on_whatsapp: false }));
+      await refreshKnowledgeList();
+      showNotice('Document saved. AI learning is not active yet (Phase 1).');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
 
-    saveResource(
-      'document',
-      knowledgeApi,
-      'POST',
-      formData,
-      (response) => {
-        const created =
-          response?.document || response;
+  const downloadDocument = async (documentId) => {
+    try {
+      // A new private signed link is required for EVERY download.
+      const result = await knowledgeApi.downloadDocument(documentId);
+      if (!result?.url) throw new Error('Download link was not returned.');
+      window.open(result.url, '_blank', 'noopener,noreferrer');
+    } catch (error) { showNotice(getError(error)); }
+  };
 
-        if (
-          created?.id ||
-          created?.document_id
-        ) {
-          setDocuments((current) => [
-            created,
-            ...current,
-          ]);
-        }
+  const saveDocumentDetails = async (event) => {
+    event.preventDefault();
+    if (!documentEditingId || readOnly) return;
+    setSaving('document-details');
+    try {
+      await knowledgeApi.update('Documents', documentEditingId, {
+        title: documentEditForm.title.trim(),
+        description: documentEditForm.description.trim() || null,
+        allow_whatsapp_share: documentEditForm.allow_whatsapp_share,
+      });
+      setDocumentEditingId(null);
+      await refreshKnowledgeList();
+      showNotice('Document details saved.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
+  const beginDocumentEdit = (item) => {
+    setDocumentEditingId(item.id);
+    setDocumentEditForm({
+      title: item.title || '',
+      description: item.description || '',
+      allow_whatsapp_share: Boolean(item.allow_whatsapp_share),
+    });
+  };
 
-        setDocumentFile(null);
+  const deleteDocument = async (item) => {
+    if (readOnly || !window.confirm(`Delete ${item.title || item.file_name}?`)) return;
+    setSaving('delete-document');
+    try {
+      await knowledgeApi.remove('Documents', item.id);
+      await refreshKnowledgeList();
+      showNotice('Document deleted.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
 
-        setEditor((current) => ({
-          ...current,
-          document_title: '',
-          document_description: '',
-          share_on_whatsapp: false,
-        }));
-      }
-    );
+  const updateDocumentSharing = async (item, allowed) => {
+    if (readOnly) return;
+    setSaving(`document-${item.id}`);
+    try {
+      await knowledgeApi.update('Documents', item.id, { allow_whatsapp_share: allowed });
+      await refreshKnowledgeList();
+      showNotice('File-sharing preference updated.');
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
   };
 
   // Needs Attention depends ONLY on real business information,
@@ -1346,11 +1481,7 @@ export default function BrainPage() {
     {
       title: 'Business profile',
       icon: 'Building2',
-      value:
-        overview?.business_profile_summary ||
-        (overview?.business_profile_complete
-          ? 'Configured'
-          : 'Nothing here yet'),
+      value: 'Open Setup',
       detail:
         overview?.business_description ||
         'Your business description and details.',
@@ -1359,11 +1490,7 @@ export default function BrainPage() {
     {
       title: 'Opening hours',
       icon: 'Clock3',
-      value:
-        overview?.hours_summary ||
-        (overview?.hours_configured
-          ? 'Configured'
-          : 'Not configured'),
+      value: 'View schedule',
       detail: 'Weekly working hours and availability.',
       action: () => changeTab('hours-staff'),
     },
@@ -1384,10 +1511,10 @@ export default function BrainPage() {
       action: () => navigate('/dashboard/products'),
     },
     {
-      title: 'Documents it can send',
+      title: 'Stored documents',
       icon: 'FileText',
       value: overview?.documents_count ?? '—',
-      detail: 'Files, menus and price lists.',
+      detail: 'Privately stored files. AI indexing is not active in Phase 1.',
       action: () => {
         setKnowledgeSection('Documents');
         changeTab('knowledge');
@@ -1421,101 +1548,115 @@ export default function BrainPage() {
 
   const closeModal = () => {
     setModal('');
+    setEditingStaffId(null);
+    setEditingLocationId(null);
     setStaffForm(initialStaff);
     setRequestForm(initialRequest);
-    setLocationForm({
-      name: '',
-      address: '',
-      phone: '',
-      notes: '',
-    });
+    setLocationForm(initialLocation);
   };
 
-  const saveModal = (event) => {
+  const openStaff = (item = null) => {
+    setEditingStaffId(item?.id || null);
+    setStaffForm(item ? {
+      name: item.name || '', role: item.role || '', phone: item.phone || '',
+      hours_mode: item.working_hours_type === 'own_hours' ? 'own' : 'business',
+      location_id: item.location_id || '',
+      is_active: item.is_active !== false,
+      custom_hours: normaliseHours(item.custom_hours || hours),
+    } : { ...initialStaff, custom_hours: normaliseHours(hours) });
+    setModal('staff');
+  };
+  const openLocation = (item = null) => {
+    setEditingLocationId(item?.id || null);
+    setLocationForm(item ? {
+      name: item.name || '', address: item.address || '',
+      phone: item.phone || '', notes: item.notes || '',
+      timezone: item.timezone || '',
+      hours_type: item.hours_type || 'same_as_business',
+      is_primary: Boolean(item.is_primary),
+    } : { ...initialLocation, timezone: setup.timezone || '' });
+    setLocationCustomHours(normaliseHours(hours));
+    setModal('location');
+    // Load the exact business/location schedule as the starting point.
+    // GET /hours without location_id returns default business hours.
+    businessHoursApi.request(item ? { query: { location_id: item.id } } : {})
+      .then((result) => setLocationCustomHours(normaliseHours(result)))
+      .catch((error) => showNotice(`Could not preload location hours: ${getError(error)}`));
+  };
+
+  const deleteEntity = async (api, resource, item, setItems) => {
+    if (readOnly || !window.confirm(`Delete ${item.name}?`)) return;
+    setSaving(`delete-${resource}`);
+    try {
+      await api.request({ method: 'DELETE', id: item.id });
+      setItems((previous) => previous.filter((row) => row.id !== item.id));
+      showNotice(`${resource} deleted.`);
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
+  };
+
+  const saveModal = async (event) => {
     event.preventDefault();
-
-    if (modal === 'staff') {
-      saveResource(
-        'staff',
-        staffApi,
-        'POST',
-        staffForm,
-        (response) => {
-          const created =
-            response?.staff_member || response;
-
-          if (created?.id || created?.staff_id) {
-            setStaff((current) => [
-              created,
-              ...current,
-            ]);
-          }
-
-          closeModal();
-        }
-      );
-    }
-
-    if (modal === 'location') {
-      saveResource(
-        'location',
-        locationsApi,
-        'POST',
-        locationForm,
-        (response) => {
-          const created =
-            response?.location || response;
-
-          if (created?.id || created?.location_id) {
-            setLocations((current) => [
-              created,
-              ...current,
-            ]);
-          }
-
-          closeModal();
-        }
-      );
-    }
-
+    if (readOnly) { showNotice('Agent role has read-only access.'); return; }
     if (modal === 'request') {
-      saveResource(
-        'request',
-        requestTypesApi,
-        'POST',
-        {
-          name: requestForm.name,
-          details_to_collect:
-            requestForm.detailsToCollect,
-          what_happens_next:
-            requestForm.whatHappensNext,
-          collect_phone_from_whatsapp: true,
-        },
-        (response) => {
-          const created =
-            response?.request_type || response;
-
-          if (
-            created?.id ||
-            created?.request_type_id
-          ) {
-            setRequests((current) => [
-              created,
-              ...current,
-            ]);
-          }
-
-          closeModal();
-        }
-      );
+      showNotice('Request types are not covered by the Phase 1 AI Brain API.');
+      return;
     }
+    setSaving(modal);
+    try {
+      if (modal === 'staff') {
+        const body = {
+          name: staffForm.name.trim(), role: staffForm.role.trim(),
+          phone: staffForm.phone.trim() || null,
+          location_id: staffForm.location_id || null,
+          working_hours_type: staffForm.hours_mode === 'own' ? 'own_hours' : 'same_as_business',
+          custom_hours: staffForm.hours_mode === 'own' ? hoursAsPayload(staffForm.custom_hours).schedule : null,
+          is_active: staffForm.is_active,
+        };
+        await staffApi.request({ method: editingStaffId ? 'PATCH' : 'POST', id: editingStaffId || undefined, body });
+        const result = await staffApi.request();
+        setStaff(records(result, 'staff'));
+      } else if (modal === 'location') {
+        // Validate 7-day hours BEFORE creating a new location, preventing
+        // partially created locations for invalid local form values.
+        const schedule = locationForm.hours_type === 'own_hours'
+          ? hoursAsPayload(locationCustomHours) : null;
+        const body = {
+          ...locationForm,
+          name: locationForm.name.trim(), address: locationForm.address.trim(),
+          phone: locationForm.phone.trim() || null,
+          notes: locationForm.notes.trim() || null,
+          timezone: locationForm.timezone || null,
+        };
+        const result = await locationsApi.request({
+          method: editingLocationId ? 'PATCH' : 'POST',
+          id: editingLocationId || undefined,
+          body,
+        });
+        const savedId = editingLocationId || result?.id || result?.location?.id;
+        if (!editingLocationId && savedId) setEditingLocationId(savedId);
+        if (schedule) {
+          if (!savedId) throw new Error('Location was saved, but its ID was not returned. Reload Locations to set custom hours.');
+          // A location with own_hours inherits a copy of business hours when
+          // first saved, then receives its user-edited 7-day schedule.
+          await businessHoursApi.request({
+            method: 'PUT', query: { location_id: savedId }, body: schedule,
+          });
+        }
+        const updated = await locationsApi.request();
+        setLocations(records(updated, 'locations'));
+      }
+      showNotice('Changes saved.');
+      closeModal();
+    } catch (error) { showNotice(getError(error)); }
+    finally { setSaving(''); }
   };
 
   return (
     <div className="bb2-brain">
       <PageHeader
         title="AI Brain"
-        description="See what your AI knows, teach it, and test it live"
+        description="Manage your business settings and knowledge sources"
       />
 
       {Notice}
@@ -1544,24 +1685,10 @@ export default function BrainPage() {
       {tab === 'what-ai-knows' && (
         <div className="bb2-overview-columns">
           <div className="bb2-overview-content">
-            <h2>
-              Your AI knows{' '}
-              {overview?.known_items_count ??
-                overview?.things_count ??
-                '—'}{' '}
-              things about{' '}
-              {overview?.business_name ||
-                setup.business_name ||
-                'your business'}
-            </h2>
-
+            <h2>Your business knowledge overview</h2>
             <p className="bb2-muted">
-              {overview?.always_known_count ?? '—'}{' '}
-              sections it sees in every conversation,
-              and{' '}
-              {overview?.reference_material_count ?? '—'}{' '}
-              items it looks up when customers ask about
-              them.
+              Navigate to Setup, Hours &amp; Staff, Locations or Knowledge to review the saved information.
+              Phase 1 does not yet send this knowledge to an AI model.
             </p>
 
             {overviewError && (
@@ -1656,8 +1783,7 @@ export default function BrainPage() {
               <h2>Always knows</h2>
 
               <p className="bb2-muted">
-                Your AI sees this in every conversation,
-                exactly as shown.
+                This page shows business information saved in Phase 1. It is not yet sent to the AI model.
               </p>
 
               <div className="bb2-knows-grid">
@@ -1703,8 +1829,7 @@ export default function BrainPage() {
               <h2>Looks up when relevant</h2>
 
               <p className="bb2-muted">
-                Your AI searches this when a customer
-                asks something related.
+                These stored knowledge records will become searchable when AI learning is enabled in a later phase.
               </p>
 
               <label className="bb2-search">
@@ -1738,14 +1863,14 @@ export default function BrainPage() {
                 </strong>
 
                 <p>
-                  Add FAQs, documents or promotions,
-                  or ask the assistant to help.
+                  Add FAQs, documents or promotions from the Knowledge tab.
                 </p>
               </div>
             </section>
 
             <section className="bb2-section">
               <h2>Try a question</h2>
+              <p className="bb2-phase1-notice">Question lookup is not available in Phase 1.</p>
 
               <p className="bb2-muted">
                 See what your AI would read before
@@ -1769,7 +1894,7 @@ export default function BrainPage() {
 
                 <button
                   className="bb2-main-button"
-                  disabled={saving === 'lookup'}
+                  disabled={true}
                 >
                   <Icon name="Search" size={15} />
 
@@ -1804,6 +1929,8 @@ export default function BrainPage() {
             </details>
           </div>
 
+          <div className="bb2-brain-phase1-panel">
+            <p className="bb2-phase1-notice" role="status">Brain Assistant chat is planned for a later backend phase. Setup, hours, staff and knowledge editing are available in the tabs.</p>
           <ChatPanel
             heading="Brain Assistant"
             subheading="Tell it about your business. It suggests changes."
@@ -1822,10 +1949,7 @@ export default function BrainPage() {
               setAssistantMessages([]);
               setAssistantText('');
             }}
-            disabled={
-              tokenBalance != null &&
-              Number(tokenBalance) <= 0
-            }
+            disabled={true}
             tokenNotice={
               tokenBalance != null &&
               Number(tokenBalance) <= 0
@@ -1836,6 +1960,7 @@ export default function BrainPage() {
             onAttachment={setAssistantFile}
             allowVoice
           />
+          </div>
         </div>
       )}
 
@@ -1863,10 +1988,13 @@ export default function BrainPage() {
                   event.preventDefault();
 
                   saveResource(
-                    'setup',
-                    brainSetupApi,
-                    'PATCH',
-                    setup
+                    'setup', brainSetupApi, 'PUT',
+                    {
+                      business_name: setup.business_name.trim(),
+                      industry: setup.industry?.trim() || null,
+                      business_description: setup.business_description?.trim() || null,
+                      timezone: setup.timezone || null,
+                    }
                   );
                 }}
               >
@@ -1904,7 +2032,7 @@ export default function BrainPage() {
                 >
                   <input
                     className="bb2-control"
-                    value={setup.whatsapp_number || ''}
+                    value={setup.whatsapp_number || setup.business_phone || ''}
                     placeholder="Connect WhatsApp to set it"
                     readOnly
                   />
@@ -1917,18 +2045,26 @@ export default function BrainPage() {
                   <div className="bb2-readonly">
                     <Icon name="MapPin" size={16} />
 
-                    {setup.business_address ||
-                      'Not set yet'}
+                    {setup.business_address || setup.address || 'Not set yet'}
 
                     <button
                       type="button"
                       onClick={() =>
-                        navigate('/dashboard/profile')
+                        changeTab('locations')
                       }
                     >
-                      Edit in Profile
+                      Edit in Locations
                     </button>
                   </div>
+                </Field>
+
+                <Field title="Business timezone" hint="IANA timezone used for opening hours and dates.">
+                  <SelectField
+                    disabled={readOnly}
+                    value={setup.timezone || ''}
+                    choices={[["", "Select your business timezone"], ...timezones]}
+                    onChange={(value) => updateSetup('timezone', value)}
+                  />
                 </Field>
 
                 <Field
@@ -1962,7 +2098,7 @@ export default function BrainPage() {
 
                 <button
                   className="bb2-main-button"
-                  disabled={saving === 'setup'}
+                  disabled={readOnly || saving === 'setup'}
                 >
                   {saving === 'setup'
                     ? 'Saving…'
@@ -1981,6 +2117,9 @@ export default function BrainPage() {
 
           <section className="bb2-section bb2-divider-section">
             <h2>AI behaviour</h2>
+            <p className="bb2-phase1-notice" role="status">
+              Phase 1 does not provide an AI behaviour API. These settings are preview-only; saving is unavailable.
+            </p>
 
             <p className="bb2-muted">
               Control how your AI agent communicates
@@ -1993,12 +2132,7 @@ export default function BrainPage() {
                 onSubmit={(event) => {
                   event.preventDefault();
 
-                  saveResource(
-                    'behaviour',
-                    brainSetupApi,
-                    'PATCH',
-                    setup
-                  );
+                  showNotice('AI behaviour saving is not available in Phase 1.');
                 }}
               >
                 <Field title="AI agent name">
@@ -2126,7 +2260,7 @@ export default function BrainPage() {
 
                 <button
                   className="bb2-main-button"
-                  disabled={saving === 'behaviour'}
+                  disabled={true}
                 >
                   {saving === 'behaviour'
                     ? 'Saving…'
@@ -2163,6 +2297,22 @@ export default function BrainPage() {
               questions.
             </p>
 
+            <div className="bb2-brain-location-filter">
+              <Field title="Working hours for">
+                <SelectField
+                  value={hoursLocation}
+                  choices={[
+                    ['', 'Default business hours'],
+                    ...locations.map((place) => [place.id, `${place.name}${place.is_primary ? ' (Primary)' : ''}`]),
+                  ]}
+                  onChange={setHoursLocation}
+                />
+              </Field>
+              {hoursLocation && locations.find((place) => place.id === hoursLocation)?.hours_type === 'same_as_business' && (
+                <p className="bb2-phase1-notice">This location inherits business hours. Select Own hours in Locations to customize its schedule.</p>
+              )}
+            </div>
+
             {errors.hours && (
               <p className="bb2-error">
                 {errors.hours}
@@ -2183,6 +2333,7 @@ export default function BrainPage() {
                         <label>
                           <input
                             type="checkbox"
+                            disabled={hoursReadOnly}
                             checked={Boolean(day.enabled)}
                             onChange={(event) =>
                               updateDay(
@@ -2200,6 +2351,7 @@ export default function BrainPage() {
                             <label className="bb2-24h">
                               <input
                                 type="checkbox"
+                                disabled={hoursReadOnly}
                                 checked={Boolean(
                                   day.is_24_hours
                                 )}
@@ -2218,6 +2370,7 @@ export default function BrainPage() {
                               type="button"
                               className="bb2-icon-btn"
                               title="Copy these hours to other days"
+                              disabled={hoursReadOnly}
                               onClick={() =>
                                 copyDay(day.day)
                               }
@@ -2232,6 +2385,7 @@ export default function BrainPage() {
                               <>
                                 <input
                                   type="time"
+                                  disabled={hoursReadOnly}
                                   value={day.start_time}
                                   onChange={(event) =>
                                     updateDay(
@@ -2246,6 +2400,7 @@ export default function BrainPage() {
 
                                 <input
                                   type="time"
+                                  disabled={hoursReadOnly}
                                   value={day.end_time}
                                   onChange={(event) =>
                                     updateDay(
@@ -2275,6 +2430,7 @@ export default function BrainPage() {
 
                                   <input
                                     type="time"
+                                    disabled={hoursReadOnly}
                                     value={shortTime(
                                       breakItem.start_time
                                     )}
@@ -2292,6 +2448,7 @@ export default function BrainPage() {
 
                                   <input
                                     type="time"
+                                    disabled={hoursReadOnly}
                                     value={shortTime(
                                       breakItem.end_time
                                     )}
@@ -2308,6 +2465,7 @@ export default function BrainPage() {
                                   <button
                                     type="button"
                                     aria-label="Remove break"
+                                    disabled={hoursReadOnly}
                                     onClick={() =>
                                       removeBreak(
                                         day.day,
@@ -2326,6 +2484,7 @@ export default function BrainPage() {
 
                             <button
                               type="button"
+                              disabled={hoursReadOnly}
                               onClick={() =>
                                 addBreak(day.day)
                               }
@@ -2341,15 +2500,8 @@ export default function BrainPage() {
                 <button
                   type="button"
                   className="bb2-main-button"
-                  disabled={saving === 'hours'}
-                  onClick={() =>
-                    saveResource(
-                      'hours',
-                      businessHoursApi,
-                      'PUT',
-                      { days: hours }
-                    )
-                  }
+                  disabled={hoursReadOnly || saving === 'hours'}
+                  onClick={saveHours}
                 >
                   {saving === 'hours'
                     ? 'Saving…'
@@ -2463,6 +2615,7 @@ export default function BrainPage() {
                     className="bb2-control"
                     type="number"
                     min={1}
+                    max={100}
                     value={
                       rules.concurrent_customers || 1
                     }
@@ -2480,14 +2633,14 @@ export default function BrainPage() {
               <button
                 type="button"
                 className="bb2-main-button"
-                disabled={saving === 'rules'}
+                disabled={readOnly || saving === 'rules'}
                 onClick={() =>
                   saveResource(
                     'rules',
                     bookingRulesApi,
                     'PUT',
-                    rules
-                  )
+                      rulesAsPayload(rules)
+                    )
                 }
               >
                 Save booking rules
@@ -2510,14 +2663,12 @@ export default function BrainPage() {
                 >
                   <span>
                     {item.date} ·{' '}
-                    {item.reason ||
-                      item.day_type ||
-                      'Closed'}
+                    {item.note || (item.is_closed_all_day ? 'Closed all day' : `${shortTime(item.open_time)}–${shortTime(item.close_time)}`)}
                   </span>
 
                   <button
                     type="button"
-                    disabled={saving === 'delete-date'}
+                    disabled={readOnly || saving === 'delete-date'}
                     onClick={async () => {
                       if (!item.id) {
                         showNotice(
@@ -2555,36 +2706,7 @@ export default function BrainPage() {
 
               <form
                 className="bb2-form-grid"
-                onSubmit={(event) => {
-                  event.preventDefault();
-
-                  saveResource(
-                    'date',
-                    closedDatesApi,
-                    'POST',
-                    dateForm,
-                    (response) => {
-                      const created =
-                        response?.date || response;
-
-                      if (
-                        created?.id ||
-                        created?.date
-                      ) {
-                        setClosedDates((current) => [
-                          ...current,
-                          created,
-                        ]);
-                      }
-
-                      setDateForm({
-                        date: '',
-                        day_type: 'Closed all day',
-                        reason: '',
-                      });
-                    }
-                  );
-                }}
+                onSubmit={saveSpecialDate}
               >
                 <Field title="Date">
                   <input
@@ -2617,6 +2739,16 @@ export default function BrainPage() {
                   />
                 </Field>
 
+                {dateForm.day_type === 'Special opening hours' && <>
+                  <Field title="Opening time *">
+                    <input type="time" className="bb2-control" required value={dateForm.open_time}
+                      onChange={(event) => setDateForm((current) => ({ ...current, open_time: event.target.value }))} />
+                  </Field>
+                  <Field title="Closing time *">
+                    <input type="time" className="bb2-control" required value={dateForm.close_time}
+                      onChange={(event) => setDateForm((current) => ({ ...current, close_time: event.target.value }))} />
+                  </Field>
+                </>}
                 <Field
                   title="Note for customers (optional)"
                   wide
@@ -2636,7 +2768,7 @@ export default function BrainPage() {
 
                 <button
                   className="bb2-soft-button"
-                  disabled={saving === 'date'}
+                  disabled={readOnly || saving === 'date'}
                 >
                   Add date
                 </button>
@@ -2657,7 +2789,7 @@ export default function BrainPage() {
               <button
                 type="button"
                 className="bb2-main-button"
-                onClick={() => setModal('staff')}
+                onClick={() => openStaff()}
               >
                 <Icon name="Plus" size={16} />
                 Add staff
@@ -2683,7 +2815,13 @@ export default function BrainPage() {
                   <span>
                     {person.name} ·{' '}
                     {person.role || 'Staff'}
+                    {person.is_active === false ? ' · Inactive' : ''}
                   </span>
+                  {!readOnly && <div className="bb2-brain-row-actions">
+                    <button type="button" onClick={() => openStaff(person)}>Edit</button>
+                    <button type="button" disabled={Boolean(saving)}
+                      onClick={() => deleteEntity(staffApi, 'Staff', person, setStaff)}>Delete</button>
+                  </div>}
                 </div>
               ))
             ) : (
@@ -2698,7 +2836,8 @@ export default function BrainPage() {
                 <button
                   type="button"
                   className="bb2-main-button"
-                  onClick={() => setModal('staff')}
+                  disabled={readOnly}
+                  onClick={() => openStaff()}
                 >
                   Add first staff member
                 </button>
@@ -2723,7 +2862,8 @@ export default function BrainPage() {
             <button
               type="button"
               className="bb2-main-button"
-              onClick={() => setModal('location')}
+              disabled={readOnly}
+              onClick={() => openLocation()}
             >
               <Icon name="Plus" size={16} />
               Add location
@@ -2750,6 +2890,15 @@ export default function BrainPage() {
                   <strong>{location.name}</strong>
                   <p>{location.address}</p>
                   <small>{location.phone || ''}</small>
+                  <p className="bb2-muted">{location.is_primary ? 'Primary · ' : ''}
+                    {location.hours_type === 'own_hours' ? 'Own hours' : 'Same as business'}
+                    {location.effective_timezone ? ` · ${location.effective_timezone}` : ''}
+                  </p>
+                  {!readOnly && <div className="bb2-brain-row-actions">
+                    <button type="button" onClick={() => openLocation(location)}>Edit</button>
+                    <button type="button" disabled={Boolean(saving)}
+                      onClick={() => deleteEntity(locationsApi, 'Location', location, setLocations)}>Delete</button>
+                  </div>}
                 </article>
               ))}
             </div>
@@ -2762,7 +2911,8 @@ export default function BrainPage() {
               <button
                 type="button"
                 className="bb2-main-button"
-                onClick={() => setModal('location')}
+                disabled={readOnly}
+                onClick={() => openLocation()}
               >
                 Add first location
               </button>
@@ -2830,33 +2980,27 @@ export default function BrainPage() {
 
           <section className="bb2-section">
             <h2>{knowledgeSection}</h2>
+            <p className="bb2-phase1-notice" role="status">
+              Phase 1 saves and validates knowledge records. Document indexing, website crawling, and AI learning are not active yet.
+            </p>
 
             <p className="bb2-muted">
               {knowledgeSection === 'FAQs'
-                ? 'Frequently asked questions the AI will answer directly from its knowledge base.'
+                ? 'Manage FAQs in your knowledge base. AI learning is not active in Phase 1.'
                 : knowledgeSection === 'Promotions'
-                  ? 'Active offers your AI mentions when customers ask about pricing or discounts.'
+                  ? 'Save promotions and their status. AI responses are not connected in Phase 1.'
                   : knowledgeSection === 'Documents'
-                    ? 'Upload PDFs or images. Your AI reads the content and can send files to customers on request.'
+                    ? 'Upload PDFs and images for private storage. Processing and AI sharing are not active in Phase 1.'
                     : knowledgeSection === 'Website'
-                      ? 'Connect your website so the AI can answer questions from its content.'
-                      : 'Teach the AI from customer conversations and corrections.'}
+                      ? 'Save a public website URL. Automatic crawling is not active in Phase 1.'
+                      : 'Store correction and training notes. Model training is not active in Phase 1.'}
             </p>
 
             <button
               type="button"
               className="bb2-text-link"
-              onClick={() => {
-                setNotApplicable((current) => ({
-                  ...current,
-                  [knowledgeSection]:
-                    !current[knowledgeSection],
-                }));
-
-                showNotice(
-                  'This preference is local until a backend setting is available.'
-                );
-              }}
+              disabled={readOnly || saving === 'applicability'}
+              onClick={saveNotApplicable}
             >
               {notApplicable[knowledgeSection]
                 ? 'Mark as applicable'
@@ -2874,6 +3018,7 @@ export default function BrainPage() {
               knowledgeSection === 'FAQs' && (
                 <>
                   <form
+                    id="bb2-knowledge-entry-form"
                     className="bb2-knowledge-form"
                     onSubmit={submitKnowledge}
                   >
@@ -2881,6 +3026,8 @@ export default function BrainPage() {
                       <input
                         className="bb2-control"
                         required
+                        minLength={3}
+                        maxLength={500}
                         placeholder="What are your opening hours?"
                         value={editor.question}
                         onChange={(event) =>
@@ -2896,6 +3043,7 @@ export default function BrainPage() {
                       <textarea
                         className="bb2-control"
                         required
+                        maxLength={5000}
                         rows={3}
                         value={editor.answer}
                         onChange={(event) =>
@@ -2909,10 +3057,10 @@ export default function BrainPage() {
 
                     <button
                       className="bb2-main-button"
-                      disabled={saving === 'knowledge'}
+                      disabled={readOnly || saving === 'knowledge'}
                     >
-                      <Icon name="Plus" size={16} />
-                      Save FAQ
+                      <Icon name={editingKnowledgeId ? 'Save' : 'Plus'} size={16} />
+                      {editingKnowledgeId ? 'Update FAQ' : 'Save FAQ'}
                     </button>
                   </form>
 
@@ -2923,9 +3071,11 @@ export default function BrainPage() {
                           {item.question || item.title}
                         </strong>
 
-                        <p>
-                          {item.answer || item.content}
-                        </p>
+                        <p>{item.answer || item.content}</p>
+                        {!readOnly && <div className="bb2-brain-row-actions">
+                          <button type="button" onClick={() => beginEditKnowledge(item)}>Edit</button>
+                          <button type="button" disabled={Boolean(saving)} onClick={() => removeKnowledgeItem(item)}>Delete</button>
+                        </div>}
                       </div>
                     ))}
 
@@ -2940,6 +3090,7 @@ export default function BrainPage() {
                   <div className="bb2-divider" />
 
                   <h2>Q&amp;A log</h2>
+                  <p className="bb2-phase1-notice">Unanswered customer questions are not available from this Phase 1 API.</p>
 
                   <p className="bb2-muted">
                     Questions the AI couldn't answer.
@@ -2958,7 +3109,9 @@ export default function BrainPage() {
 
             {!notApplicable[knowledgeSection] &&
               knowledgeSection === 'Promotions' && (
+                <>
                 <form
+                  id="bb2-knowledge-entry-form"
                   className="bb2-knowledge-form"
                   onSubmit={submitKnowledge}
                 >
@@ -2972,6 +3125,8 @@ export default function BrainPage() {
                     <input
                       className="bb2-control"
                       required
+                      minLength={2}
+                      maxLength={200}
                       value={editor.title}
                       placeholder="e.g. Eid Special, 20% off all services"
                       onChange={(event) =>
@@ -3013,14 +3168,31 @@ export default function BrainPage() {
                     />
                   </Field>
 
-                  <button
-                    className="bb2-main-button"
-                    disabled={saving === 'knowledge'}
-                  >
-                    <Icon name="Plus" size={16} />
-                    Add promotion
+                  <label className="bb2-checkbox">
+                    <input type="checkbox" checked={Boolean(editor.is_active)} disabled={readOnly}
+                      onChange={(event) => updateEditor('is_active', event.target.checked)} />
+                    Promotion active
+                  </label>
+                  <button className="bb2-main-button" disabled={readOnly || saving === 'knowledge'}>
+                    <Icon name={editingKnowledgeId ? 'Save' : 'Plus'} size={16} />
+                    {editingKnowledgeId ? 'Update promotion' : 'Add promotion'}
                   </button>
                 </form>
+                <div className="bb2-knowledge-list">
+                  {entries.map((item) => (
+                    <div key={item.id}>
+                      <strong>{item.title}</strong>
+                      <p>{item.details || 'No additional details'} · {item.is_currently_valid ? 'Currently valid' : item.is_active ? 'Active' : 'Paused'}
+                        {item.valid_until ? ` · Ends ${item.valid_until}` : ''}</p>
+                      {!readOnly && <div className="bb2-brain-row-actions">
+                        <button type="button" onClick={() => beginEditKnowledge(item)}>Edit</button>
+                        <button type="button" onClick={() => changePromotionStatus(item)} disabled={Boolean(saving)}>{item.is_active ? 'Pause' : 'Activate'}</button>
+                        <button type="button" onClick={() => removeKnowledgeItem(item)} disabled={Boolean(saving)}>Delete</button>
+                      </div>}
+                    </div>
+                  ))}
+                </div>
+              </>
               )}
 
             {!notApplicable[knowledgeSection] &&
@@ -3034,6 +3206,7 @@ export default function BrainPage() {
                       <input
                         className="bb2-control"
                         required
+                        maxLength={200}
                         value={editor.document_title}
                         onChange={(event) =>
                           updateEditor(
@@ -3067,7 +3240,7 @@ export default function BrainPage() {
                         className="bb2-control"
                         type="file"
                         required={!documentFile}
-                        accept=".pdf,.png,.jpg,.jpeg"
+                        accept=".pdf,.png,.jpg,.jpeg,.webp"
                         onChange={(event) =>
                           setDocumentFile(
                             event.target.files?.[0] ||
@@ -3097,7 +3270,7 @@ export default function BrainPage() {
 
                     <button
                       className="bb2-main-button"
-                      disabled={saving === 'document'}
+                      disabled={readOnly || saving === 'document'}
                     >
                       <Icon name="Upload" size={16} />
                       Upload document
@@ -3110,25 +3283,39 @@ export default function BrainPage() {
                     )}
 
                     {documents.map((item) => (
-                      <p
-                        className="bb2-saved-row"
-                        key={
-                          item.id ||
-                          item.document_id ||
-                          item.title
-                        }
-                      >
-                        {item.title || item.file_name}
-                      </p>
+                      <div className="bb2-saved-row bb2-brain-document-row" key={item.id || item.document_id || item.title}>
+                        <div className="bb2-brain-document-details">
+                          <strong>{item.title || item.file_name}</strong>
+                          <small>{item.file_name || ''} · {item.ai_ready ? 'AI ready' : 'Pending — AI learning not active yet'}</small>
+                          <label className="bb2-checkbox">
+                            <input type="checkbox" disabled={readOnly || Boolean(saving)}
+                              checked={Boolean(item.allow_whatsapp_share)}
+                              onChange={(event) => updateDocumentSharing(item, event.target.checked)} />
+                            Allow WhatsApp file sharing (setting only in Phase 1)
+                          </label>
+                        </div>
+                        <div className="bb2-brain-row-actions">
+                          <button type="button" onClick={() => downloadDocument(item.id)}>Download</button>
+                          {!readOnly && <button type="button" disabled={Boolean(saving)} onClick={() => beginDocumentEdit(item)}>Edit</button>}
+                          {!readOnly && <button type="button" disabled={Boolean(saving)} onClick={() => deleteDocument(item)}>Delete</button>}
+                        </div>
+                      </div>
                     ))}
                   </form>
+                  {documentEditingId && <form className="bb2-brain-doc-edit" onSubmit={saveDocumentDetails}>
+                    <h3>Edit document details</h3>
+                    <Field title="Title *"><input className="bb2-control" required maxLength={200}
+                      value={documentEditForm.title} onChange={(e) => setDocumentEditForm((v) => ({ ...v, title: e.target.value }))} /></Field>
+                    <Field title="Description"><textarea className="bb2-control" maxLength={1000} rows={2}
+                      value={documentEditForm.description} onChange={(e) => setDocumentEditForm((v) => ({ ...v, description: e.target.value }))} /></Field>
+                    <div className="bb2-brain-row-actions">
+                      <button type="submit" className="bb2-main-button" disabled={readOnly || Boolean(saving)}>Save details</button>
+                      <button type="button" className="bb2-soft-button" onClick={() => setDocumentEditingId(null)}>Cancel</button>
+                    </div>
+                  </form>}
 
-                  <InfoCard title="How documents work">
-                    Uploaded files are indexed so
-                    your AI can answer questions from
-                    menus, price lists and catalogues.
-                    Sharing a file through WhatsApp
-                    requires backend support.
+                  <InfoCard title="Phase 1 document storage">
+                    Files are privately stored but remain pending with ai_ready false. Processing, AI learning and automatic sending are not active in this phase.
                   </InfoCard>
                 </div>
               )}
@@ -3141,9 +3328,7 @@ export default function BrainPage() {
                     onSubmit={submitKnowledge}
                   >
                     <p className="bb2-muted">
-                      Your AI can read website pages
-                      and index the content after
-                      crawling succeeds.
+                      Phase 1 validates and saves your website URL. Crawling is not active yet.
                     </p>
 
                     <Field title="Website URL *">
@@ -3151,6 +3336,7 @@ export default function BrainPage() {
                         type="url"
                         required
                         className="bb2-control"
+                        maxLength={500}
                         placeholder="https://yourbusiness.com"
                         value={editor.website_url}
                         onChange={(event) =>
@@ -3164,24 +3350,32 @@ export default function BrainPage() {
 
                     <button
                       className="bb2-main-button"
-                      disabled={saving === 'knowledge'}
+                      disabled={readOnly || saving === 'knowledge'}
                     >
                       <Icon name="Globe" size={16} />
-                      Crawl website
+                      Save website URL
                     </button>
                   </form>
 
-                  <InfoCard title="Website crawling">
-                    Page limits and crawling behavior
-                    depend on your backend. Re-crawl
-                    whenever website content changes.
+                  <div className="bb2-brain-website-status" role="status">
+                    <strong>Website status: {websiteDetails?.status || 'Not connected'}</strong>
+                    <span>{websiteDetails?.ai_ready ? 'AI ready' : 'AI learning not active yet'}</span>
+                    {websiteDetails?.url && <small>{websiteDetails.url}</small>}
+                    {websiteDetails?.url && !readOnly && (
+                      <button type="button" className="bb2-soft-button" disabled={Boolean(saving)} onClick={disconnectWebsite}>Disconnect website</button>
+                    )}
+                  </div>
+                  <InfoCard title="Website registration">
+                    The backend saves your website address with pending status. Crawling is planned for Phase 2.
                   </InfoCard>
                 </div>
               )}
 
             {!notApplicable[knowledgeSection] &&
               knowledgeSection === 'Chat Training' && (
+                <>
                 <form
+                  id="bb2-knowledge-entry-form"
                   className="bb2-knowledge-form"
                   onSubmit={submitKnowledge}
                 >
@@ -3189,6 +3383,8 @@ export default function BrainPage() {
                     <input
                       className="bb2-control"
                       required
+                      minLength={2}
+                      maxLength={255}
                       value={editor.title}
                       onChange={(event) =>
                         updateEditor(
@@ -3204,6 +3400,8 @@ export default function BrainPage() {
                       className="bb2-control"
                       rows={5}
                       required
+                      minLength={3}
+                      maxLength={5000}
                       value={editor.content}
                       onChange={(event) =>
                         updateEditor(
@@ -3214,13 +3412,23 @@ export default function BrainPage() {
                     />
                   </Field>
 
-                  <button
-                    className="bb2-main-button"
-                    disabled={saving === 'knowledge'}
-                  >
-                    Save training
+                  <button className="bb2-main-button" disabled={readOnly || saving === 'knowledge'}>
+                    {editingKnowledgeId ? 'Update training' : 'Save training'}
                   </button>
                 </form>
+                <div className="bb2-knowledge-list">
+                  {entries.map((item) => (
+                    <div key={item.id}>
+                      <strong>{item.title}</strong>
+                      <p>{item.training_notes}</p>
+                      {!readOnly && <div className="bb2-brain-row-actions">
+                        <button type="button" onClick={() => beginEditKnowledge(item)}>Edit</button>
+                        <button type="button" onClick={() => removeKnowledgeItem(item)} disabled={Boolean(saving)}>Delete</button>
+                      </div>}
+                    </div>
+                  ))}
+                </div>
+                </>
               )}
           </section>
         </div>
@@ -3233,14 +3441,14 @@ export default function BrainPage() {
             <div>
               <h2>Request types</h2>
               <p className="bb2-muted">
-                Tell your AI which details to collect
-                when customers make an enquiry.
+                Request types are planned for a later backend phase. No API endpoint is supplied in the Phase 1 AI Brain documentation.
               </p>
             </div>
 
             <button
               type="button"
               className="bb2-main-button"
+              disabled={true}
               onClick={() => setModal('request')}
             >
               <Icon name="Plus" size={16} />
@@ -3279,15 +3487,14 @@ export default function BrainPage() {
               <strong>Nothing to collect yet</strong>
 
               <p>
-                Your AI will collect the information
-                you specify when a customer sends a
-                request.
+                Request type management is not enabled in Phase 1.
               </p>
 
               <button
                 type="button"
                 className="bb2-main-button"
-                onClick={() => setModal('request')}
+                disabled={true}
+              onClick={() => setModal('request')}
               >
                 Add Request Type
               </button>
@@ -3301,10 +3508,7 @@ export default function BrainPage() {
         <div className="bb2-test-area">
           <div className="bb2-test-head">
             <p>
-              A test conversation with your AI.
-              Nothing is sent over WhatsApp.
-              Test orders and appointments should not
-              trigger real couriers or payments.
+              Test AI is planned for a later backend phase. It is disabled until the backend provides a real test chat endpoint.
             </p>
 
             <button
@@ -3329,12 +3533,12 @@ export default function BrainPage() {
             setText={setTestText}
             submit={submitTest}
             reset={() => setTestMessages([])}
-            disabled={checkingPlan}
+            disabled={true}
           />
 
           {!isConfigured(testAiApi) && (
             <p className="bb2-error">
-              Test AI API is not configured.
+              Test AI is not available in the Phase 1 AI Brain API.
             </p>
           )}
         </div>
@@ -3345,9 +3549,9 @@ export default function BrainPage() {
         <Modal
           title={
             modal === 'staff'
-              ? 'Add staff member'
+              ? (editingStaffId ? 'Edit staff member' : 'Add staff member')
               : modal === 'location'
-                ? 'Add location'
+                ? (editingLocationId ? 'Edit location' : 'Add location')
                 : 'Add Request Type'
           }
           onClose={closeModal}
@@ -3366,9 +3570,9 @@ export default function BrainPage() {
                 type="submit"
                 form="bb2-brain-modal"
                 className="bb2-main-button"
-                disabled={Boolean(saving)}
+                disabled={readOnly || Boolean(saving) || modal === 'request'}
               >
-                {saving ? 'Saving…' : 'Save'}
+                {saving ? 'Saving…' : editingStaffId || editingLocationId ? 'Update' : 'Save'}
               </button>
             </>
           }
@@ -3422,10 +3626,9 @@ export default function BrainPage() {
                 <Field key={key} title={title}>
                   <input
                     className="bb2-control"
-                    required={
-                      key !== 'phone' &&
-                      key !== 'notes'
-                    }
+                    required={modal === 'staff' ? ['name', 'role'].includes(key) : modal === 'location' ? ['name', 'address'].includes(key) : true}
+                    disabled={readOnly}
+                    maxLength={key === 'name' ? (modal === 'staff' ? 100 : 120) : key === 'role' ? 100 : key === 'address' ? 255 : key === 'notes' ? 500 : undefined}
                     value={current[key] || ''}
                     onChange={(event) =>
                       setCurrent((value) => ({
@@ -3438,10 +3641,16 @@ export default function BrainPage() {
               );
             })}
 
-            {modal === 'staff' && (
+            {modal === 'staff' && <>
+              <Field title="Assigned location">
+                <SelectField value={staffForm.location_id} disabled={readOnly}
+                  choices={[["", "No specific location"], ...locations.map((l) => [l.id, l.name])]}
+                  onChange={(value) => setStaffForm((previous) => ({ ...previous, location_id: value }))} />
+              </Field>
               <Field title="Working hours">
                 <SelectField
                   value={staffForm.hours_mode}
+                  disabled={readOnly}
                   choices={[
                     [
                       'business',
@@ -3457,7 +3666,44 @@ export default function BrainPage() {
                   }
                 />
               </Field>
-            )}
+              <label className="bb2-checkbox">
+                <input type="checkbox" checked={staffForm.is_active} disabled={readOnly}
+                  onChange={(event) => setStaffForm((old) => ({ ...old, is_active: event.target.checked }))} />
+                Active staff member
+              </label>
+              {staffForm.hours_mode === 'own' && (
+                <div className="bb2-field wide">
+                  <strong>Custom weekly hours *</strong>
+                  <WeeklyHoursEditor rows={staffForm.custom_hours} disabled={readOnly}
+                    setRows={(fn) => setStaffForm((old) => ({ ...old, custom_hours: fn(old.custom_hours) }))} />
+                </div>
+              )}
+            </>}
+            {modal === 'location' && <>
+              <Field title="Location timezone">
+                <SelectField value={locationForm.timezone} disabled={readOnly}
+                  choices={[["", "Use business timezone"], ...timezones]}
+                  onChange={(value) => setLocationForm((old) => ({ ...old, timezone: value }))} />
+              </Field>
+              <Field title="Location working hours">
+                <SelectField value={locationForm.hours_type} disabled={readOnly}
+                  choices={[["same_as_business", "Same as business"], ["own_hours", "Own hours (copies business schedule)"]]}
+                  onChange={(value) => setLocationForm((old) => ({ ...old, hours_type: value }))} />
+              </Field>
+              <label className="bb2-checkbox">
+                <input type="checkbox" checked={locationForm.is_primary} disabled={readOnly || (editingLocationId && locations.find((l) => l.id === editingLocationId)?.is_primary)}
+                  onChange={(event) => setLocationForm((old) => ({ ...old, is_primary: event.target.checked }))} />
+                Primary business location
+              </label>
+              {locationForm.hours_type === 'own_hours' && (
+                <div className="bb2-field wide">
+                  <strong>Location custom weekly hours *</strong>
+                  <WeeklyHoursEditor rows={locationCustomHours} disabled={readOnly}
+                    setRows={setLocationCustomHours} />
+                  <small className="bb2-muted">Hours are saved for this location after the location record is saved.</small>
+                </div>
+              )}
+            </>}
           </form>
         </Modal>
       )}

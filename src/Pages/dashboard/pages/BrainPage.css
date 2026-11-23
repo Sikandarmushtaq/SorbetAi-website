@@ -1067,3 +1067,170 @@
     flex-basis: 35%;
   }
 }
+
+/* ======================================================
+   AI BRAIN PHASE 1 — ADDITIONAL CONTROLS ONLY
+   Existing Bellbee dashboard styles remain unchanged.
+   ====================================================== */
+.bb2-brain .bb2-phase1-notice {
+  margin: 10px 0 16px;
+  padding: 11px 14px;
+  border: 1px solid rgba(148, 119, 41, .22);
+  border-radius: 10px;
+  background: #fff5d9;
+  color: #775c28;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.bb2-brain .bb2-brain-location-filter {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin: 15px 0 20px;
+}
+.bb2-brain .bb2-brain-location-filter .bb2-field {
+  width: min(100%, 350px);
+}
+.bb2-brain .bb2-brain-location-filter .bb2-phase1-notice {
+  flex: 1 1 280px;
+  margin: 0;
+}
+.bb2-brain .bb2-brain-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.bb2-brain .bb2-brain-row-actions button {
+  min-height: 30px;
+  padding: 6px 12px;
+  border: 1px solid var(--db-border, #d7ded8);
+  border-radius: 8px;
+  background: var(--db-white, #fff);
+  color: var(--db-green, #10372a);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.bb2-brain .bb2-brain-row-actions button:hover:not(:disabled) {
+  background: var(--db-cream, #f7f1e8);
+}
+.bb2-brain button:disabled,
+.bb2-brain input:disabled,
+.bb2-brain select:disabled,
+.bb2-brain textarea:disabled {
+  cursor: not-allowed;
+  opacity: .65;
+}
+.bb2-brain .bb2-brain-document-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.bb2-brain .bb2-brain-document-details {
+  flex: 1 1 230px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.bb2-brain .bb2-brain-document-details strong {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.bb2-brain .bb2-brain-document-details small {
+  overflow-wrap: anywhere;
+  color: var(--db-muted, #617568);
+  font-size: 11px;
+}
+.bb2-brain .bb2-brain-document-details label {
+  max-width: 100%;
+  line-height: 1.5;
+  white-space: normal;
+}
+.bb2-brain .bb2-brain-doc-edit {
+  display: grid;
+  gap: 13px;
+  margin: 14px 0;
+  padding: 18px;
+  border: 1px solid var(--db-border, #d7ded8);
+  border-radius: 12px;
+  background: var(--db-cream, #f7f1e8);
+}
+.bb2-brain .bb2-brain-doc-edit h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.bb2-brain .bb2-brain-doc-edit .bb2-brain-row-actions {
+  justify-content: flex-start;
+}
+.bb2-brain .bb2-brain-website-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--db-border, #d7ded8);
+  border-radius: 12px;
+  background: var(--db-cream, #f7f1e8);
+  color: var(--db-green, #10372a);
+  font-size: 12px;
+}
+.bb2-brain .bb2-brain-website-status small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.bb2-brain .bb2-brain-phase1-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.bb2-brain .bb2-brain-custom-hours {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 10px;
+}
+.bb2-brain .bb2-brain-custom-day {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--db-border, #d7ded8);
+  border-radius: 9px;
+  background: var(--db-white, #fff);
+}
+.bb2-brain .bb2-brain-custom-day .bb2-checkbox {
+  min-width: 80px;
+}
+.bb2-brain .bb2-brain-custom-day input[type="time"] {
+  width: 113px;
+  max-width: 100%;
+}
+.bb2-brain .bb2-knowledge-form input,
+.bb2-brain .bb2-knowledge-form textarea {
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  .bb2-brain .bb2-brain-location-filter {
+    display: block;
+  }
+  .bb2-brain .bb2-brain-location-filter .bb2-field {
+    width: 100%;
+  }
+  .bb2-brain .bb2-brain-row-actions {
+    justify-content: flex-start;
+  }
+  .bb2-brain .bb2-brain-custom-day input[type="time"] {
+    flex: 1 1 105px;
+  }
+}
