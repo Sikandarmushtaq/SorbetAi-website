@@ -22,6 +22,7 @@ import {
 } from "react-icons/fa";
 
 import "./OneInboxPage.css";
+import Footer from "../../components/Footer";
 
 // ==========================================
 // WHAT IT HELPS WITH
@@ -661,6 +662,7 @@ export default function OneInboxPage() {
           </div>
         </div>
       </section>
+      <Footer/>
 
     </main>
   );

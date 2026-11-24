@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 
 import "./AIBrainPage.css";
+import Footer from "../../components/Footer";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -1328,6 +1329,7 @@ export default function AIBrainPage() {
       <BrainFAQ />
       <BrainRelated />
       <BrainCTA />
+      <Footer/>
     </main>
   );
 }

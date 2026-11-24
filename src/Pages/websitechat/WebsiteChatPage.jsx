@@ -20,6 +20,7 @@ import {
 
 import "./WebsiteChatPage.css";
 
+
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export default function WebsiteChatPage() {
@@ -95,6 +96,7 @@ export default function WebsiteChatPage() {
       <WebsiteChatFAQ />
       <WebsiteChatRelated />
       <WebsiteChatCTA />
+      
     </main>
   );
 }

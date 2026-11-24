@@ -1,0 +1,245 @@
+/* ===========================================================
+   BELLBEE AI — PREMIUM BLOG / ARTICLE PAGES
+   Fully scoped so existing Navbar, Dashboard and pages are safe.
+   =========================================================== */
+.bbblog-page {
+  --bbg-cream: var(--bg, #f3ede1);
+  --bbg-green: var(--fg, #10372a);
+  --bbg-coral: var(--coral, #ff7a59);
+  --bbg-lavender: var(--lavender, #cdbdff);
+  --bbg-yellow: var(--yellow, #f4c95d);
+  --bbg-white: var(--white, #fffaf0);
+  --bbg-muted: #5a6f63;
+  --bbg-line: rgba(16, 55, 42, .13);
+  width: 100%; min-width: 0; overflow: clip;
+  background: var(--bbg-cream); color: var(--bbg-green);
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+}
+.bbblog-page *, .bbblog-page *::before, .bbblog-page *::after { box-sizing: border-box; }
+.bbblog-page h1, .bbblog-page h2, .bbblog-page h3, .bbblog-page p { margin-top: 0; }
+.bbblog-page a { color: inherit; text-decoration: none; }
+.bbblog-page button { font: inherit; cursor: pointer; }
+.bbblog-container { width: min(1240px, calc(100% - 80px)); margin-inline: auto; }
+.bbblog-page em { color: var(--bbg-coral); font-family: "Newsreader", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.03em; }
+
+/* Soft organic Bellbee blobs behind BOTH list and detail page hero */
+.bbblog-hero, .bbblog-detail-hero { position: relative; isolation: isolate; overflow: hidden; }
+.bbblog-blob { position: absolute; z-index: -1; pointer-events: none; border-radius: 56% 44% 67% 33% / 45% 61% 39% 55%; }
+.bbblog-blob-a { width: min(46vw, 650px); aspect-ratio: 1; top: -240px; right: -110px; background: var(--bbg-lavender); opacity: .69; transform: rotate(-21deg); }
+.bbblog-blob-b { width: min(26vw, 350px); aspect-ratio: 1; bottom: -150px; left: 11%; background: var(--bbg-yellow); opacity: .60; transform: rotate(23deg); }
+.bbblog-hero { padding: 100px 0 94px; }
+.bbblog-hero-content { position: relative; max-width: 1240px; }
+.bbblog-eyebrow { display: inline-flex; align-items: center; gap: 9px; padding: 10px 15px; border: 1px solid var(--bbg-line); border-radius: 99px; background: var(--bbg-white); font-size: 11px; font-weight: 850; letter-spacing: 1.2px; }
+.bbblog-hero h1 { max-width: 880px; margin: 27px 0 0; font-size: clamp(52px, 6.25vw, 88px); letter-spacing: -.066em; line-height: 1.02; font-weight: 850; }
+.bbblog-hero-content > p { max-width: 650px; margin: 23px 0 0; font-size: 16px; line-height: 1.85; color: var(--bbg-muted); }
+.bbblog-hero-bottom { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 24px; margin-top: 30px; }
+.bbblog-hero-bottom span { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 750; }
+.bbblog-hero-bottom svg { color: #2f8b5c; }
+
+/* Sections, editorial headings and category chips */
+.bbblog-list-section { padding: 78px 0 82px; background: var(--bbg-white); }
+.bbblog-section-heading, .bbblog-other-heading { display: flex; align-items: end; justify-content: space-between; gap: 35px; margin-bottom: 26px; }
+.bbblog-section-label { display: inline-block; margin-bottom: 14px; color: #a45c43; font-size: 11px; font-weight: 850; letter-spacing: 1.5px; }
+.bbblog-section-heading h2, .bbblog-other-heading h2 { margin: 0; font-size: clamp(34px, 4.1vw, 57px); letter-spacing: -.055em; line-height: 1.1; font-weight: 850; }
+.bbblog-section-heading > p { max-width: 350px; margin: 0 0 4px; color: var(--bbg-muted); font-size: 13px; line-height: 1.8; }
+.bbblog-categories { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 30px; }
+.bbblog-categories button { min-height: 39px; padding: 10px 16px; border: 1px solid var(--bbg-line); border-radius: 99px; background: transparent; color: var(--bbg-green); font-size: 12px; font-weight: 750; transition: background .2s, color .2s, transform .2s; }
+.bbblog-categories button.active, .bbblog-categories button:hover { background: var(--bbg-green); color: var(--bbg-white); transform: translateY(-1px); }
+
+/* Three original covers — same image on listing and article */
+.bbblog-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: stretch; }
+.bbblog-card { min-width: 0; display: flex; flex-direction: column; padding: 9px; border: 1px solid var(--bbg-line); border-radius: 27px; background: #f9f5ec; box-shadow: 0 10px 28px rgba(16,55,42,.045); transition: transform .35s, box-shadow .35s; }
+.bbblog-card:hover { transform: translateY(-8px); box-shadow: 0 26px 48px rgba(16,55,42,.13); }
+.bbblog-cover-link { position: relative; display: block; border-radius: 19px; overflow: hidden; }
+.bbblog-cover { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; isolation: isolate; border-radius: 19px; background: #10372a; }
+.bbblog-cover-large { aspect-ratio: 1 / 1; border-radius: 24px; }
+.bbblog-cover-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 13px; padding: 30px 24px; color: #fffaf0; overflow: hidden; background: radial-gradient(circle at 80% 15%, #9c8fce 0%, transparent 38%), linear-gradient(140deg,#174b36 10%,#10372a 75%); }
+.bbblog-cover-response .bbblog-cover-fallback { background: radial-gradient(circle at 85% 18%, #ff7a59 0%, transparent 42%), linear-gradient(135deg, #285d44 10%, #10372a 75%); }
+.bbblog-cover-service .bbblog-cover-fallback { background: radial-gradient(circle at 86% 15%, #f4c95d 0%, transparent 43%), linear-gradient(140deg, #285c46 10%, #10372a 75%); }
+.bbblog-cover-fallback::before { content: ""; position: absolute; width: 200px; height: 200px; border: 15px solid rgba(255,255,255,.13); border-radius: 40px; transform: rotate(-28deg); top: 17%; left: 12%; }
+.bbblog-fallback-rings { position: absolute; top: 24%; right: 16%; display: grid; place-items: center; width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,.13); backdrop-filter: blur(5px); }
+.bbblog-cover-fallback > span { z-index: 1; font-size: 10px; letter-spacing: 1.5px; font-weight: 850; }
+.bbblog-cover-fallback > strong { position: relative; z-index: 1; max-width: 330px; font-size: clamp(23px, 2.5vw, 36px); line-height: 1.07; letter-spacing: -.04em; font-weight: 900; }
+.bbblog-cover-image { position: absolute; inset: 0; z-index: 2; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; opacity: 0; transform: scale(1.005); transition: opacity .35s, transform .65s; }
+.bbblog-cover-image.is-loaded { opacity: 1; }
+.bbblog-card:hover .bbblog-cover-image { transform: scale(1.055); }
+.bbblog-cover-corner { position: absolute; z-index: 3; top: 17px; right: 17px; display: grid; place-items: center; width: 43px; height: 43px; border-radius: 50%; background: var(--bbg-white); color: var(--bbg-green); box-shadow: 0 5px 16px rgba(0,0,0,.14); transition: transform .25s, background .25s; }
+.bbblog-card:hover .bbblog-cover-corner { transform: rotate(45deg); background: var(--bbg-yellow); }
+.bbblog-card-content { display: flex; flex: 1; flex-direction: column; padding: 21px 17px 14px; }
+.bbblog-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.bbblog-category { display: inline-flex; align-items: center; padding: 7px 10px; border-radius: 99px; background: #e4d8ff; font-size: 10px; font-weight: 850; }
+.bbblog-meta-date { display: inline-flex; align-items: center; gap: 5px; color: var(--bbg-muted); font-size: 10px; font-weight: 700; }
+.bbblog-card h3 { margin: 17px 0 11px; font-size: clamp(21px, 2vw, 28px); line-height: 1.19; letter-spacing: -.035em; font-weight: 850; }
+.bbblog-card h3 a:hover { color: #bd5539; }
+.bbblog-card-content > p { flex: 1; margin: 0 0 24px; font-size: 12px; line-height: 1.8; color: var(--bbg-muted); }
+.bbblog-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 9px; border-top: 1px solid var(--bbg-line); padding-top: 14px; }
+.bbblog-readtime { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-size: 11px; color: var(--bbg-muted); }
+.bbblog-readmore { display: inline-flex; align-items: center; gap: 11px; border-radius: 99px; color: var(--bbg-green) !important; font-size: 12px; font-weight: 850; transition: color .2s; }
+.bbblog-readmore > span:first-child { border-bottom: 1.5px solid currentColor; padding-bottom: 3px; }
+.bbblog-readmore-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--bbg-green); color: var(--bbg-white); transition: background .25s, transform .25s; }
+.bbblog-readmore:hover .bbblog-readmore-icon { background: var(--bbg-coral); color: var(--bbg-green); transform: translateX(4px) rotate(-30deg); }
+
+/* Compact Bellbee CTA */
+.bbblog-cta-section { padding: 56px 0 76px; }
+.bbblog-cta { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 33px 42px; border-radius: 23px; background: var(--bbg-green); color: var(--bbg-white); }
+.bbblog-cta > div { flex: 1; min-width: 0; }
+.bbblog-cta-kicker { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 10px; color: var(--bbg-yellow); font-size: 10px; font-weight: 850; letter-spacing: 1px; }
+.bbblog-cta h2 { margin: 0; font-size: clamp(29px,3.2vw,43px); font-weight: 850; line-height: 1.14; letter-spacing: -.05em; }
+.bbblog-cta h2 em { color: var(--bbg-yellow); }
+.bbblog-cta p { margin: 9px 0 0; color: #d1e2d6; font-size: 13px; line-height: 1.7; }
+.bbblog-primary-btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; flex-shrink: 0; min-height: 49px; padding: 12px 20px; border-radius: 99px; background: var(--bbg-coral); color: var(--bbg-green) !important; font-size: 12px; font-weight: 850; transition: transform .25s, box-shadow .25s; }
+.bbblog-primary-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 23px rgba(255,122,89,.23); }
+
+/* Individual article hero with the SAME artwork */
+.bbblog-detail-hero { padding: 56px 0 74px; }
+.bbblog-back-link { display: inline-flex; align-items: center; gap: 9px; padding: 11px 15px; border: 1px solid var(--bbg-line); border-radius: 99px; background: var(--bbg-white); color: var(--bbg-green) !important; font-size: 12px; font-weight: 850; transition: transform .2s, background .2s; }
+.bbblog-back-link:hover { transform: translateX(-4px); background: #e9deff; }
+.bbblog-detail-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: clamp(34px,5vw,80px); margin-top: 35px; }
+.bbblog-detail-hero-copy { min-width: 0; max-width: 1010px; }
+.bbblog-detail-hero-copy h1 { margin: 21px 0 0; font-size: clamp(42px,5.1vw,72px); font-weight: 850; letter-spacing: -.062em; line-height: 1.06; overflow-wrap: break-word; }
+.bbblog-detail-hero-copy > p { max-width: 600px; margin: 23px 0 0; font-size: 15px; line-height: 1.85; color: var(--bbg-muted); }
+.bbblog-detail-reading { display: inline-flex; align-items: center; gap: 9px; margin-top: 25px; font-size: 12px; font-weight: 750; color: var(--bbg-muted); }
+.bbblog-detail-cover-wrap { position: relative; min-width: 0; max-width: 880px; width: 100%; margin: auto; padding: 8px 10px 22px; }
+.bbblog-detail-cover-wrap::before { content: ""; position: absolute; z-index: -1; width: 190px; height: 190px; right: -28px; top: -27px; border-radius: 56% 44% 62% 38%; background: var(--bbg-yellow); }
+.bbblog-detail-cover-wrap .bbblog-cover { box-shadow: 0 26px 55px rgba(16,55,42,.17); }
+.bbblog-detail-cover-badge { position: absolute; z-index: 4; bottom: 0; left: -20px; display: inline-flex; align-items: center; gap: 8px; padding: 13px 16px; border-radius: 99px; background: var(--bbg-lavender); color: var(--bbg-green); box-shadow: 0 10px 23px rgba(16,55,42,.13); font-size: 11px; font-weight: 850; }
+
+/* Article + sticky editorial contents */
+.bbblog-article-section { padding: 77px 0 90px; background: var(--bbg-white); }
+.bbblog-article-layout { display: grid; grid-template-columns: minmax(0, 1fr) 278px; align-items: start; gap: clamp(28px,4vw,70px); }
+.bbblog-article { min-width: 0; }
+.bbblog-lead { padding: 0 0 28px 22px; border-left: 4px solid var(--bbg-coral); margin-bottom: 38px; font-size: 19px; font-weight: 650; line-height: 1.8; letter-spacing: -.01em; }
+.bbblog-article-section-block { scroll-margin-top: 105px; padding-bottom: 25px; }
+.bbblog-article-section-block + .bbblog-article-section-block { padding-top: 28px; border-top: 1px solid var(--bbg-line); }
+.bbblog-section-number { margin-bottom: 11px; color: #ae6d51; font-size: 11px; font-weight: 850; letter-spacing: 1px; }
+.bbblog-article-section-block h2 { margin: 0 0 18px; font-size: clamp(28px,3vw,38px); font-weight: 850; line-height: 1.16; letter-spacing: -.045em; }
+.bbblog-article-section-block p { margin: 0 0 17px; color: #4b6455; font-size: 15px; line-height: 1.95; }
+.bbblog-article-section-block ul { display: flex; flex-direction: column; gap: 13px; margin: 18px 0 8px; padding: 0; list-style: none; }
+.bbblog-article-section-block li { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid #e8e5da; border-radius: 13px; background: #f8f5ed; color: #4b6455; font-size: 14px; line-height: 1.75; }
+.bbblog-article-section-block li svg { flex: 0 0 17px; margin-top: 4px; color: #2a915c; }
+.bbblog-toc { position: sticky; top: 102px; padding: 23px; border: 1px solid var(--bbg-line); border-radius: 20px; background: #f3ede1; box-shadow: 0 11px 24px rgba(16,55,42,.045); }
+.bbblog-toc-label { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 15px; color: #9b5a46; font-size: 10px; font-weight: 850; letter-spacing: 1px; }
+.bbblog-toc nav { display: flex; flex-direction: column; }
+.bbblog-toc nav a { display: flex; align-items: flex-start; gap: 9px; padding: 11px 0; border-bottom: 1px solid var(--bbg-line); font-size: 11px; line-height: 1.6; font-weight: 700; transition: color .2s; }
+.bbblog-toc nav a:last-child { border-bottom: 0; }
+.bbblog-toc nav a:hover { color: #b5543c; }
+.bbblog-toc nav a span { flex: 0 0 23px; color: #b47a64; font-size: 10px; }
+.bbblog-article-faqs { display: flex; flex-direction: column; gap: 10px; }
+.bbblog-article-faqs details { overflow: hidden; border: 1px solid var(--bbg-line); border-radius: 13px; background: #f7f3eb; }
+.bbblog-article-faqs summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px; color: var(--bbg-green); font-size: 14px; font-weight: 850; cursor: pointer; list-style: none; }
+.bbblog-article-faqs summary::-webkit-details-marker { display: none; }
+.bbblog-article-faqs summary svg { flex-shrink: 0; transition: transform .2s; }
+.bbblog-article-faqs details[open] summary svg { transform: rotate(90deg); }
+.bbblog-article-faqs details p { margin: 0 17px 17px; font-size: 13px; }
+.bbblog-article-end { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; margin-top: 33px; padding: 22px; border-radius: 17px; background: #e9deff; }
+.bbblog-article-end > svg { flex: 0 0 21px; }
+.bbblog-article-end > div { flex: 1; min-width: 190px; }
+.bbblog-article-end strong { font-size: 14px; }
+.bbblog-article-end p { margin: 5px 0 0; color: var(--bbg-muted); font-size: 12px; line-height: 1.6; }
+.bbblog-article-end > a { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 850; }
+.bbblog-article-bottom-back { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 13px; padding-top: 33px; }
+
+/* Related stories on article pages */
+.bbblog-other-section { padding: 74px 0 80px; }
+.bbblog-other-heading > a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 850; white-space: nowrap; }
+.bbblog-other-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.bbblog-other-card { display: grid; grid-template-columns: minmax(120px, .63fr) minmax(0, 1fr); min-width: 0; overflow: hidden; border: 1px solid var(--bbg-line); border-radius: 21px; background: var(--bbg-white); transition: transform .25s, box-shadow .25s; }
+.bbblog-other-card:hover { transform: translateY(-4px); box-shadow: 0 12px 23px rgba(16,55,42,.09); }
+.bbblog-other-card > .bbblog-cover { height: 100%; min-height: 190px; aspect-ratio: auto; border-radius: 0; }
+.bbblog-other-card > .bbblog-cover .bbblog-cover-fallback { padding: 12px; }
+.bbblog-other-card > .bbblog-cover .bbblog-cover-fallback strong { font-size: 15px; }
+.bbblog-other-card > .bbblog-cover .bbblog-cover-fallback > span { font-size: 8px; }
+.bbblog-other-card > div:last-child { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 20px; }
+.bbblog-other-card > div:last-child > span { font-size: 10px; color: #a05e48; font-weight: 800; }
+.bbblog-other-card h3 { margin: 11px 0 17px; font-size: 19px; line-height: 1.25; letter-spacing: -.035em; }
+.bbblog-other-card > div:last-child > strong { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
+.bbblog-last-back { margin-top: 28px; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .bbblog-container { width: calc(100% - 56px); }
+  .bbblog-card-grid { gap: 15px; }
+  .bbblog-card-content { padding: 19px 13px 13px; }
+  .bbblog-card h3 { font-size: 22px; }
+  .bbblog-article-layout { grid-template-columns: minmax(0,1fr) 230px; gap: 30px; }
+}
+@media (max-width: 920px) {
+  .bbblog-hero { padding: 77px 0 72px; }
+  .bbblog-card-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .bbblog-card-grid .bbblog-card:last-child:nth-child(odd) { grid-column: 1 / -1; max-width: 510px; }
+  .bbblog-detail-hero-grid { grid-template-columns: 1fr; }
+  .bbblog-detail-hero-copy { max-width: 730px; }
+  .bbblog-detail-cover-wrap { max-width: 500px; width: 100%; }
+  .bbblog-article-layout { grid-template-columns: 1fr; }
+  .bbblog-sidebar { display: none; }
+  .bbblog-article { max-width: 830px; }
+  .bbblog-other-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  .bbblog-container { width: calc(100% - 32px); }
+  .bbblog-hero { padding: 64px 0 66px; }
+  .bbblog-hero h1 { font-size: clamp(43px, 9vw, 62px); }
+  .bbblog-hero-content > p { font-size: 14px; }
+  .bbblog-blob-a { width: 420px; right: -280px; top: -135px; }
+  .bbblog-blob-b { width: 280px; left: -120px; bottom: -150px; }
+  .bbblog-list-section { padding: 60px 0; }
+  .bbblog-section-heading, .bbblog-other-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .bbblog-section-heading h2, .bbblog-other-heading h2 { font-size: 37px; }
+  .bbblog-card-grid { grid-template-columns: 1fr; }
+  .bbblog-card-grid .bbblog-card:last-child:nth-child(odd) { grid-column: auto; max-width: none; }
+  .bbblog-cover { aspect-ratio: 1 / 1; }
+  .bbblog-card-content { padding: 21px 17px 15px; }
+  .bbblog-card h3 { font-size: 25px; }
+  .bbblog-cta { align-items: flex-start; flex-direction: column; padding: 25px 22px; gap: 19px; }
+  .bbblog-cta .bbblog-primary-btn { width: 100%; }
+  .bbblog-cta h2 { font-size: 32px; }
+  .bbblog-detail-hero { padding: 35px 0 60px; }
+  .bbblog-detail-hero-grid { margin-top: 29px; gap: 28px; }
+  .bbblog-detail-hero-copy h1 { font-size: clamp(38px,9vw,56px); }
+  .bbblog-detail-cover-badge { left: 0; font-size: 10px; }
+  .bbblog-article-section { padding: 60px 0; }
+  .bbblog-lead { font-size: 17px; }
+  .bbblog-article-section-block h2 { font-size: 28px; }
+  .bbblog-article-section-block p { font-size: 14px; }
+  .bbblog-article-section-block li { font-size: 13px; }
+  .bbblog-article-bottom-back { align-items: stretch; flex-direction: column; }
+  .bbblog-article-bottom-back > a { justify-content: center; }
+  .bbblog-other-section { padding: 58px 0 64px; }
+}
+@media (max-width: 410px) {
+  .bbblog-container { width: calc(100% - 26px); }
+  .bbblog-hero h1 { font-size: 42px; }
+  .bbblog-cover { aspect-ratio: 1 / 1; }
+  .bbblog-readtime { font-size: 10px; }
+  .bbblog-other-card { grid-template-columns: 115px minmax(0,1fr); }
+  .bbblog-other-card h3 { font-size: 15px; }
+  .bbblog-other-card > div:last-child { padding: 13px; }
+  .bbblog-other-card > .bbblog-cover .bbblog-cover-fallback strong { font-size: 12px; }
+}
+.bbblog-page a:focus-visible, .bbblog-page button:focus-visible, .bbblog-page summary:focus-visible { outline: 3px solid var(--bbg-coral); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .bbblog-page *, .bbblog-page *::before, .bbblog-page *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+
+/* Organic ambient shapes carry the brand styling behind the cards and article. */
+.bbblog-list-section, .bbblog-article-section, .bbblog-other-section { position: relative; isolation: isolate; overflow: hidden; }
+.bbblog-list-section::before, .bbblog-article-section::before, .bbblog-other-section::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  width: min(31vw, 390px); aspect-ratio: 1;
+  border-radius: 58% 42% 65% 35% / 45% 62% 38% 55%;
+  background: var(--bbg-lavender); opacity: .2;
+  top: 7%; right: -185px; transform: rotate(-20deg);
+}
+.bbblog-list-section::after, .bbblog-article-section::after, .bbblog-other-section::after {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  width: min(24vw, 300px); aspect-ratio: 1;
+  border-radius: 45% 55% 32% 68% / 63% 37% 63% 37%;
+  background: var(--bbg-yellow); opacity: .19;
+  bottom: 5%; left: -130px; transform: rotate(16deg);
+}
+.bbblog-article-section::before { top: 23%; right: -220px; }
+.bbblog-other-section::after { background: var(--bbg-coral); opacity: .11; }
+.bbblog-list-section > .bbblog-container, .bbblog-article-section > .bbblog-container, .bbblog-other-section > .bbblog-container {
+  position: relative; z-index: 1;
+}

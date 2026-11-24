@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 
 import "./AIAssistantPage.css";
+import Footer from "../../components/Footer";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -1055,6 +1056,7 @@ export default function AIAssistantPage() {
       <AssistantFAQ />
       <AssistantRelated />
       <AssistantCTA />
+      <Footer/>
     </main>
   );
 }

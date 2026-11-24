@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 import {
-  FaAndroid,
+  // FaAndroid,
   FaFacebookMessenger,
   FaInstagram,
   FaWhatsapp,
@@ -110,13 +110,13 @@ const navigation = [
             icon: Handshake,
             color: 'yellow',
           },
-          {
-            title: 'Android app',
-            description: 'Your chats and alerts on your phone.',
-            to: '/android-app',
-            icon: FaAndroid,
-            color: 'green',
-          },
+          // {
+          //   title: 'Android app',
+          //   description: 'Your chats and alerts on your phone.',
+          //   to: '/android-app',
+          //   icon: FaAndroid,
+          //   color: 'green',
+          // },
         ],
       },
     ],
@@ -224,7 +224,7 @@ const navigation = [
           {
             title: 'FAQs',
             description: 'Find answers to common questions.',
-            to: '/faqs',
+            to: '/#faqs',
             icon: CircleHelp,
             color: 'yellow',
           },

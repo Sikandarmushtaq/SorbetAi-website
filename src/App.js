@@ -1,3 +1,6 @@
+
+import { useEffect } from "react";
+
 import {
   BrowserRouter,
   Navigate,
@@ -5,8 +8,6 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
-
-import { useEffect } from "react";
 
 // ============================================
 // SHARED PUBLIC COMPONENTS
@@ -18,20 +19,85 @@ import Chatbot from "./components/Chatbot/Chatbot";
 import Contact from "./Pages/contact/Contact";
 
 // ============================================
-// PUBLIC PRODUCT PAGES
+// PRODUCT - CHANNELS
 // ============================================
 
-// Completed WhatsApp AI Agent page
 import WhatsAppAIAgentPage from "./Pages/whatsapp/WhatsAppAIAgentPage";
+
+import InstagramMessengerPage from "./Pages/instagram/InstagramMessengerPage";
+
+import WebsiteChatPage from "./Pages/websitechat/WebsiteChatPage";
+
+import OneInboxPage from "./Pages/oneInbox/OneInboxPage";
+
+// ============================================
+// PRODUCT - AI & TOOLS
+// ============================================
+
+import AIAssistantPage from "./Pages/aiassistant/AIAssistantPage";
+
+import AIBrainPage from "./Pages/aibrain/AIBrainPage";
+
+import HumanHandoffPage from "./Pages/humanhandoff/HumanHandoffPage";
+
+// ============================================
+// SOLUTIONS
+// ============================================
+
+import AssistantpageAi from "./Pages/aicustomersupport/AICustomerSupportPage";
+
+import OrdersInChatPage from "./Pages/ordersinchat/OrdersInChatPage";
+
+import AppointmentBookingPage from "./Pages/appointmentbooking/AppointmentBookingPage";
+
+import LeadCapturePage from "./Pages/leadcapture/LeadCapturePage";
+
+import WhatsAppCampaignsPage from "./Pages/whatsappcampaigns/WhatsAppCampaignsPage";
+
+// ============================================
+// INDUSTRY PAGES
+// ============================================
+
+import OnlineShopsPage from "./Pages/onlineshops/OnlineShopsPage";
+
+import RestaurantsPage from "./Pages/restaurants/RestaurantsPage";
+
+import SalonsPage from "./Pages/salons/SalonsPage";
+
+import AutoServicesPage from "./Pages/autoservices/AutoServicesPage";
+
+// ============================================
+// PRICING
+// ============================================
+
+import PricingPage from "./Pages/pricing/PricingPage";
+
+// ============================================
+// BLOGS
+// ============================================
+
+import BlogPage from "./Pages/blog/BlogPage";
+
+import BlogPostPage from "./Pages/blog/BlogPostPage";
+
+// ============================================
+// HOW IT WORKS
+// ============================================
+
+import HowItWorksPage from "./Pages/howitworks/HowItWorksPage";
 
 // ============================================
 // AUTHENTICATION PAGES
 // ============================================
 
 import SignIn from "./Pages/verifyemail/signin/SignIn";
+
 import SignUp from "./Pages/verifyemail/signin/SignUp";
+
 import VerifyEmail from "./Pages/verifyemail/signin/VerifyEmail";
+
 import Onboarding from "./Pages/verifyemail/signin/Onboarding";
+
 import ResetPassword from "./Pages/verifyemail/signin/ResetPassword";
 
 // ============================================
@@ -41,131 +107,14 @@ import ResetPassword from "./Pages/verifyemail/signin/ResetPassword";
 import Dashboard from "./Pages/Dashboard";
 
 // ============================================
-// AUTH ROUTE GUARDS
+// AUTH ROUTE GUARDS & CONTEXT
 // ============================================
 
 import GuestRoute from "./components/auth/GuestRoute";
+
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+
 import { AuthProvider } from "./context/AuthContext";
-// import InstagramMessengerHero from "./Pages/instagram/components/InstagramMessengerHero";
-import InstagramMessengerPage from "./Pages/instagram/InstagramMessengerPage";
-// import { WebsiteChatBenefits } from "./Pages/websitechat/components/WebsiteChatSections";
-import WebsiteChatPage from "./Pages/websitechat/WebsiteChatPage";
-import OneInboxPage from "./Pages/oneInbox/OneInboxPage";
-// import AiCapabilities from "./components/landing/AiCapabilities";
-import AIAssistantPage from "./Pages/aiassistant/AIAssistantPage";
-import AIBrainPage from "./Pages/aibrain/AIBrainPage";
-
-// ============================================
-// PUBLIC PAGE ROUTES
-//
-// These pages do not require authentication.
-//
-// WhatsApp AI Agent is already implemented,
-// so it is registered separately below.
-//
-// Remaining pages display placeholders until
-// their actual components are created.
-// ============================================
-
-const publicPages = [
-  // ==========================================
-  // PRODUCT - CHANNELS
-  // ==========================================
-
-
-
-  // ==========================================
-  // PRODUCT - AI & TOOLS
-  // ==========================================
-
- 
-
-  {
-    path: "/human-handoff",
-    title: "Human Handoff",
-  },
-  {
-    path: "/android-app",
-    title: "Android App",
-  },
-
-  // ==========================================
-  // SOLUTIONS
-  // ==========================================
-
-  {
-    path: "/ai-customer-support",
-    title: "AI Customer Support",
-  },
-  {
-    path: "/orders-in-chat",
-    title: "Orders in Chat",
-  },
-  {
-    path: "/appointment-booking",
-    title: "Appointment Booking",
-  },
-  {
-    path: "/lead-capture",
-    title: "Lead Capture",
-  },
-  {
-    path: "/whatsapp-campaigns",
-    title: "WhatsApp Campaigns",
-  },
-
-  // ==========================================
-  // INDUSTRIES
-  // ==========================================
-
-  {
-    path: "/ai-chat-for-online-shops",
-    title: "Online Shops and Retail",
-  },
-  {
-    path: "/ai-chat-for-restaurants",
-    title: "Restaurants and Cafes",
-  },
-  {
-    path: "/ai-chat-for-salons",
-    title: "Salons and Beauty",
-  },
-  {
-    path: "/ai-chat-for-auto-services",
-    title: "Car Wash and Auto Services",
-  },
-
-  // ==========================================
-  // PRICING
-  // ==========================================
-
-  {
-    path: "/pricing",
-    title: "Pricing",
-  },
-
-  // ==========================================
-  // RESOURCES
-  // ==========================================
-
-  {
-    path: "/how-it-works",
-    title: "How It Works",
-  },
-  {
-    path: "/faqs",
-    title: "Frequently Asked Questions",
-  },
-  {
-    path: "/blogs",
-    title: "Blogs",
-  },
-  {
-    path: "/about",
-    title: "About Us",
-  },
-];
 
 // ============================================
 // SCROLL MANAGEMENT
@@ -175,40 +124,51 @@ function ScrollToHash() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
+    let frame;
+
+    frame = requestAnimationFrame(() => {
       if (hash) {
-        const element = document.getElementById(
-          decodeURIComponent(hash.slice(1)),
-        );
+        let sectionId;
+
+        try {
+          sectionId = decodeURIComponent(hash.slice(1));
+        } catch {
+          sectionId = hash.slice(1);
+        }
+
+        const element = document.getElementById(sectionId);
 
         if (element) {
           element.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+
+          return;
         }
-      } else {
-        window.scrollTo({
-          top: 0,
-          behavior: "auto",
-        });
       }
+
+      window.scrollTo({
+        top: 0,
+        behavior: "auto",
+      });
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [pathname, hash]);
 
   return null;
 }
 
 // ============================================
-// PUBLIC LAYOUT
+// PUBLIC WEBSITE LAYOUT
 //
-// Navbar and Chatbot appear only on public
-// marketing pages.
+// Navbar + Chatbot on public pages only.
 //
-// Dashboard and auth pages use their
-// existing separate layouts.
+// Authentication and dashboard continue using
+// their own existing layouts.
 // ============================================
 
 function PublicLayout({ children }) {
@@ -224,10 +184,10 @@ function PublicLayout({ children }) {
 }
 
 // ============================================
-// TEMPORARY PUBLIC PLACEHOLDER
+// TEMPORARY ABOUT PAGE
 //
-// Replace with actual page components
-// as new pages are completed.
+// This preserves your existing About route.
+// Replace it once the About page is ready.
 // ============================================
 
 function PlaceholderPage({ title }) {
@@ -243,8 +203,8 @@ function PlaceholderPage({ title }) {
         </h1>
 
         <p className="mt-5 max-w-xl text-base leading-relaxed text-sorbet-green/70">
-          Discover how Bellbee Ai can help your business. More information about
-          this feature is coming soon.
+          Discover how Bellbee Ai can help your business.
+          More information about this page is coming soon.
         </p>
       </div>
     </main>
@@ -262,9 +222,10 @@ export default function App() {
         <ScrollToHash />
 
         <Routes>
-          {/* ==================================
-              PUBLIC HOME PAGE
-              ================================== */}
+
+          {/* ====================================
+              PUBLIC HOME
+          ==================================== */}
 
           <Route
             path="/"
@@ -275,9 +236,9 @@ export default function App() {
             }
           />
 
-          {/* ==================================
-              PUBLIC CONTACT PAGE
-              ================================== */}
+          {/* ====================================
+              PUBLIC CONTACT
+          ==================================== */}
 
           <Route
             path="/contact"
@@ -288,11 +249,9 @@ export default function App() {
             }
           />
 
-          {/* ==================================
-              PRODUCT - WHATSAPP AI AGENT
-              ACTUAL PAGE COMPONENT
-              PUBLIC ROUTE
-              ================================== */}
+          {/* ====================================
+              PRODUCT - CHANNELS
+          ==================================== */}
 
           <Route
             path="/whatsapp-ai-agent"
@@ -302,86 +261,267 @@ export default function App() {
               </PublicLayout>
             }
           />
-            <Route
+
+          <Route
             path="/instagram-ai-automation"
             element={
               <PublicLayout>
-                <InstagramMessengerPage/>
+                <InstagramMessengerPage />
               </PublicLayout>
-
-              
             }
           />
-             <Route
+
+          {/* Messenger uses the existing
+              Instagram/Messenger page section */}
+
+          <Route
             path="/messenger-ai-automation"
             element={
-              <PublicLayout>
-                 <Navigate
-      to="/instagram-ai-automation#im-messenger"
-      replace
-    />
-              </PublicLayout>
-
-              
+              <Navigate
+                to="/instagram-ai-automation#im-messenger"
+                replace
+              />
             }
           />
-           <Route
+
+          <Route
             path="/website-chat"
             element={
               <PublicLayout>
-               <WebsiteChatPage/>
+                <WebsiteChatPage />
               </PublicLayout>
-
-              
             }
           />
-      <Route
-  path="/omnichannel-messaging"
-  element={
-    <PublicLayout>
-      <OneInboxPage />
-    </PublicLayout>
-  }///
-/>
-      <Route
-  path="/ai-assistant"
-  element={
-    <PublicLayout>
-      <AIAssistantPage/>
-    </PublicLayout>
-  }///ai-assistant    /ai-brain
-/>
-      <Route
-  path="/ai-brain"
-  element={
-    <PublicLayout>
-    <AIBrainPage/>
-    </PublicLayout>
-  }///ai-assistant   
-/>
 
-          {/* ==================================
-              OTHER PRODUCT / SOLUTIONS /
-              INDUSTRIES / PRICING / RESOURCES
+          <Route
+            path="/omnichannel-messaging"
+            element={
+              <PublicLayout>
+                <OneInboxPage />
+              </PublicLayout>
+            }
+          />
 
-              ALL PUBLIC ROUTES
-              ================================== */}
+          {/* ====================================
+              PRODUCT - AI & TOOLS
+          ==================================== */}
 
-          {publicPages.map((page) => (
-            <Route
-              key={page.path}
-              path={page.path}
-              element={
-                <PublicLayout>
-                  <PlaceholderPage title={page.title} />
-                </PublicLayout>
-              }
-            />
-          ))}
+          <Route
+            path="/ai-assistant"
+            element={
+              <PublicLayout>
+                <AIAssistantPage />
+              </PublicLayout>
+            }
+          />
 
-          {/* ==================================
+          <Route
+            path="/ai-brain"
+            element={
+              <PublicLayout>
+                <AIBrainPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/human-handoff"
+            element={
+              <PublicLayout>
+                <HumanHandoffPage />
+              </PublicLayout>
+            }
+          />
+
+          {/* ====================================
+              SOLUTIONS
+          ==================================== */}
+
+          <Route
+            path="/ai-customer-support"
+            element={
+              <PublicLayout>
+                <AssistantpageAi />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/orders-in-chat"
+            element={
+              <PublicLayout>
+                <OrdersInChatPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/appointment-booking"
+            element={
+              <PublicLayout>
+                <AppointmentBookingPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/lead-capture"
+            element={
+              <PublicLayout>
+                <LeadCapturePage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/whatsapp-campaigns"
+            element={
+              <PublicLayout>
+                <WhatsAppCampaignsPage />
+              </PublicLayout>
+            }
+          />
+
+          {/* ====================================
+              INDUSTRIES
+          ==================================== */}
+
+          <Route
+            path="/ai-chat-for-online-shops"
+            element={
+              <PublicLayout>
+                <OnlineShopsPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/ai-chat-for-restaurants"
+            element={
+              <PublicLayout>
+                <RestaurantsPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/ai-chat-for-salons"
+            element={
+              <PublicLayout>
+                <SalonsPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/ai-chat-for-auto-services"
+            element={
+              <PublicLayout>
+                <AutoServicesPage />
+              </PublicLayout>
+            }
+          />
+
+          {/* ====================================
+              PRICING
+          ==================================== */}
+
+          <Route
+            path="/pricing"
+            element={
+              <PublicLayout>
+                <PricingPage />
+              </PublicLayout>
+            }
+          />
+
+          {/* ====================================
+              BLOG ROUTES
+
+              /blogs from your existing Navbar
+              redirects to the actual /blog page.
+
+              Individual article URLs stay:
+              /blog/:slug
+          ==================================== */}
+
+          <Route
+            path="/blog"
+            element={
+              <PublicLayout>
+                <BlogPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/blog/:slug"
+            element={
+              <PublicLayout>
+                <BlogPostPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/blogs"
+            element={
+              <Navigate to="/blog" replace />
+            }
+          />
+
+          {/* ====================================
+              HOW IT WORKS
+
+              Existing landing HowItWorks component
+              is reused inside HowItWorksPage.
+          ==================================== */}
+
+          <Route
+            path="/how-it-works"
+            element={
+              <PublicLayout>
+                <HowItWorksPage />
+              </PublicLayout>
+            }
+          />
+
+          {/* ====================================
+              FAQS
+
+              Home already contains:
+              <section id="faqs">
+
+              The old /faqs link redirects
+              to that section.
+          ==================================== */}
+
+          <Route
+            path="/faqs"
+            element={
+              <Navigate to="/#faqs" replace />
+            }
+          />
+
+          {/* ====================================
+              ABOUT
+          ==================================== */}
+
+          <Route
+            path="/about"
+            element={
+              <PublicLayout>
+                <PlaceholderPage title="About Us" />
+              </PublicLayout>
+            }
+          />
+
+          {/* ====================================
               GUEST-ONLY AUTHENTICATION
-              ================================== */}
+
+              Existing GuestRoute protection
+              remains unchanged.
+          ==================================== */}
 
           <Route
             path="/signin"
@@ -401,21 +541,29 @@ export default function App() {
             }
           />
 
-          {/* ==================================
+          {/* ====================================
               EMAIL VERIFICATION
-              ================================== */}
+          ==================================== */}
 
-          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route
+            path="/verify-email"
+            element={<VerifyEmail />}
+          />
 
-          {/* ==================================
-              RESET PASSWORD
-              ================================== */}
+          {/* ====================================
+              PASSWORD RESET
+          ==================================== */}
 
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/reset-password"
+            element={<ResetPassword />}
+          />
 
-          {/* ==================================
+          {/* ====================================
               PROTECTED ONBOARDING
-              ================================== */}
+
+              Authentication required.
+          ==================================== */}
 
           <Route
             path="/onboarding"
@@ -426,26 +574,14 @@ export default function App() {
             }
           />
 
-          {/* ==================================
+          {/* ====================================
               PROTECTED USER DASHBOARD
 
-              All dashboard pages:
-              Chats
-              Leads
-              Customers
-              Orders
-              Products
-              Services
-              AI Brain
-              Appointments
-              Analytics
-              Channels
-              Billing
-              Support
-              Automation Settings
+              All existing dashboard subroutes
+              continue to work under /dashboard/*.
 
-              Remain inside Dashboard routing.
-              ================================== */}
+              Do not change authentication.
+          ==================================== */}
 
           <Route
             path="/dashboard/*"
@@ -456,37 +592,66 @@ export default function App() {
             }
           />
 
-          {/* ==================================
+          {/* ====================================
               LEGACY DASHBOARD REDIRECTS
-              ================================== */}
+
+              Continue routing through the
+              protected Dashboard page.
+          ==================================== */}
 
           <Route
             path="/whatsapp"
-            element={<Navigate to="/dashboard/whatsapp" replace />}
+            element={
+              <Navigate
+                to="/dashboard/whatsapp"
+                replace
+              />
+            }
           />
 
           <Route
             path="/billing/plans"
-            element={<Navigate to="/dashboard/billing/plans" replace />}
+            element={
+              <Navigate
+                to="/dashboard/billing/plans"
+                replace
+              />
+            }
           />
 
           <Route
             path="/billing/reports"
-            element={<Navigate to="/dashboard/billing/reports" replace />}
+            element={
+              <Navigate
+                to="/dashboard/billing/reports"
+                replace
+              />
+            }
           />
 
           <Route
             path="/billing/payment-collection"
             element={
-              <Navigate to="/dashboard/billing/payment-collection" replace />
+              <Navigate
+                to="/dashboard/billing/payment-collection"
+                replace
+              />
             }
           />
 
-          {/* ==================================
+          {/* ====================================
               UNKNOWN ROUTES
-              ================================== */}
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+              Keep this at the end.
+          ==================================== */}
+
+          <Route
+            path="*"
+            element={
+              <Navigate to="/" replace />
+            }
+          />
+
         </Routes>
       </AuthProvider>
     </BrowserRouter>
