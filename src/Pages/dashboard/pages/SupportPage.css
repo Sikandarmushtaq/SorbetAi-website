@@ -989,3 +989,55 @@
     font-size: 12px;
   }
 }
+
+/* BELLBEE-REMAINING-PREMIUM-BEGIN */
+
+
+/* ==========================================
+   BELLBEE SUPPORTPAGE PREMIUM
+   APPEND-ONLY — EXISTING CSS FILE
+========================================== */
+.sp-page { min-width:0; width:100%; max-width:1380px; margin-left:auto; margin-right:auto; padding-bottom:max(24px,2.5vw); }
+.sp-page .sp-inbox,
+.sp-page .sp-ticket-sidebar,
+.sp-page .sp-ticket-detail,
+.sp-page .sp-message,
+.sp-page .sp-form-group {
+  min-width:0;
+  max-width:100%;
+  border-radius:20px;
+  border-color:rgba(16,55,42,.12);
+  background-image:radial-gradient(ellipse at 92% 7%,rgba(205,189,255,.21),transparent 32%),radial-gradient(ellipse at 7% 94%,rgba(244,201,93,.13),transparent 32%);
+  box-shadow:0 11px 30px rgba(16,55,42,.045);
+}
+.sp-page .sp-primary-button {
+  min-height:42px;
+  border-radius:12px;
+  background:#ff7a59;
+  color:#10372a;
+  border-color:#ff7a59;
+  font-size:12px;
+  font-weight:800;
+  transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease;
+}
+
+.sp-page :where(button, input, select, textarea, a):focus-visible { outline:3px solid #ff7a59; outline-offset:2px; }
+.sp-page :where(input:not([type=checkbox]):not([type=radio]), select, textarea) { max-width:100%; min-width:0; border-radius:11px; }
+.sp-page :where(h1,h2,h3,p) { overflow-wrap:anywhere; }
+.sp-page :where(.dp-table-wrap,.bb2-table-wrap,.an-chart-scroll,.tp-template-list,.sp-ticket-list) { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+@media(max-width:760px) {
+  .sp-page { max-width:100%; min-width:0; padding-bottom:28px; }
+  .sp-page :where(.dp-header-actions,.ap-header-actions,.tp-page-actions,.fi-actions) { display:flex; flex-wrap:wrap; gap:9px; max-width:100%; }
+  .sp-page :where(.dp-form-grid,.bb2-form-grid,.ba-form-grid) { min-width:0; }
+}
+@media(max-width:440px) {
+  .sp-page :where(.dp-header-actions>button,.tp-page-actions>button) { flex:1 1 130px; }
+}
+@media(prefers-reduced-motion:reduce) { .sp-page :where(button,a) { transition:none!important; } }
+
+.sp-page .sp-primary-button:not(:disabled):hover { background:#ff8b6f; color:#10372a; transform:translateY(-2px); box-shadow:0 11px 23px rgba(255,122,89,.19); }
+
+.sp-page .sp-primary-button:not(:disabled):hover { background:#ff8b6f; color:#10372a; }
+.sp-page .sp-inbox { min-width:0; border-radius:22px; }
+.sp-page .sp-ticket-sidebar { min-width:0; }
+@media(max-width:760px){ .sp-page .sp-inbox { max-width:100%; overflow-x:hidden; } }

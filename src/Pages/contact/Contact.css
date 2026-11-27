@@ -778,3 +778,55 @@
     font-size: 11px;
   }
 }
+
+
+
+
+
+/* =====================================
+   PUBLIC CONTACT FORM VALIDATION
+   APPEND TO Contact.css
+===================================== */
+
+.contact-field [aria-invalid="true"] {
+  border-color: #c44b3d;
+  background: #fff7f4;
+}
+
+.contact-field-error {
+  display: block;
+
+  color: #b7473b;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  margin-top: 5px;
+}
+
+.contact-form-error {
+  margin: 0;
+  padding: 12px 14px;
+
+  border: 1px solid #f0b9ac;
+  border-radius: 10px;
+
+  background: #fff0eb;
+  color: #a64335;
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.contact-submit-button:disabled {
+  opacity: .72;
+  cursor: wait;
+  transform: none;
+}
+
+.contact-form button:focus-visible,
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible {
+  outline: 3px solid #ff7a59;
+  outline-offset: 2px;
+}

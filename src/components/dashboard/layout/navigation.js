@@ -1,6 +1,6 @@
 import {
   Home, MessageSquare, UserRound, Users, FileText, Megaphone,
-  ShoppingBag, Package, Briefcase, Brain, CalendarDays,
+  ShoppingBag, Package, Briefcase, Brain, CalendarDays, ClipboardList,
   BarChart3, Radio, LifeBuoy, CreditCard, Gift, Settings, Lightbulb,
   UserCircle, Bell,
 } from 'lucide-react';
@@ -23,6 +23,7 @@ export const navigationGroups = [
       { id: 'products', label: 'Products', icon: Package },
       { id: 'services', label: 'Services', icon: Briefcase },
       { id: 'brain', label: 'AI Brain', icon: Brain },
+      { id: 'requests', label: 'Requests Inbox', icon: ClipboardList },
       { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     ],
   },

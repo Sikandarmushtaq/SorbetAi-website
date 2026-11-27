@@ -1,16 +1,20 @@
-import { customersApi } from '../../../services/dashboard/customers.api.js';
-import './CustomersPage.css';
-import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  ArrowDown, ArrowLeft, ArrowUp, CalendarDays, ChevronDown, MessageCircle,
-  Plus, Search, Tag, Users,
+  ArrowDown, ArrowLeft, ArrowUp, CalendarDays, ChevronDown,
+  MessageCircle, Plus, RefreshCw, Search, Tag, Users,
 } from 'lucide-react';
-import { EmptyState, PageHeader, Panel, useNotice } from '../../../components/dashboard/common/DashboardUI';
+import { customersApi } from '../../../services/dashboard/customers.api.js';
+import { EmptyState, PageHeader, Panel } from '../../../components/dashboard/common/DashboardUI';
+import { useDashboardToast } from '../../../components/dashboard/common/DashboardToastProvider';
+import { getDashboardFormErrors } from '../../../components/dashboard/common/dashboardFormErrors';
+import './CustomersPage.css';
+
 const EMPTY_LABELS = Object.freeze([]);
 
 function recordsFrom(response) {
-  return Array.isArray(response) ? response : response?.items || response?.results || response?.customers || [];
+  const records = Array.isArray(response) ? response : response?.items || response?.results || response?.customers || [];
+  return Array.isArray(records) ? records : [];
 }
 
 function getCustomerName(customer) {
@@ -29,17 +33,22 @@ function formatLastContact(value) {
   return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
 
-// Shows API-backed customer records in a URL-filtered master/detail workspace.
+function RelatedRow({ title, detail, value }) {
+  return <div className="dp-customer-related-row"><strong>{title}</strong><span>{detail}</span><small>{value}</small></div>;
+}
+
 export default function CustomersPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { showNotice, Notice } = useNotice();
+  const toast = useDashboardToast();
+
   const query = searchParams.get('q') || '';
   const selectedId = searchParams.get('customer') || '';
   const sort = searchParams.get('sort') || 'lastContact';
   const direction = searchParams.get('direction') || 'desc';
   const labelQuery = searchParams.get('label') || '';
   const selectedLabels = useMemo(() => labelQuery.split(',').filter(Boolean), [labelQuery]);
+
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -48,19 +57,36 @@ export default function CustomersPage() {
   const [labelsDraft, setLabelsDraft] = useState([]);
   const [newLabel, setNewLabel] = useState('');
   const [isSavingDetails, setIsSavingDetails] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  const loadCustomers = useCallback(async ({ notify = false, isActive = () => true } = {}) => {
+    setIsLoading(true);
+    setLoadError('');
+    try {
+      const response = await customersApi.request({
+        query: { search: query || undefined, labels: selectedLabels.join(',') || undefined, sort, direction },
+      });
+      if (!isActive()) return;
+      setCustomers(recordsFrom(response));
+      if (notify) toast.success('Customers refreshed', 'Latest customer records were loaded.');
+    } catch (error) {
+      if (!isActive()) return;
+      const message = error?.message || 'Could not load customers.';
+      setLoadError(message);
+      if (notify) toast.error('Could not refresh customers', message);
+    } finally {
+      if (isActive()) setIsLoading(false);
+    }
+  }, [query, selectedLabels, sort, direction, toast]);
 
   useEffect(() => {
     let active = true;
-    setIsLoading(true);
-    setLoadError('');
-    customersApi.request({ query: { search: query || undefined, labels: selectedLabels.join(',') || undefined, sort, direction } })
-      .then((response) => { if (active) setCustomers(recordsFrom(response)); })
-      .catch((error) => { if (active) { setCustomers([]); setLoadError(error.message); } })
-      .finally(() => { if (active) setIsLoading(false); });
+    loadCustomers({ isActive: () => active });
     return () => { active = false; };
-  }, [query, selectedLabels, sort, direction]);
+  }, [loadCustomers]);
 
   const labels = useMemo(() => [...new Set(customers.flatMap((customer) => Array.isArray(customer.labels) ? customer.labels : []))].filter(Boolean).sort(), [customers]);
+
   const sortedCustomers = useMemo(() => {
     const filtered = customers.filter((customer) => {
       const name = getCustomerName(customer).toLowerCase();
@@ -70,19 +96,16 @@ export default function CustomersPage() {
       const matchesLabels = !selectedLabels.length || selectedLabels.every((label) => customerLabels.includes(label));
       return matchesSearch && matchesLabels;
     });
+
     return filtered.sort((a, b) => {
       if (sort === 'name') {
         const compare = getCustomerName(a).toLowerCase().localeCompare(getCustomerName(b).toLowerCase());
         return direction === 'asc' ? compare : -compare;
       }
-      const first = sort === 'dateAdded'
-        ? a.created_at
-        : (a.last_contact_at || a.last_contact);
-      const second = sort === 'dateAdded'
-        ? b.created_at
-        : (b.last_contact_at || b.last_contact);
-      const firstTime = first ? new Date(first).getTime() : Number.NaN;
-      const secondTime = second ? new Date(second).getTime() : Number.NaN;
+      const first = sort === 'dateAdded' ? a.created_at : a.last_contact_at || a.last_contact;
+      const second = sort === 'dateAdded' ? b.created_at : b.last_contact_at || b.last_contact;
+      const firstTime = first ? new Date(first).getTime() : NaN;
+      const secondTime = second ? new Date(second).getTime() : NaN;
       if (Number.isNaN(firstTime) && Number.isNaN(secondTime)) return 0;
       if (Number.isNaN(firstTime)) return 1;
       if (Number.isNaN(secondTime)) return -1;
@@ -97,6 +120,7 @@ export default function CustomersPage() {
   useEffect(() => {
     setNotes(selectedCustomer?.notes || '');
     setLabelsDraft(selectedCustomerLabels);
+    setFieldErrors({});
   }, [selectedId, selectedCustomer?.notes, selectedCustomerLabels]);
 
   const setParam = (key, value) => {
@@ -119,74 +143,72 @@ export default function CustomersPage() {
 
   const addCustomerLabel = () => {
     const label = newLabel.trim();
-    if (!label || labelsDraft.some((item) => item.toLowerCase() === label.toLowerCase())) return;
+    if (!label) return;
+    if (labelsDraft.some((item) => item.toLowerCase() === label.toLowerCase())) {
+      toast.info('Label already added', 'Choose another label name.');
+      return;
+    }
     setLabelsDraft((current) => [...current, label]);
+    setFieldErrors((current) => ({ ...current, labels: '' }));
     setNewLabel('');
   };
 
   const saveCustomerDetails = async () => {
-    if (!selectedCustomer) return;
+    if (!selectedCustomer || isSavingDetails) return;
+    const id = selectedCustomer.id || selectedCustomer.customer_id;
     setIsSavingDetails(true);
+    setFieldErrors({});
+    const pendingId = toast.loading('Saving customer details', 'Updating notes and labels…');
     try {
-      const id = selectedCustomer.id || selectedCustomer.customer_id;
       await customersApi.request({ method: 'PATCH', id, body: { labels: labelsDraft, notes } });
       setCustomers((current) => current.map((customer) => String(customer.id || customer.customer_id) === String(id) ? { ...customer, labels: labelsDraft, notes } : customer));
-      showNotice('Customer details updated.');
+      toast.update(pendingId, 'success', 'Customer details saved', 'Notes and labels have been updated.');
     } catch (error) {
-      showNotice(error.message);
+      const parsed = getDashboardFormErrors(error);
+      setFieldErrors(parsed.fields);
+      toast.update(pendingId, 'error', 'Could not save customer details', parsed.summary);
     } finally {
       setIsSavingDetails(false);
     }
   };
 
   return (
-    <>
-      <PageHeader title="Customers" description="View and manage your contacts" />
-      {Notice}
-      {loadError && <div className="dp-inline-notice dp-api-error" role="status">{loadError}</div>}
+    <div className="bb-customers-premium">
+      <PageHeader
+        eyebrow="YOUR CUSTOMER RELATIONSHIPS"
+        title="Customers"
+        description="Customer conversations, contact details and follow-up notes — all in one workspace."
+        actions={<button type="button" className="dp-secondary-button bb-customers-refresh" onClick={() => loadCustomers({ notify: true })} disabled={isLoading}><RefreshCw size={15} /> {isLoading ? 'Loading…' : 'Refresh customers'}</button>}
+      />
+      {loadError && <div className="dp-inline-notice dp-api-error" role="alert">{loadError}</div>}
       <section className={`dp-customers-workspace ${selectedId ? 'has-selection' : ''}`}>
         <div className="dp-customers-list-pane">
-          <label className="dp-customer-search">
-            <Search size={17} />
-            <input value={query} onChange={(event) => setParam('q', event.target.value)} placeholder="Search by name or phone..." />
-          </label>
+          <label className="dp-customer-search"><Search size={17} /><input value={query} onChange={(event) => setParam('q', event.target.value)} placeholder="Search by name or phone…" /></label>
           <div className="dp-customer-list-controls">
             <div className="dp-label-filter-wrap">
-              <button type="button" className={`dp-secondary-button dp-label-filter-button ${selectedLabels.length ? 'is-selected' : ''}`} onClick={() => setLabelMenuOpen((open) => !open)}>
-                <Tag size={14} /> Filter by Label <ChevronDown size={13} />
-              </button>
+              <button type="button" className={`dp-secondary-button dp-label-filter-button ${selectedLabels.length ? 'is-selected' : ''}`} onClick={() => setLabelMenuOpen((open) => !open)}><Tag size={14} /> Filter by Label <ChevronDown size={13} /></button>
               {labelMenuOpen && <div className="dp-label-filter-menu">
-                {labels.length ? labels.map((label) => <label key={label}><input type="checkbox" checked={selectedLabels.includes(label)} onChange={() => toggleLabel(label)} />{label}</label>) : <p>Labels will appear here when customers are saved.</p>}
+                {labels.length ? labels.map((label) => <label key={label}><input type="checkbox" checked={selectedLabels.includes(label)} onChange={() => toggleLabel(label)} />{label}</label>) : <p>Labels will appear when customers are saved.</p>}
                 <button type="button" onClick={() => setParam('label', '')}>Clear filters</button>
               </div>}
             </div>
             <div className="dp-customer-sort">
               <span>SORT BY</span>
-              <select value={sort} onChange={(event) => setParam('sort', event.target.value)} aria-label="Sort customers">
-                <option value="lastContact">Last Contact</option>
-                <option value="name">Name</option>
-                <option value="dateAdded">Date Added</option>
-              </select>
-              <button type="button" className="dp-icon-action" onClick={() => setParam('direction', direction === 'asc' ? 'desc' : 'asc')} aria-label={`Sort ${direction === 'asc' ? 'descending' : 'ascending'}`}>
-                {direction === 'asc' ? <ArrowUp size={15} /> : <ArrowDown size={15} />}
-              </button>
+              <select value={sort} onChange={(event) => setParam('sort', event.target.value)} aria-label="Sort customers"><option value="lastContact">Last Contact</option><option value="name">Name</option><option value="dateAdded">Date Added</option></select>
+              <button type="button" className="dp-icon-action" onClick={() => setParam('direction', direction === 'asc' ? 'desc' : 'asc')} aria-label={`Sort ${direction === 'asc' ? 'descending' : 'ascending'}`}>{direction === 'asc' ? <ArrowUp size={15} /> : <ArrowDown size={15} />}</button>
             </div>
           </div>
           <div className="dp-customers-list-scroll">
-            {isLoading ? <div className="dp-customer-list-message">Loading customers…</div> : sortedCustomers.length ? sortedCustomers.map((customer) => {
+            {isLoading && !customers.length ? <div className="dp-customer-list-message">Loading customers…</div> : sortedCustomers.length ? sortedCustomers.map((customer) => {
               const id = String(customer.id || customer.customer_id);
               return (
                 <button type="button" key={id} className={`dp-customer-row ${selectedId === id ? 'active' : ''}`} onClick={() => setParam('customer', id)}>
                   <span className="dp-customer-avatar">{getCustomerName(customer).charAt(0).toUpperCase()}</span>
-                  <span className="dp-customer-row-main">
-                    <strong>{getCustomerName(customer)}</strong>
-                    <small>{customer.phone || customer.whatsapp_number || 'No phone number'}</small>
-                    <span className="dp-customer-labels">{(customer.labels || []).slice(0, 2).map((label) => <i key={label}>{label}</i>)}</span>
-                  </span>
+                  <span className="dp-customer-row-main"><strong>{getCustomerName(customer)}</strong><small>{customer.phone || customer.whatsapp_number || 'No phone number'}</small><span className="dp-customer-labels">{(customer.labels || []).slice(0, 2).map((label) => <i key={label}>{label}</i>)}</span></span>
                   <time>{formatLastContact(customer.last_contact_at || customer.last_contact)}</time>
                 </button>
               );
-            }) : loadError ? <div className="dp-customer-list-message">Customer records are not available until the customers API is connected.</div> : <EmptyState icon={MessageCircle} title="No customers yet" description="Everyone who messages your business is saved here automatically." />}
+            }) : loadError ? <div className="dp-customer-list-message">Couldn't load customers. Check your connection and refresh.</div> : <EmptyState icon={MessageCircle} title="No customers yet" description="People who message your business will appear here automatically." />}
           </div>
         </div>
 
@@ -202,14 +224,15 @@ export default function CustomersPage() {
                 <button type="button" className="dp-primary-button" onClick={() => navigate(`/dashboard/chats?customer=${encodeURIComponent(selectedId)}`)}><MessageCircle size={15} /> Open chat</button>
               </div>
               <Panel className="dp-customer-detail-card">
-                <div className="dp-panel-heading"><h3>Labels</h3></div>
+                <div className="dp-panel-heading"><h3>Customer labels</h3></div>
                 <div className="dp-customer-label-editor">
-                  {[...new Set([...labels, ...labelsDraft])].map((label) => <label key={label}><input type="checkbox" checked={labelsDraft.includes(label)} onChange={() => setLabelsDraft((current) => current.includes(label) ? current.filter((item) => item !== label) : [...current, label])} />{label}</label>)}
-                  {!labels.length && !labelsDraft.length && <small>No labels have been added yet.</small>}
+                  {[...new Set([...labels, ...labelsDraft])].map((label) => <label key={label}><input type="checkbox" checked={labelsDraft.includes(label)} onChange={() => { setLabelsDraft((current) => current.includes(label) ? current.filter((item) => item !== label) : [...current, label]); setFieldErrors((current) => ({ ...current, labels: '' })); }} />{label}</label>)}
+                  {!labels.length && !labelsDraft.length && <small>No labels added yet.</small>}
                 </div>
                 <div className="dp-customer-add-label"><input value={newLabel} onChange={(event) => setNewLabel(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addCustomerLabel(); } }} placeholder="Add a label" maxLength={40} /><button type="button" className="dp-secondary-button" onClick={addCustomerLabel} disabled={!newLabel.trim()}><Plus size={14} /> Add label</button></div>
-                <label className="dp-form-field dp-customer-notes"><span>Notes</span><textarea className="dp-field-control dp-field-textarea" value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Add notes about this customer…" /></label>
-                <button type="button" className="dp-secondary-button" onClick={saveCustomerDetails} disabled={isSavingDetails}>{isSavingDetails ? 'Saving…' : 'Save customer details'}</button>
+                {fieldErrors.labels && <small className="dp-field-error" role="alert">{fieldErrors.labels}</small>}
+                <label className={`dp-form-field dp-customer-notes ${fieldErrors.notes ? 'dp-form-field-invalid' : ''}`}><span>Notes</span><textarea className="dp-field-control dp-field-textarea" value={notes} onChange={(event) => { setNotes(event.target.value); setFieldErrors((current) => ({ ...current, notes: '' })); }} placeholder="Add notes about this customer…" />{fieldErrors.notes && <small className="dp-field-error" role="alert">{fieldErrors.notes}</small>}</label>
+                <button type="button" className="dp-primary-button bb-customers-save" onClick={saveCustomerDetails} disabled={isSavingDetails}>{isSavingDetails ? 'Saving…' : 'Save customer details'}</button>
               </Panel>
               <div className="dp-customer-related-grid">
                 <Panel className="dp-customer-detail-card"><div className="dp-panel-heading"><h3>Orders</h3></div>{(selectedCustomer.orders || []).length ? selectedCustomer.orders.map((order) => <RelatedRow key={order.id || order.order_number} title={order.order_number || order.reference || 'Order'} detail={order.status || ''} value={order.total || order.amount || ''} />) : <p className="dp-muted">No orders linked to this customer.</p>}</Panel>
@@ -219,10 +242,6 @@ export default function CustomersPage() {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
-}
-
-function RelatedRow({ title, detail, value }) {
-  return <div className="dp-customer-related-row"><strong>{title}</strong><span>{detail}</span><small>{value}</small></div>;
 }

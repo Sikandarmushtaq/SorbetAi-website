@@ -419,7 +419,7 @@ export default function TemplatesPage() {
 
       showNotice('Template status refresh completed.');
     } catch (error) {
-      showNotice(error.message);
+      showNotice(error.message, 'error');
     } finally {
       setRefreshingId('');
     }

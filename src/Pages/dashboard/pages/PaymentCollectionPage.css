@@ -1,10 +1,21 @@
-/* Extracted from the original Bellbee dashboard stylesheet. Visual declarations are preserved. */
+
+/* Original payment styles */
+
 .dp-connection-icon {
-  display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px; border-radius: 10px; background: #dcebd9; color: var(--db-green);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 10px;
+  background: #dcebd9;
+  color: var(--db-green);
 }
 
 .dp-payment-hero {
-  padding: 22px; background: var(--db-green); color: var(--db-white);
+  padding: 22px;
+  background: var(--db-green);
+  color: var(--db-white);
 }
 
 .dp-payment-hero .dp-section-kicker {
@@ -12,19 +23,34 @@
 }
 
 .dp-payment-hero h2 {
-  margin: 4px 0 7px; color: var(--db-white); font-size: 22px; font-weight: 850;
+  margin: 4px 0 7px;
+  color: var(--db-white);
+  font-size: 22px;
+  font-weight: 850;
 }
 
 .dp-payment-hero > p {
-  max-width: 720px; margin: 0; color: rgba(255,250,240,.73); font-size: 10px; line-height: 1.7;
+  max-width: 720px;
+  margin: 0;
+  color: rgba(255, 250, 240, .73);
+  font-size: 10px;
+  line-height: 1.7;
 }
 
 .dp-payment-security {
-  display: flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--db-yellow); font-size: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--db-yellow);
+  font-size: 9px;
 }
 
 .dp-payment-provider-grid {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px;
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .dp-payment-provider-card {
@@ -32,20 +58,284 @@
 }
 
 .dp-payment-provider-top {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .dp-payment-provider-card h3 {
-  margin: 13px 0 5px; font-size: 15px; font-weight: 850;
+  margin: 13px 0 5px;
+  font-size: 15px;
+  font-weight: 850;
 }
 
 .dp-payment-provider-card p {
-  min-height: 38px; color: var(--db-muted); font-size: 9px; line-height: 1.6;
+  min-height: 38px;
+  color: var(--db-muted);
+  font-size: 9px;
+  line-height: 1.6;
 }
 
 @media (max-width: 760px) {
-.dp-payment-provider-grid {
-  grid-template-columns: 1fr;
+  .dp-payment-provider-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
+/* Premium Payment Collection
+   Added inside the same existing CSS file
+*/
+
+.bb-payment-premium {
+  width: 100%;
+  max-width: 1380px;
+  min-width: 0;
+  margin: 0 auto;
+  padding-bottom: 32px;
+}
+
+.bb-payment-premium .dp-payment-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  padding: clamp(23px, 3vw, 35px);
+
+  background:
+    radial-gradient(
+      circle at 89% 7%,
+      rgba(205, 189, 255, .4),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 5% 95%,
+      rgba(244, 201, 93, .22),
+      transparent 28%
+    ),
+    #fffaf0;
+
+  color: #10372a;
+
+  border: 1px solid rgba(16, 55, 42, .12);
+  border-radius: 24px;
+
+  box-shadow:
+    0 14px 35px rgba(16, 55, 42, .055);
+}
+
+.bb-payment-premium
+.dp-payment-hero .dp-section-kicker {
+  color: #a7784e;
+  font-size: 10px;
+}
+
+.bb-payment-premium
+.dp-payment-hero h2 {
+  color: #10372a;
+
+  margin: 12px 0 10px;
+
+  font-size: clamp(23px, 2.9vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -.8px;
+}
+
+.bb-payment-premium
+.dp-payment-hero > p {
+  max-width: 750px;
+
+  color: #5f7669;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.bb-payment-premium
+.dp-billing-hero-icon {
+  display: inline-grid;
+  place-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 15px;
+
+  background: #fce49c;
+  color: #10372a;
+
+  margin-bottom: 14px;
+}
+
+.bb-payment-premium
+.dp-payment-security {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+
+  padding: 10px 12px;
+
+  background: #e7f2e7;
+  color: #205b3b;
+
+  font-size: 11px;
+  line-height: 1.5;
+  border-radius: 12px;
+}
+
+.bb-payment-premium
+.bb-payment-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.bb-payment-premium
+.bb-payment-section-heading h2 {
+  color: #10372a;
+  font-size: clamp(19px, 2.1vw, 25px);
+}
+
+.bb-payment-premium
+.dp-payment-provider-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bb-payment-premium
+.dp-payment-provider-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  padding: 24px;
+
+  min-width: 0;
+  min-height: 235px;
+
+  display: flex;
+  flex-direction: column;
+
+  border: 1px solid rgba(16, 55, 42, .11);
+  border-radius: 22px;
+
+  background:
+    radial-gradient(
+      circle at 91% 8%,
+      rgba(205, 189, 255, .27),
+      transparent 31%
+    ),
+    #fffaf0;
+
+  box-shadow:
+    0 11px 30px rgba(16, 55, 42, .05);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.bb-payment-premium
+.dp-payment-provider-card:nth-child(2n) {
+  background:
+    radial-gradient(
+      circle at 91% 8%,
+      rgba(244, 201, 93, .22),
+      transparent 32%
+    ),
+    #fffaf0;
+}
+
+.bb-payment-premium
+.dp-payment-provider-card:hover {
+  box-shadow:
+    0 17px 35px rgba(16, 55, 42, .09);
+}
+
+.bb-payment-premium
+.dp-connection-icon {
+  background: #e5dcff;
+  color: #10372a;
+
+  width: 45px;
+  height: 45px;
+
+  border-radius: 14px;
+}
+
+.bb-payment-premium
+.dp-payment-provider-card h3 {
+  font-size: 19px;
+  line-height: 1.3;
+  margin: 17px 0 8px;
+}
+
+.bb-payment-premium
+.dp-payment-provider-card p {
+  color: #61776a;
+  font-size: 12px;
+  line-height: 1.7;
+  flex: 1;
+}
+
+.bb-payment-premium
+.dp-payment-provider-card button {
+  min-height: 43px;
+  font-size: 12px;
+  border-radius: 12px;
+}
+
+.bb-payment-premium
+.dp-primary-button {
+  background: #ff7a59;
+  color: #10372a;
+  border: 1px solid #ff7a59;
+}
+
+.bb-payment-premium
+.dp-primary-button:not(:disabled):hover {
+  background: #ff896b;
+  transform: translateY(-2px);
+}
+
+.bb-payment-premium
+.dp-page-header .dp-secondary-button {
+  font-size: 12px;
+  min-height: 43px;
+  border-radius: 12px;
+}
+
+.bb-payment-premium
+button:focus-visible {
+  outline: 3px solid #ff7a59;
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .bb-payment-premium
+  .dp-payment-provider-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bb-payment-premium
+  .dp-payment-provider-card {
+    min-height: 205px;
+    padding: 20px;
+  }
+
+  .bb-payment-premium
+  .dp-page-header .dp-header-actions {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-payment-premium
+  .dp-payment-provider-card {
+    transition: none;
+  }
 }

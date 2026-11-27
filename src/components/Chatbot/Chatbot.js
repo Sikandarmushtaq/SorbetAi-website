@@ -13,7 +13,7 @@ import {
   sendMessage,
   endConversation,
   isChatbotApiConfigured,
-} from '../../components/services/chatbotService.js';
+} from "../service/chatbotService"
 
 import './Chatbot.css';
 

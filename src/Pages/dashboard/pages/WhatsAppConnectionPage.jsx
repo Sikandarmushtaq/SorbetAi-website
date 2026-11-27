@@ -31,6 +31,7 @@ import {
 import { whatsappConnectionApi } from '../../../services/dashboard/whatsapp-connection.api.js';
 
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
+import { useDashboardToast } from '../../../components/dashboard/common/DashboardToastProvider';
 
 import {
   useNotice,
@@ -150,6 +151,7 @@ export default function WhatsAppConnectionPage() {
   } = useFreePlan();
 
   const { showNotice, Notice } = useNotice();
+  const toast = useDashboardToast();
 
   const [connection, setConnection] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -170,13 +172,14 @@ export default function WhatsAppConnectionPage() {
     String(connection?.status || '').toLowerCase() === 'connected'
   );
 
-  const loadConnection = useCallback(async (silent = false) => {
+  const loadConnection = useCallback(async (silent = false, notify = false) => {
     if (!configured) {
       if (!silent) {
         setError(
           'WhatsApp connection API is not configured.'
         );
         setLoading(false);
+        if (notify) toast.warning('Connection status unavailable', 'The WhatsApp API path is not configured.');
       }
       return;
     }
@@ -192,6 +195,7 @@ export default function WhatsAppConnectionPage() {
       const result = getConnection(response);
 
       setConnection(result);
+      if (notify) toast.success('WhatsApp status refreshed', 'Latest connection information loaded.');
 
       const isConnected = Boolean(
         result?.connected === true ||
@@ -209,11 +213,12 @@ export default function WhatsAppConnectionPage() {
           requestError?.message ||
           'Unable to check your WhatsApp connection.'
         );
+        if (notify) toast.error('Could not refresh WhatsApp', requestError?.message || 'Please try again.');
       }
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [configured]);
+  }, [configured, toast]);
 
   useEffect(() => {
     loadConnection();
@@ -258,6 +263,7 @@ export default function WhatsAppConnectionPage() {
     if (connectingMode) return;
 
     setConnectingMode(mode);
+    const pendingId = toast.loading('Starting WhatsApp connection', 'Requesting Meta authorization…');
 
     try {
       const response = await whatsappConnectionApi.request({
@@ -293,21 +299,16 @@ export default function WhatsAppConnectionPage() {
           );
         }
 
+        toast.update(pendingId, 'info', 'Opening Meta authorization', 'Complete setup with Meta. Connection is not yet confirmed.');
         window.location.assign(url.href);
         return;
       }
 
-      showNotice(
-        response?.message ||
-        'Connection request submitted. Complete the Meta authorization process.'
-      );
+      toast.update(pendingId, 'info', 'WhatsApp connection requested', response?.message || 'Complete Meta authorization and refresh your status.');
 
       await loadConnection();
     } catch (requestError) {
-      showNotice(
-        requestError?.message ||
-        'Unable to start the Meta connection.'
-      );
+      toast.update(pendingId, 'error', 'WhatsApp connection could not start', requestError?.message || 'Please try again.');
     } finally {
       setConnectingMode('');
     }
@@ -330,6 +331,7 @@ export default function WhatsAppConnectionPage() {
     if (qrBusy) return;
 
     setQrBusy(true);
+    const pendingId = toast.loading('Generating WhatsApp QR', 'Requesting a pairing code…');
     setQrImage('');
     setQrStatus('');
 
@@ -355,12 +357,9 @@ export default function WhatsAppConnectionPage() {
         'Scan this QR code using WhatsApp Linked Devices.'
       );
 
-      showNotice('QR code generated.');
+      toast.update(pendingId, 'success', 'QR code generated', 'Scan the QR to link your WhatsApp device.');
     } catch (requestError) {
-      showNotice(
-        requestError?.message ||
-        'Unable to generate WhatsApp QR code.'
-      );
+      toast.update(pendingId, 'error', 'QR code generation failed', requestError?.message || 'Please try again.');
     } finally {
       setQrBusy(false);
     }
@@ -402,7 +401,7 @@ export default function WhatsAppConnectionPage() {
         <button
           type="button"
           className="wac-refresh-status"
-          onClick={() => loadConnection()}
+          onClick={() => loadConnection(false, true)}
           disabled={loading || !configured}
         >
           <RefreshCw size={14} />
@@ -675,7 +674,7 @@ export default function WhatsAppConnectionPage() {
 
                   <button
                     type="button"
-                    onClick={() => loadConnection()}
+                    onClick={() => loadConnection(false, true)}
                     disabled={loading}
                   >
                     <RefreshCw size={14} />

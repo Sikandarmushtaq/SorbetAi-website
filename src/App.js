@@ -105,6 +105,7 @@ import ResetPassword from "./Pages/verifyemail/signin/ResetPassword";
 // ============================================
 
 import Dashboard from "./Pages/Dashboard";
+import AdminRoutes from "./routes/AdminRoutes";
 
 // ============================================
 // AUTH ROUTE GUARDS & CONTEXT
@@ -115,6 +116,7 @@ import GuestRoute from "./components/auth/GuestRoute";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 import { AuthProvider } from "./context/AuthContext";
+import NotFoundPage from "./Pages/notfound/NotFoundPage";
 
 // ============================================
 // SCROLL MANAGEMENT
@@ -593,6 +595,16 @@ export default function App() {
           />
 
           {/* ====================================
+              PLATFORM ADMIN DASHBOARD
+              Dedicated server-verified admin permissions.
+              User dashboard and its existing guards are unchanged.
+          ==================================== */}
+          <Route
+            path="/admin/*"
+            element={<AdminRoutes />}
+          />
+
+          {/* ====================================
               LEGACY DASHBOARD REDIRECTS
 
               Continue routing through the
@@ -648,7 +660,7 @@ export default function App() {
           <Route
             path="*"
             element={
-              <Navigate to="/" replace />
+             <NotFoundPage/>
             }
           />
 

@@ -474,3 +474,21 @@
     flex-wrap: wrap;
   }
 }
+
+/* BELLBEE-REMAINING-PREMIUM-BEGIN */
+
+
+/* Bellbee Facebook & Instagram premium — merged into original FacebookInstagramPage.css */
+.fi-page { width:100%; max-width:1130px; min-width:0; margin:0 auto; padding-bottom:35px; }
+.fi-header h1 { font-size:clamp(30px,3.3vw,43px); letter-spacing:-1.3px; color:#10372a; }
+.fi-page :is(.fi-main-card,.fi-connected-summary,.fi-information-box,.fi-security-note,.fi-benefit) { position:relative; isolation:isolate; overflow:hidden; min-width:0; border:1px solid rgba(16,55,42,.11); border-radius:22px; background:radial-gradient(circle at 92% 7%,rgba(205,189,255,.23),transparent 30%),radial-gradient(circle at 7% 94%,rgba(244,201,93,.14),transparent 27%),#fffaf0; box-shadow:0 11px 29px rgba(16,55,42,.05); }
+.fi-page .fi-main-card::after { content:""; position:absolute; right:-40px; bottom:-62px; width:135px; height:135px; border-radius:59% 41% 57% 43%/42% 60% 40% 58%; background:rgba(255,122,89,.12); z-index:-1; pointer-events:none; }
+.fi-page .fi-connect-button { min-height:45px; padding:10px 17px; border:1px solid #ff7a59; border-radius:13px; background:#ff7a59; color:#10372a; font-size:12px; font-weight:850; transition:transform .2s,box-shadow .2s; }
+.fi-page .fi-connect-button:not(:disabled):hover { background:#ff8b6e; color:#10372a; transform:translateY(-2px); box-shadow:0 12px 25px rgba(255,122,89,.22); }
+.fi-page :is(.fi-refresh-button,.fi-back-button) { min-height:40px; border-radius:12px; font-size:12px; }
+.fi-page :is(.fi-benefits,.fi-connected-items,.fi-actions) { min-width:0; }
+.fi-page p { overflow-wrap:anywhere; }
+.fi-page :is(button,input):focus-visible { outline:3px solid #ff7a59; outline-offset:2px; }
+@media(max-width:760px) { .fi-page { width:100%; padding-bottom:25px; } .fi-page :is(.fi-main-card,.fi-connected-summary) { padding:clamp(16px,3vw,23px); } .fi-page .fi-actions { flex-wrap:wrap; } }
+@media(max-width:440px) { .fi-page .fi-connect-button { max-width:100%; width:100%; } }
+@media(prefers-reduced-motion:reduce) { .fi-page button { transition:none!important; } }

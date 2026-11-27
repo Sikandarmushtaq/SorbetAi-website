@@ -529,7 +529,7 @@ export default function DashboardHome() {
 
       await loadDashboard();
     } catch (error) {
-      showNotice(error.message);
+      showNotice(error.message, 'error');
     } finally {
       setIsSavingStep(false);
     }
@@ -572,7 +572,7 @@ export default function DashboardHome() {
         'Your opening hours have been confirmed.'
       );
     } catch (error) {
-      showNotice(error.message);
+      showNotice(error.message, 'error');
     } finally {
       setIsConfirmingHours(false);
     }

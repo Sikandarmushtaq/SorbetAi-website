@@ -11,6 +11,7 @@ import OrdersPage from '../Pages/dashboard/pages/OrdersPage';
 import ProductsPage from '../Pages/dashboard/pages/ProductsPage';
 import ServicesPage from '../Pages/dashboard/pages/ServicesPage';
 import BrainPage from '../Pages/dashboard/pages/BrainPage';
+import RequestsInboxPage from '../Pages/dashboard/pages/RequestsInboxPage';
 import AppointmentsPage from '../Pages/dashboard/pages/AppointmentsPage';
 import AnalyticsPage from '../Pages/dashboard/pages/AnalyticsPage';
 import ChannelsPage from '../Pages/dashboard/pages/ChannelsPage';
@@ -43,6 +44,8 @@ export default function DashboardRoutes() {
         <Route path="products" element={<ProductsPage />} />
         <Route path="services" element={<ServicesPage />} />
         <Route path="brain" element={<BrainPage />} />
+        <Route path="requests" element={<RequestsInboxPage />} />
+        <Route path="requests/:requestId" element={<RequestsInboxPage />} />
         <Route path="appointments" element={<AppointmentsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="channels" element={<ChannelsPage />} />

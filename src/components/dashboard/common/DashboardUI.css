@@ -318,3 +318,238 @@
     border-radius: 16px 16px 0 0;
   }
 }
+/* ============================================================
+   NOV 2026: GLOBAL POPUP FIX — applies to ALL shared Modal users.
+   Do not make a separate CSS file. Keep existing styles above.
+   The Modal is rendered into <body> by DashboardUI.jsx.
+   ============================================================ */
+.dp-modal-backdrop.bb-dashboard-modal-portal {
+  --db-green: #10372a;
+  --db-white: #fffaf0;
+  --db-cream: #f3ede1;
+  --db-coral: #ff7a59;
+  --db-muted: #64766b;
+  --db-border: rgba(16, 55, 42, 0.13);
+  --bb-primary: #ff7a59;
+  --bb-ink: #10372a;
+  --bb-outline: rgba(16, 55, 42, 0.12);
+
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147480000 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: clamp(12px, 3vh, 26px) !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(12, 36, 26, 0.45) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-sizing: border-box;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  width: min(100%, 600px) !important;
+  max-height: min(80dvh, 690px) !important;
+  margin: auto;
+  overflow: hidden;
+  border: 1px solid rgba(16, 55, 42, .12) !important;
+  border-radius: 20px !important;
+  background: #fffaf0 !important;
+  color: #10372a !important;
+  box-shadow: 0 28px 75px rgba(13, 42, 29, .25) !important;
+}
+
+/* Preserve narrow width for existing confirmation popups. */
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal:has(.dp-free-plan-benefits),
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal:has(.dp-addon-confirm-details) {
+  width: min(100%, 420px) !important;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-header,
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-footer {
+  flex: 0 0 auto;
+  min-width: 0;
+  background: #fffaf0 !important;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-header {
+  padding: 14px 19px !important;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid rgba(16, 55, 42, .10) !important;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-header h2 {
+  margin: 0;
+  font-size: clamp(17px, 2vw, 20px) !important;
+  line-height: 1.25;
+  color: #10372a;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-header p {
+  margin: 5px 0 0;
+  font-size: 12px !important;
+  line-height: 1.55;
+  color: #617469;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-close {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #f7efe4;
+  color: #10372a;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-close:hover {
+  background: #ffe3d8;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  padding: 16px 19px !important;
+  background: #fffaf0 !important;
+  scrollbar-width: thin;
+  scrollbar-color: #c6c9bd transparent;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 13px 19px !important;
+  border-top: 1px solid rgba(16,55,42,.1) !important;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 15px;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-form-full {
+  grid-column: 1 / -1;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-form-field,
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-field-control {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-field-control {
+  min-height: 40px;
+  border-radius: 11px;
+  background: #fffdf8 !important;
+  color: #10372a !important;
+  border: 1px solid rgba(16,55,42,.18) !important;
+  font-size: 12px;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal textarea.dp-field-control {
+  min-height: 65px;
+  resize: vertical;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-form-field-invalid .dp-field-control {
+  border-color: #c94d40 !important;
+  background: #fff5f2 !important;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: #b44137;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #f2c5bb;
+  border-radius: 11px;
+  color: #ad4435;
+  background: #fff0e9;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-error p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-primary-button {
+  background: #ff7a59 !important;
+  border-color: #ff7a59 !important;
+  color: #10372a !important;
+  border-radius: 11px;
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal .dp-primary-button:not(:disabled):hover {
+  background: #ff896a !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255,122,89,.22);
+}
+
+.dp-modal-backdrop.bb-dashboard-modal-portal :is(button, input, textarea, select):focus-visible {
+  outline: 2px solid #ff7a59;
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .dp-modal-backdrop.bb-dashboard-modal-portal {
+    place-items: end center !important;
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal {
+    width: 100% !important;
+    max-height: 88dvh !important;
+    border-radius: 19px !important;
+  }
+
+  .dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-body {
+    padding: 14px !important;
+  }
+
+  .dp-modal-backdrop.bb-dashboard-modal-portal .dp-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .dp-modal-backdrop.bb-dashboard-modal-portal .dp-modal-footer > button {
+    flex: 1 1 auto;
+  }
+}
+
+/* Suggestion form already uses a body portal; compact its existing dialog too. */
+.dp-suggestions-modal-overlay .dp-suggestions-modal {
+  width: min(100%, 440px);
+  max-height: min(80dvh, 680px) !important;
+}
+
+/* Referral QR popup uses the same shared Modal and primary action color. */
+.dp-modal-backdrop.bb-dashboard-modal-portal .rf-modal-primary {
+  background: #ff7a59;
+  border-color: #ff7a59;
+  color: #10372a;
+}

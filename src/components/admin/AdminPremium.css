@@ -1,0 +1,1879 @@
+
+/* ================================================
+   BELLBEE AI — PREMIUM ADMIN DASHBOARD
+   FINAL LIGHT HERO + ORGANIC BLOBS DESIGN
+   -----------------------------------------------
+   Brand:
+   Cream     #f3ede1
+   Green     #10372a
+   Coral     #ff7a59
+   Lavender  #cdbdff
+   Yellow    #f4c95d
+   White     #fffaf0
+================================================ */
+
+.bb-admin-premium {
+  --bb-admin-green: #10372a;
+  --bb-admin-cream: #f3ede1;
+  --bb-admin-coral: #ff7a59;
+  --bb-admin-yellow: #f4c95d;
+  --bb-admin-lavender: #cdbdff;
+  --bb-admin-white: #fffaf0;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+
+  background: var(--bb-admin-cream);
+  color: var(--bb-admin-green);
+}
+
+.bb-admin-premium *,
+.bb-admin-premium *::before,
+.bb-admin-premium *::after {
+  box-sizing: border-box;
+}
+
+.bb-admin-premium .db-main {
+  min-width: 0;
+}
+
+/* ================================================
+   MAIN CONTENT AREA
+================================================ */
+
+.bb-admin-premium .bb-admin-content {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  max-width: 1480px;
+  min-width: 0;
+
+  min-height: calc(100vh - 85px);
+
+  padding: 22px 9px 55px;
+  overflow: hidden;
+}
+
+.bb-admin-page-layer {
+  position: relative;
+  z-index: 2;
+
+  min-width: 0;
+  width: 100%;
+}
+
+/* ================================================
+   AMBIENT BACKGROUND BLOBS
+   Contained inside content viewport
+================================================ */
+
+.bb-admin-ambient {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bb-admin-ambient i {
+  position: absolute;
+  display: block;
+
+  border-radius:
+    60% 40% 57% 43% /
+    42% 58% 42% 58%;
+
+  opacity: 0.22;
+
+  animation:
+    bbAdminMorph 17s ease-in-out
+    infinite alternate;
+}
+
+.bb-admin-ambient-one {
+  width: min(36vw, 440px);
+  aspect-ratio: 1;
+
+  top: 15px;
+  right: 2%;
+
+  background: var(--bb-admin-lavender);
+}
+
+.bb-admin-ambient-two {
+  width: min(28vw, 300px);
+  aspect-ratio: 1;
+
+  top: 440px;
+  left: 2%;
+
+  background: var(--bb-admin-yellow);
+  animation-delay: -7s !important;
+}
+
+.bb-admin-ambient-three {
+  width: min(19vw, 220px);
+  aspect-ratio: 1;
+
+  top: 890px;
+  right: 5%;
+
+  background: var(--bb-admin-coral);
+  animation-delay: -10s !important;
+}
+
+@keyframes bbAdminMorph {
+  0% {
+    border-radius:
+      60% 40% 57% 43% /
+      42% 58% 42% 58%;
+    transform: rotate(0deg);
+  }
+
+  100% {
+    border-radius:
+      41% 59% 45% 55% /
+      61% 39% 61% 39%;
+    transform:
+      translate(10px, 12px)
+      rotate(12deg);
+  }
+}
+
+/* ================================================
+   SIDEBAR
+   Keep dark-green navigation as original
+================================================ */
+
+.bb-admin-premium .db-sidebar {
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      167deg,
+      #154b37 0%,
+      #10372a 52%,
+      #0b2b20 100%
+    );
+
+  box-shadow:
+    0 22px 49px rgba(16, 55, 42, 0.2);
+}
+
+.bb-admin-premium .db-sidebar-nav {
+  padding-right: 2px;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(255, 250, 240, 0.28)
+    transparent;
+}
+
+.bb-admin-premium .db-nav-item {
+  min-height: 35px;
+  border-radius: 10px;
+}
+
+.bb-admin-premium
+.db-sidebar.is-expanded
+.db-nav-item {
+  padding: 0 12px;
+}
+
+.bb-admin-premium
+.db-sidebar.is-expanded
+.db-nav-label {
+  font-size: 11px;
+}
+
+.bb-admin-premium .db-nav-item.active {
+  box-shadow:
+    0 4px 13px rgba(255, 122, 89, 0.15);
+
+  font-weight: 800;
+}
+
+.bb-admin-premium
+.db-sidebar.is-expanded
+.db-nav-group-title {
+  font-size: 8px;
+  letter-spacing: 1.3px;
+
+  color: rgba(255, 250, 240, 0.5);
+}
+
+.bb-admin-premium .db-brand-mark {
+  background: var(--bb-admin-coral);
+  border-radius: 12px;
+}
+
+.bb-admin-premium .db-brand-name {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.bb-admin-premium .bb-admin-brand-tag {
+  display: block;
+  margin-top: 4px;
+
+  font-size: 8px;
+  letter-spacing: 1.5px;
+
+  color: var(--bb-admin-yellow);
+}
+
+.bb-admin-sidebar-bottom-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 3px;
+  border-radius: 12px;
+
+  background: rgba(255, 250, 240, 0.055);
+  color: var(--bb-admin-yellow);
+}
+
+.bb-admin-premium .bb-admin-sidebar-foot {
+  color: rgba(255, 250, 240, 0.77);
+
+  font-size: 9px;
+  letter-spacing: 0.65px;
+}
+
+/* ================================================
+   PREMIUM STICKY HEADER
+================================================ */
+
+.bb-admin-premium .bb-admin-header {
+  position: sticky;
+  z-index: 180;
+
+  min-height: 76px;
+  padding: 12px 10px 12px 9px;
+
+  border-bottom:
+    1px solid rgba(16, 55, 42, 0.08);
+
+  background: rgba(243, 237, 225, 0.91);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.bb-admin-premium .bb-admin-header-start {
+  min-width: 180px;
+}
+
+.bb-admin-premium .bb-admin-header-eyebrow {
+  gap: 7px;
+
+  color: #a85f45;
+  font-size: 9px;
+  letter-spacing: 1.3px;
+}
+
+.bb-admin-premium
+.bb-admin-header-start strong {
+  font-size: 17px;
+  letter-spacing: -0.65px;
+}
+
+/* HEADER SEARCH */
+
+.bb-admin-premium .bb-admin-search {
+  flex: 1 1 390px;
+
+  max-width: 470px;
+  min-width: 180px;
+  height: 44px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 250, 240, 0.94);
+
+  box-shadow:
+    0 3px 13px rgba(16, 55, 42, 0.03);
+}
+
+.bb-admin-premium .bb-admin-search input {
+  font-size: 12px;
+}
+
+.bb-admin-premium .bb-admin-search kbd {
+  padding: 4px 7px;
+
+  border: 1px solid rgba(16, 55, 42, 0.1);
+  border-radius: 6px;
+
+  background: #f2e9da;
+  color: #708074;
+
+  font-size: 11px;
+}
+
+.bb-admin-premium .bb-admin-search button {
+  background: #edf2e8;
+}
+
+/* PREVIEW BADGE */
+
+.bb-admin-top-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 11px;
+
+  border: 1px solid #e9d9b5;
+  border-radius: 100px;
+
+  background: #fff3cf;
+  color: #835e24;
+
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.5px;
+
+  white-space: nowrap;
+}
+
+.bb-admin-top-preview span {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+  background: #d59925;
+}
+
+/* HEADER NOTIFICATION */
+
+.bb-admin-notification-icon {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  width: 39px;
+  height: 39px;
+
+  border: 1px solid rgba(16, 55, 42, 0.11);
+  border-radius: 13px;
+
+  color: var(--bb-admin-green);
+  background: var(--bb-admin-white);
+
+  cursor: pointer;
+}
+
+.bb-admin-notification-icon:hover {
+  background: #fff0d0;
+}
+
+/* ================================================
+   ROUND ADMIN PROFILE BUTTON
+================================================ */
+
+.bb-admin-profile-anchor {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.bb-admin-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  max-width: 230px;
+  min-height: 46px;
+
+  padding: 4px 9px 4px 5px;
+
+  border: 1px solid rgba(16, 55, 42, 0.11);
+  border-radius: 100px;
+
+  background: var(--bb-admin-white);
+  color: var(--bb-admin-green);
+
+  cursor: pointer;
+}
+
+.bb-admin-profile-trigger:hover,
+.bb-admin-profile-trigger.is-open {
+  border-color: rgba(255, 122, 89, 0.7);
+
+  box-shadow:
+    0 6px 20px rgba(16, 55, 42, 0.07);
+}
+
+.bb-admin-profile-avatar {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 35px;
+
+  width: 35px;
+  height: 35px;
+
+  border-radius: 50%;
+
+  background: var(--bb-admin-coral);
+  color: var(--bb-admin-green);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.bb-admin-profile-avatar.large {
+  flex-basis: 46px;
+
+  width: 46px;
+  height: 46px;
+
+  font-size: 15px;
+}
+
+.bb-admin-profile-trigger-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+
+  min-width: 0;
+}
+
+.bb-admin-profile-trigger-label strong {
+  max-width: 110px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 11px;
+}
+
+.bb-admin-profile-trigger-label small {
+  color: #748478;
+  font-size: 9px;
+}
+
+.bb-admin-profile-chevron {
+  flex-shrink: 0;
+
+  color: #7e8c80;
+
+  transition: transform 0.2s;
+}
+
+.bb-admin-profile-trigger.is-open
+.bb-admin-profile-chevron {
+  transform: rotate(180deg);
+}
+
+/* ================================================
+   PREMIUM PROFILE DROPDOWN
+================================================ */
+
+.bb-admin-profile-menu {
+  position: absolute;
+  z-index: 300;
+
+  top: calc(100% + 13px);
+  right: 0;
+
+  width: 290px;
+  max-width: calc(100vw - 28px);
+
+  padding: 12px;
+
+  border: 1px solid rgba(16, 55, 42, 0.12);
+  border-radius: 19px;
+
+  background: var(--bb-admin-white);
+
+  box-shadow:
+    0 22px 55px rgba(16, 55, 42, 0.17);
+
+  animation: bbAdminMenu 0.22s ease both;
+}
+
+@keyframes bbAdminMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bb-admin-profile-intro {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 9px 8px 15px;
+}
+
+.bb-admin-profile-intro > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.bb-admin-profile-intro strong {
+  font-size: 13px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bb-admin-profile-intro small {
+  color: #7c8a80;
+  font-size: 10px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bb-admin-profile-menu-caption {
+  margin: 0 5px 6px;
+  padding: 9px 4px 0;
+
+  border-top: 1px solid rgba(16, 55, 42, 0.09);
+
+  color: #9b7965;
+
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 1px;
+}
+
+.bb-admin-profile-menu > button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  width: 100%;
+  min-height: 42px;
+
+  padding: 0 10px;
+
+  border: 0;
+  border-radius: 11px;
+
+  background: transparent;
+  color: var(--bb-admin-green);
+
+  text-align: left;
+  font-size: 12px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.bb-admin-profile-menu > button:hover {
+  background: #f4ecdf;
+}
+
+.bb-admin-profile-menu-divider {
+  height: 1px;
+  margin: 8px 3px;
+
+  background: rgba(16, 55, 42, 0.1);
+}
+
+.bb-admin-profile-menu
+> .bb-admin-profile-signout {
+  color: #b55442;
+}
+
+.bb-admin-profile-menu
+> .bb-admin-profile-signout:hover {
+  background: #ffe3dc;
+}
+
+.bb-admin-menu-soon {
+  margin-left: auto;
+
+  color: #9a9d90;
+  font-size: 9px;
+}
+
+/* ================================================
+   PAGE HEADINGS
+================================================ */
+
+.bb-admin-premium .bb-admin-page-header {
+  margin-bottom: 25px;
+}
+
+.bb-admin-premium
+.bb-admin-page-header h1 {
+  font-size: clamp(31px, 3.3vw, 47px);
+  font-weight: 900;
+
+  letter-spacing: -2px;
+}
+
+.bb-admin-premium
+.bb-admin-page-header
+.dp-page-description {
+  color: #738175;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ================================================
+   PREMIUM PANELS
+================================================ */
+
+.bb-admin-premium .dp-panel,
+.bb-admin-premium .bb-admin-profile-hero {
+  border: 1px solid rgba(16, 55, 42, 0.095);
+
+  background: rgba(255, 250, 240, 0.96);
+
+  box-shadow:
+    0 8px 30px rgba(16, 55, 42, 0.045);
+}
+
+.bb-admin-premium .bb-admin-panel {
+  padding: 26px;
+  border-radius: 23px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.bb-admin-premium
+.bb-admin-panel-heading h2 {
+  font-size: 20px;
+}
+
+.bb-admin-premium .bb-admin-btn {
+  min-height: 42px;
+  padding: 10px 17px;
+
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.bb-admin-premium .bb-admin-btn-primary {
+  border-radius: 100px;
+}
+
+.bb-admin-premium .bb-admin-filter-search,
+.bb-admin-premium .bb-admin-select {
+  border-radius: 13px;
+  background: #fffdfa;
+}
+
+/* ================================================
+   PREMIUM TABLES
+================================================ */
+
+.bb-admin-premium .bb-admin-table {
+  font-size: 12px;
+}
+
+.bb-admin-premium .bb-admin-table th {
+  padding: 16px 13px;
+  font-size: 10px;
+}
+
+.bb-admin-premium .bb-admin-table td {
+  padding: 15px 13px;
+}
+
+.bb-admin-premium
+.bb-admin-table tbody tr {
+  transition: background 0.18s;
+}
+
+.bb-admin-premium
+.bb-admin-table tbody tr:hover {
+  background: #f8f4eb;
+}
+
+.bb-admin-premium .bb-admin-view {
+  padding: 10px 14px;
+
+  border-radius: 100px;
+  font-size: 10px;
+}
+
+.bb-admin-premium .bb-admin-detail-tabs {
+  border-radius: 15px;
+}
+
+.bb-admin-premium .bb-admin-info-item {
+  border-radius: 15px;
+  background: #f5f0e6;
+}
+
+/* ================================================
+   QUICK ACCESS CARDS
+================================================ */
+
+.bb-admin-premium .bb-admin-quick {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 160px;
+  padding: 20px;
+
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at 85% 18%,
+      rgba(205, 189, 255, 0.16),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 16% 84%,
+      rgba(244, 201, 93, 0.13),
+      transparent 26%
+    ),
+    #f7f1e8;
+}
+
+.bb-admin-premium .bb-admin-quick:hover {
+  background:
+    radial-gradient(
+      circle at 85% 18%,
+      rgba(205, 189, 255, 0.24),
+      transparent 29%
+    ),
+    #f3eadd;
+
+  box-shadow:
+    0 12px 24px rgba(16, 55, 42, 0.07);
+}
+
+.bb-admin-premium .bb-admin-quick-grid {
+  gap: 13px;
+}
+
+/* ================================================
+   STATISTIC CARDS WITH ORGANIC SHAPES
+================================================ */
+
+.bb-admin-premium .bb-admin-stat {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 156px;
+  padding: 22px;
+
+  border: 1px solid rgba(16, 55, 42, 0.085);
+  border-radius: 21px;
+
+  background:
+    radial-gradient(
+      circle at 88% 14%,
+      rgba(205, 189, 255, 0.12),
+      transparent 28%
+    ),
+    rgba(255, 250, 240, 0.97);
+}
+
+.bb-admin-premium .bb-admin-stat::after {
+  content: "";
+
+  position: absolute;
+
+  right: -22px;
+  bottom: -28px;
+
+  width: 100px;
+  height: 100px;
+
+  border-radius:
+    57% 43% 63% 37% /
+    42% 61% 39% 58%;
+
+  background: var(--bb-admin-lavender);
+  opacity: 0.24;
+
+  pointer-events: none;
+}
+
+.bb-admin-premium
+.bb-admin-stat-link:nth-child(2)
+.bb-admin-stat::after {
+  background: var(--bb-admin-coral);
+}
+
+.bb-admin-premium
+.bb-admin-stat-link:nth-child(3)
+.bb-admin-stat::after {
+  background: var(--bb-admin-yellow);
+}
+
+.bb-admin-premium
+.bb-admin-stat-link:nth-child(4)
+.bb-admin-stat::after {
+  background: #94c9ae;
+}
+
+.bb-admin-premium
+.bb-admin-stat-link:nth-child(5)
+.bb-admin-stat::after {
+  background: var(--bb-admin-yellow);
+}
+
+.bb-admin-premium
+.bb-admin-stat-link:nth-child(6)
+.bb-admin-stat::after {
+  background: var(--bb-admin-coral);
+}
+
+.bb-admin-premium .bb-admin-stat > strong {
+  position: relative;
+  z-index: 1;
+
+  display: block;
+  margin-top: 12px;
+
+  font-size: clamp(28px, 2.6vw, 36px);
+}
+
+.bb-admin-premium .bb-admin-stat > p {
+  position: relative;
+  z-index: 1;
+
+  font-size: 12px;
+}
+
+.bb-admin-premium .bb-admin-stat > small {
+  position: relative;
+  z-index: 1;
+
+  font-size: 10px;
+}
+
+/* ================================================
+   NEW LIGHT PREMIUM OVERVIEW HERO
+   No solid dark-green background
+================================================ */
+
+.bb-admin-premium .bb-admin-spotlight {
+  position: relative;
+  isolation: isolate;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(220px, 0.75fr);
+
+  align-items: center;
+  gap: 24px;
+
+  min-height: 258px;
+
+  padding:
+    34px clamp(24px, 3.7vw, 48px);
+
+  margin-bottom: 27px;
+
+  overflow: hidden;
+  border-radius: 28px;
+
+  border: 1px solid rgba(16, 55, 42, 0.08);
+
+  background:
+    radial-gradient(
+      circle at 12% 18%,
+      rgba(244, 201, 93, 0.22),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 83% 18%,
+      rgba(205, 189, 255, 0.3),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 72% 86%,
+      rgba(255, 122, 89, 0.14),
+      transparent 27%
+    ),
+    linear-gradient(
+      180deg,
+      #fffaf0 0%,
+      #f8f1e7 100%
+    );
+
+  box-shadow:
+    0 18px 36px rgba(16, 55, 42, 0.075);
+
+  color: var(--bb-admin-green);
+}
+
+/* TOP-RIGHT ORGANIC LAVENDER BLOB */
+
+.bb-admin-premium .bb-admin-spotlight::before {
+  content: "";
+
+  position: absolute;
+  z-index: 0;
+
+  top: -120px;
+  right: -40px;
+
+  width: min(34vw, 410px);
+  aspect-ratio: 1;
+
+  border-radius:
+    58% 42% 51% 49% /
+    45% 55% 45% 55%;
+
+  background: rgba(205, 189, 255, 0.37);
+
+  pointer-events: none;
+
+  animation:
+    bbAdminHeroBlob 18s ease-in-out infinite alternate;
+}
+
+/* LOWER GOLD ORGANIC BLOB */
+
+.bb-admin-premium .bb-admin-spotlight::after {
+  content: "";
+
+  position: absolute;
+  z-index: 0;
+
+  left: 42%;
+  bottom: -155px;
+
+  width: 290px;
+  height: 290px;
+
+  border-radius:
+    60% 40% 64% 36% /
+    42% 58% 42% 58%;
+
+  background: rgba(244, 201, 93, 0.22);
+
+  pointer-events: none;
+
+  animation:
+    bbAdminHeroBlob 23s ease-in-out
+    infinite alternate-reverse;
+}
+
+@keyframes bbAdminHeroBlob {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+
+  to {
+    transform: rotate(18deg) scale(1.07);
+  }
+}
+
+/* HERO COPY */
+
+.bb-admin-spotlight-copy {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.bb-admin-premium .bb-admin-spotlight-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 14px;
+
+  border: 1px solid rgba(16, 55, 42, 0.1);
+  border-radius: 100px;
+
+  background: rgba(255, 250, 240, 0.75);
+  color: #97681f;
+
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1px;
+}
+
+.bb-admin-premium .bb-admin-spotlight h1 {
+  max-width: 680px;
+
+  margin: 18px 0 10px;
+
+  color: var(--bb-admin-green);
+
+  font-size: clamp(31px, 3.6vw, 52px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -2px;
+}
+
+.bb-admin-premium .bb-admin-spotlight h1 em {
+  color: #be8327;
+
+  font-family:
+    "Newsreader",
+    Georgia,
+    serif;
+
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -1px;
+}
+
+.bb-admin-premium .bb-admin-spotlight p {
+  max-width: 510px;
+
+  margin: 0 0 19px;
+
+  color: #617467;
+
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+/* HERO BUTTONS */
+
+.bb-admin-spotlight-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bb-admin-premium
+.bb-admin-spotlight-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 17px;
+
+  border: 1px solid transparent;
+  border-radius: 100px;
+
+  background: var(--bb-admin-coral);
+  color: var(--bb-admin-green);
+
+  text-decoration: none;
+
+  font-size: 11px;
+  font-weight: 850;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.bb-admin-premium
+.bb-admin-spotlight-actions a:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 22px rgba(255, 122, 89, 0.2);
+}
+
+.bb-admin-premium
+.bb-admin-spotlight-actions a + a {
+  border-color: rgba(16, 55, 42, 0.13);
+
+  color: var(--bb-admin-green);
+  background: rgba(255, 250, 240, 0.85);
+}
+
+.bb-admin-premium
+.bb-admin-spotlight-actions a + a:hover {
+  background: #fffaf0;
+}
+
+/* ================================================
+   HERO ILLUSTRATION - LIGHT PREMIUM VERSION
+================================================ */
+
+.bb-admin-spotlight-art {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  place-items: center;
+
+  min-width: 0;
+  min-height: 180px;
+}
+
+/* OUTER ORBIT */
+
+.bb-admin-orbit {
+  position: relative;
+  isolation: isolate;
+
+  display: grid;
+  place-items: center;
+
+  width: 167px;
+  height: 167px;
+
+  border: 1px dashed rgba(16, 55, 42, 0.18);
+  border-radius: 50%;
+
+  background: rgba(255, 250, 240, 0.45);
+}
+
+/* SOFT LAVENDER CIRCLE BEHIND ORBIT */
+
+.bb-admin-orbit::before {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  inset: -48px;
+
+  border-radius:
+    58% 42% 48% 52% /
+    47% 53% 47% 53%;
+
+  background: rgba(205, 189, 255, 0.25);
+
+  pointer-events: none;
+}
+
+.bb-admin-orbit::after {
+  content: "";
+
+  position: absolute;
+  inset: -28px;
+
+  border: 1px solid rgba(16, 55, 42, 0.1);
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+/* CENTRAL YELLOW ICON */
+
+.bb-admin-orbit-core {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+  place-items: center;
+
+  width: 87px;
+  height: 87px;
+
+  border-radius: 30px;
+
+  transform: rotate(-8deg);
+
+  background: var(--bb-admin-yellow);
+  color: var(--bb-admin-green);
+
+  box-shadow:
+    0 18px 35px rgba(16, 55, 42, 0.12);
+}
+
+.bb-admin-orbit-core svg {
+  transform: rotate(8deg);
+}
+
+/* FLOATING LABELS */
+
+.bb-admin-orbit-pill {
+  position: absolute;
+  z-index: 3;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 10px 13px;
+
+  border-radius: 100px;
+
+  background: var(--bb-admin-white);
+  color: var(--bb-admin-green);
+
+  font-size: 10px;
+  font-weight: 850;
+  white-space: nowrap;
+
+  box-shadow:
+    0 12px 26px rgba(16, 55, 42, 0.1);
+}
+
+.bb-admin-orbit-pill.one {
+  top: 7px;
+  right: -30px;
+}
+
+.bb-admin-orbit-pill.two {
+  bottom: 11px;
+  left: -43px;
+
+  background: rgba(205, 189, 255, 0.92);
+}
+
+/* ================================================
+   GUIDE CARD — LIGHT BLOBS VERSION
+   "A clearer view. Better decisions."
+================================================ */
+
+.bb-admin-premium .bb-admin-guide {
+  position: relative;
+  isolation: isolate;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(16, 55, 42, 0.08);
+  border-radius: 23px;
+
+  background:
+    radial-gradient(
+      circle at 18% 14%,
+      rgba(244, 201, 93, 0.2),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 84% 18%,
+      rgba(205, 189, 255, 0.28),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 72% 92%,
+      rgba(255, 122, 89, 0.13),
+      transparent 27%
+    ),
+    linear-gradient(
+      180deg,
+      #fffaf0 0%,
+      #f8f2e8 100%
+    );
+
+  color: var(--bb-admin-green);
+
+  box-shadow:
+    0 12px 28px rgba(16, 55, 42, 0.06);
+}
+
+/* LAVENDER ORGANIC BLOB */
+
+.bb-admin-premium .bb-admin-guide::before {
+  content: "";
+
+  position: absolute;
+  z-index: 0;
+
+  top: -72px;
+  right: -58px;
+
+  width: 175px;
+  height: 175px;
+
+  border-radius:
+    61% 39% 46% 54% /
+    46% 57% 43% 54%;
+
+  background: rgba(205, 189, 255, 0.31);
+
+  pointer-events: none;
+}
+
+/* YELLOW ORGANIC BLOB */
+
+.bb-admin-premium .bb-admin-guide::after {
+  content: "";
+
+  position: absolute;
+  z-index: 0;
+
+  bottom: -78px;
+  left: -48px;
+
+  width: 160px;
+  height: 160px;
+
+  border-radius:
+    52% 48% 62% 38% /
+    42% 60% 40% 58%;
+
+  background: rgba(244, 201, 93, 0.24);
+
+  pointer-events: none;
+}
+
+/* ENSURE TEXT SITS ABOVE BLOBS */
+
+.bb-admin-premium .bb-admin-guide > * {
+  position: relative;
+  z-index: 1;
+}
+
+.bb-admin-premium
+.bb-admin-guide .dp-eyebrow {
+  color: #966824;
+}
+
+.bb-admin-premium .bb-admin-guide h2 {
+  color: var(--bb-admin-green);
+
+  font-size: clamp(24px, 2.5vw, 32px);
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.15;
+}
+
+.bb-admin-premium .bb-admin-guide p {
+  color: #62786c;
+  line-height: 1.8;
+}
+
+.bb-admin-premium .bb-admin-guide > svg {
+  color: var(--bb-admin-coral);
+}
+
+/* GUIDE CARD BUTTON */
+
+.bb-admin-premium
+.bb-admin-guide .bb-admin-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: fit-content;
+  max-width: 100%;
+
+  padding: 12px 17px;
+
+  border-radius: 100px;
+
+  background: var(--bb-admin-coral);
+  color: var(--bb-admin-green);
+
+  font-weight: 850;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.bb-admin-premium
+.bb-admin-guide .bb-admin-btn-primary svg {
+  color: var(--bb-admin-green);
+}
+
+.bb-admin-premium
+.bb-admin-guide .bb-admin-btn-primary:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 24px rgba(255, 122, 89, 0.19);
+}
+
+/* ================================================
+   SECTION LABELS
+================================================ */
+
+.bb-admin-section-label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+
+  margin: 9px 0 15px;
+
+  color: var(--bb-admin-green);
+
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: -0.4px;
+}
+
+.bb-admin-section-label span {
+  color: #78897b;
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.bb-admin-panel-lead {
+  margin-top: -3px;
+  margin-bottom: 13px;
+
+  color: #758678;
+  font-size: 11px;
+}
+
+/* ================================================
+   DEMO ACTION CONTROLS
+================================================ */
+
+.bb-admin-preview-select {
+  min-width: 108px;
+  padding: 8px;
+
+  border: 1px solid rgba(16, 55, 42, 0.14);
+  border-radius: 9px;
+
+  background: #fff4df;
+  color: var(--bb-admin-green);
+
+  font-size: 10px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.bb-admin-preview-select:focus-visible {
+  outline: 2px solid var(--bb-admin-coral);
+  outline-offset: 2px;
+}
+
+.bb-admin-demo-hint {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  margin-top: 13px;
+
+  color: #8a7962;
+  font-size: 10px;
+}
+
+/* ================================================
+   RESPONSIVE — SMALL DESKTOP
+================================================ */
+
+@media (max-width: 1250px) {
+  .bb-admin-top-preview {
+    display: none;
+  }
+
+  .bb-admin-premium
+  .bb-admin-header-start {
+    min-width: 155px;
+  }
+}
+
+@media (max-width: 1050px) {
+  .bb-admin-premium
+  .bb-admin-profile-trigger-label {
+    display: none;
+  }
+
+  .bb-admin-premium
+  .bb-admin-profile-trigger {
+    padding: 4px;
+  }
+
+  .bb-admin-premium
+  .bb-admin-profile-chevron {
+    display: none;
+  }
+
+  .bb-admin-premium .bb-admin-spotlight {
+    grid-template-columns:
+      minmax(0, 1fr)
+      220px;
+  }
+}
+
+/* ================================================
+   RESPONSIVE — TABLET
+================================================ */
+
+@media (max-width: 950px) {
+  .bb-admin-premium .bb-admin-spotlight {
+    grid-template-columns:
+      minmax(0, 1fr)
+      170px;
+  }
+
+  .bb-admin-orbit {
+    width: 125px;
+    height: 125px;
+  }
+
+  .bb-admin-orbit-core {
+    width: 70px;
+    height: 70px;
+  }
+
+  .bb-admin-orbit-pill {
+    padding: 8px;
+    font-size: 9px;
+  }
+
+  .bb-admin-premium .bb-admin-search {
+    max-width: 320px;
+  }
+}
+
+/* ================================================
+   RESPONSIVE — MOBILE
+================================================ */
+
+@media (max-width: 760px) {
+  .bb-admin-premium .bb-admin-content {
+    padding: 14px 2px 65px;
+  }
+
+  .bb-admin-premium .bb-admin-header {
+    padding-inline: 3px;
+  }
+
+  .bb-admin-premium .bb-admin-spotlight {
+    grid-template-columns: 1fr;
+
+    padding: 28px 24px;
+    border-radius: 22px;
+  }
+
+  .bb-admin-spotlight-art {
+    min-height: 130px;
+  }
+
+  .bb-admin-orbit {
+    width: 114px;
+    height: 114px;
+  }
+
+  .bb-admin-orbit-pill.one {
+    right: -35px;
+  }
+
+  .bb-admin-orbit-pill.two {
+    left: -35px;
+  }
+
+  .bb-admin-premium
+  .bb-admin-page-header h1 {
+    font-size: 33px;
+  }
+
+  .bb-admin-premium .bb-admin-stats-six {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .bb-admin-premium
+  .bb-admin-header-start {
+    min-width: 0;
+  }
+
+  .bb-admin-premium .db-sidebar-nav {
+    overflow-y: auto;
+  }
+
+  .bb-admin-premium .bb-admin-guide {
+    min-height: 0;
+  }
+}
+
+/* ================================================
+   RESPONSIVE — SMALL PHONES
+================================================ */
+
+@media (max-width: 500px) {
+  .bb-admin-spotlight-art {
+    display: none;
+  }
+
+  .bb-admin-premium .bb-admin-spotlight {
+    padding: 25px 20px;
+  }
+
+  .bb-admin-premium .bb-admin-spotlight h1 {
+    font-size: clamp(30px, 8vw, 37px);
+  }
+
+  .bb-admin-premium
+  .bb-admin-header-start strong {
+    font-size: 14px;
+  }
+
+  .bb-admin-premium
+  .bb-admin-header-eyebrow {
+    font-size: 8px;
+  }
+
+  .bb-admin-premium .bb-admin-panel {
+    padding: 17px;
+  }
+
+  .bb-admin-premium .bb-admin-stat {
+    min-height: 143px;
+    padding: 16px;
+  }
+
+  .bb-admin-premium
+  .bb-admin-page-header h1 {
+    font-size: 30px;
+  }
+
+  .bb-admin-premium
+  .bb-admin-profile-menu {
+    right: -2px;
+  }
+
+  .bb-admin-premium .bb-admin-guide h2 {
+    font-size: 25px;
+  }
+
+  .bb-admin-premium .bb-admin-guide::before {
+    width: 130px;
+    height: 130px;
+  }
+
+  .bb-admin-premium .bb-admin-guide::after {
+    width: 115px;
+    height: 115px;
+  }
+}
+
+/* ================================================
+   REDUCED MOTION
+================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-admin-ambient i,
+  .bb-admin-profile-menu,
+  .bb-admin-premium .bb-admin-spotlight::before,
+  .bb-admin-premium .bb-admin-spotlight::after {
+    animation: none !important;
+  }
+}
+
+
+
+
+/* =====================================
+   FAST ADMIN SIDEBAR
+   APPEND TO EXISTING AdminPremium.css
+===================================== */
+
+.bb-admin-premium .db-sidebar {
+  transition:
+    width .18s cubic-bezier(.2, .8, .2, 1),
+    box-shadow .18s ease;
+
+  will-change: width;
+}
+
+.bb-admin-premium .db-main {
+  transition:
+    margin-left .18s
+    cubic-bezier(.2, .8, .2, 1);
+}
+
+.bb-admin-premium .db-nav-item {
+  transition:
+    background-color .12s ease,
+    color .12s ease,
+    padding .18s ease;
+}
+
+.bb-admin-premium
+.db-sidebar .db-brand-name,
+.bb-admin-premium
+.db-sidebar .db-nav-label {
+  display: block;
+
+  max-width: 0;
+
+  opacity: 0;
+  visibility: hidden;
+
+  white-space: nowrap;
+
+  transition:
+    opacity .10s ease,
+    max-width .18s ease,
+    visibility 0s linear .18s;
+}
+
+.bb-admin-premium
+.db-sidebar.is-expanded .db-brand-name,
+.bb-admin-premium
+.db-sidebar.is-expanded .db-nav-label {
+  max-width: 180px;
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity .12s ease .04s,
+    max-width .18s ease,
+    visibility 0s;
+}
+
+.bb-admin-premium
+.db-sidebar .db-nav-group-title {
+  display: block;
+
+  max-height: 0;
+  opacity: 0;
+
+  overflow: hidden;
+  margin: 0;
+}
+
+.bb-admin-premium
+.db-sidebar.is-expanded
+.db-nav-group-title {
+  max-height: 25px;
+  opacity: 1;
+
+  margin-bottom: 3px;
+}
+
+.bb-admin-mobile-backdrop {
+  display: none;
+}
+
+/* MOBILE SIDEBAR */
+
+@media (max-width: 760px) {
+  .bb-admin-premium .db-sidebar {
+    display: flex !important;
+
+    position: fixed;
+    z-index: 270;
+
+    inset: 0 auto 0 0;
+
+    width: min(315px, 88vw) !important;
+    max-width: min(315px, 88vw);
+
+    height: 100dvh;
+
+    padding: 18px 14px;
+
+    border: 0;
+    border-radius: 0 20px 20px 0;
+
+    transform:
+      translate3d(-105%, 0, 0);
+
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+      transform .18s
+        cubic-bezier(.2, .8, .2, 1),
+      visibility 0s linear .18s;
+
+    will-change: transform;
+  }
+
+  .bb-admin-premium
+  .db-sidebar.mobile-open {
+    display: flex !important;
+
+    transform:
+      translate3d(0, 0, 0);
+
+    visibility: visible;
+    pointer-events: auto;
+
+    transition:
+      transform .18s
+        cubic-bezier(.2, .8, .2, 1),
+      visibility 0s;
+  }
+
+  .bb-admin-premium
+  .db-sidebar .db-brand-name,
+  .bb-admin-premium
+  .db-sidebar .db-nav-label {
+    max-width: 180px;
+
+    opacity: 1;
+    visibility: visible;
+
+    transition: none;
+  }
+
+  .bb-admin-premium
+  .db-sidebar .db-nav-group-title {
+    max-height: 25px;
+    opacity: 1;
+
+    margin-bottom: 5px;
+  }
+
+  .bb-admin-premium
+  .db-sidebar ~ .db-main {
+    margin-left: 0 !important;
+  }
+
+  .bb-admin-premium
+  .bb-admin-mobile-backdrop {
+    display: block;
+
+    position: fixed;
+    z-index: 255;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100dvh;
+
+    padding: 0;
+    border: 0;
+
+    background:
+      rgba(16, 55, 42, .28);
+
+    opacity: 0;
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+      opacity .18s ease,
+      visibility 0s linear .18s;
+  }
+
+  .bb-admin-premium.bb-admin-menu-open
+  .bb-admin-mobile-backdrop {
+    opacity: 1;
+    visibility: visible;
+
+    pointer-events: auto;
+
+    transition:
+      opacity .18s ease,
+      visibility 0s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-admin-premium .db-sidebar,
+  .bb-admin-premium .db-main,
+  .bb-admin-premium
+  .bb-admin-mobile-backdrop {
+    transition: none !important;
+    will-change: auto;
+  }
+}

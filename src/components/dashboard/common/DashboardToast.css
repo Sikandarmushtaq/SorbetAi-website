@@ -1,0 +1,201 @@
+
+.bb-user-toast-stack {
+  position: fixed;
+  z-index: 12000;
+  top: 86px;
+  right: 20px;
+  width: min(400px, calc(100vw - 24px));
+
+  display: grid;
+  gap: 11px;
+  pointer-events: none;
+}
+
+.bb-user-toast {
+  --toast-accent: #32865d;
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  overflow: hidden;
+  padding: 15px 43px 17px 14px;
+
+  background: #fffaf0;
+  color: #10372a;
+  border: 1px solid rgba(16, 55, 42, 0.12);
+  border-radius: 18px;
+
+  box-shadow:
+    0 18px 45px rgba(16, 55, 42, 0.15);
+
+  pointer-events: auto;
+
+  animation:
+    bbUserToastIn 0.3s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bb-user-toast::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--toast-accent);
+}
+
+.bb-user-toast-error {
+  --toast-accent: #d45345;
+}
+
+.bb-user-toast-warning {
+  --toast-accent: #b58328;
+}
+
+.bb-user-toast-info,
+.bb-user-toast-loading {
+  --toast-accent: #8470b2;
+}
+
+.bb-user-toast-icon {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+  color: var(--toast-accent);
+  background: #f2eaf7;
+}
+
+.bb-user-toast-success .bb-user-toast-icon {
+  background: #e2f2e7;
+}
+
+.bb-user-toast-error .bb-user-toast-icon {
+  background: #ffebe5;
+}
+
+.bb-user-toast-warning .bb-user-toast-icon {
+  background: #fff0cc;
+}
+
+.bb-user-toast-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.bb-user-toast-text strong {
+  display: block;
+
+  font-size: 13px;
+  line-height: 1.48;
+  font-weight: 850;
+
+  overflow-wrap: anywhere;
+}
+
+.bb-user-toast-text p {
+  margin: 5px 0 0;
+
+  font-size: 12px;
+  color: #526b5d;
+  line-height: 1.6;
+
+  overflow-wrap: anywhere;
+}
+
+.bb-user-toast-close {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+
+  display: grid;
+  place-items: center;
+
+  width: 28px;
+  height: 28px;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: transparent;
+  color: #64786a;
+  cursor: pointer;
+}
+
+.bb-user-toast-close:hover {
+  background: #f2e9dc;
+}
+
+.bb-user-toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  height: 3px;
+  width: 100%;
+
+  transform-origin: left;
+  background: var(--toast-accent);
+
+  animation:
+    bbUserToastCountdown linear forwards;
+}
+
+.bb-user-toast-spin {
+  animation:
+    bbUserToastRotate 1s linear infinite;
+}
+
+@keyframes bbUserToastIn {
+  from {
+    opacity: 0;
+    transform:
+      translate(12px, -12px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bbUserToastCountdown {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes bbUserToastRotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .bb-user-toast-stack {
+    top: 72px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+
+  .bb-user-toast {
+    padding: 13px 40px 15px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-user-toast,
+  .bb-user-toast-spin,
+  .bb-user-toast-progress {
+    animation: none;
+  }
+}

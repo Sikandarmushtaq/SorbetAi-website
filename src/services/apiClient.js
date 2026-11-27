@@ -6,6 +6,17 @@ const API_BASE_URL = (
 
 const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1$/, '');
 const API_VERSION = '/api/v1';
+
+// ngrok free endpoints may return a browser warning instead of JSON.
+// This header is added only for ngrok hosts, not for other production origins.
+const IS_NGROK_BACKEND = (() => {
+  try {
+    const host = new URL(API_ORIGIN).hostname.toLowerCase();
+    return ['.ngrok-free.app', '.ngrok.app', '.ngrok.io'].some((suffix) => host.endsWith(suffix));
+  } catch {
+    return false;
+  }
+})();
 const ACCESS_TOKEN_KEYS = ['bellbee_access_token', 'access_token', 'accessToken'];
 const REFRESH_TOKEN_KEYS = ['bellbee_refresh_token', 'refresh_token', 'refreshToken'];
 
@@ -144,6 +155,9 @@ function readResponse(response) {
   catch { return { message: value }; }
 }
 
+// Privacy: legacy API console logging is intentionally disabled.
+// Do not print request URLs, backend messages, or error objects to the browser console.
+/*
 function logResponse({ endpoint, method, response, payload }) {
   const details = {
     method,
@@ -167,6 +181,7 @@ function logNetworkError(endpoint, method, error) {
     message: error?.message || 'Network request failed.',
   });
 }
+*/
 
 function unwrapResponse(payload, status, endpoint) {
   if (payload && typeof payload === 'object' && payload.success === false) {
@@ -223,6 +238,7 @@ async function performRequest(path, options, tokenOverride, hasRetried) {
   const headers = new Headers(options.headers || {});
   const usesCustomAuthorization = headers.has('Authorization');
   headers.set('Accept', 'application/json');
+  if (IS_NGROK_BACKEND) headers.set('ngrok-skip-browser-warning', 'true');
 
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   if (options.body !== undefined && !isFormData) headers.set('Content-Type', 'application/json');
@@ -247,9 +263,9 @@ async function performRequest(path, options, tokenOverride, hasRetried) {
       transformResponse: [(data) => data],
     });
     payload = readResponse(response);
-    logResponse({ endpoint, method, response, payload });
+    // logResponse({ endpoint, method, response, payload }); // disabled for privacy
   } catch (error) {
-    logNetworkError(endpoint, method, error);
+    // logNetworkError(endpoint, method, error); // disabled for privacy
     throw new DashboardApiError(
       error?.message || 'Unable to connect to the backend.',
       'NETWORK_ERROR',
@@ -282,6 +298,145 @@ export async function apiRequest(path, options = {}) {
     throw new DashboardApiError('An API endpoint is required.', 'ENDPOINT_REQUIRED');
   }
   return performRequest(path, options, '', false);
+}
+
+/**
+ * Browser SSE-over-POST using the same Axios instance and JWT refresh as
+ * apiRequest(). EventSource cannot send the Bearer token or JSON POST body.
+ * The only published assistant text is the validated terminal "reply" event.
+ * Progress is metadata (e.g. "checking_hours"), never partial AI content.
+ */
+export async function apiStreamRequest(path, { body, onProgress, signal } = {}) {
+  if (!path) throw new DashboardApiError('An API endpoint is required.', 'ENDPOINT_REQUIRED');
+  const endpoint = path.startsWith('/') ? path : `/${path}`;
+  const payload = JSON.stringify(body || {});
+
+  const requestOnce = async (token, retried = false) => {
+    let offset = 0;
+    let buffer = '';
+    let terminal = null;
+
+    const processEvent = (raw) => {
+      let eventName = 'message';
+      const dataLines = [];
+      for (const line of raw.split(/\r?\n/)) {
+        if (line.startsWith('event:')) eventName = line.slice(6).trim();
+        if (line.startsWith('data:')) dataLines.push(line.slice(5).trimStart());
+      }
+      if (!dataLines.length) return;
+      let value;
+      try { value = JSON.parse(dataLines.join('\n')); }
+      catch { return; }
+      if (eventName === 'reply' || eventName === 'error') {
+        terminal = { event: eventName, data: value };
+      } else if (!terminal && typeof onProgress === 'function') {
+        onProgress(eventName, value);
+      }
+    };
+
+    const ingest = (additional) => {
+      if (!additional || terminal) return;
+      buffer += additional;
+      let match;
+      while ((match = /\r?\n\r?\n/.exec(buffer)) !== null) {
+        const raw = buffer.slice(0, match.index);
+        buffer = buffer.slice(match.index + match[0].length);
+        processEvent(raw);
+        if (terminal) break;
+      }
+    };
+
+    // onDownloadProgress receives the complete responseText-so-far, not a
+    // single delta. Never parse previously seen data a second time.
+    const onDownloadProgress = ({ event }) => {
+      const target = event?.currentTarget || event?.target;
+      let snapshot;
+      try { snapshot = target?.responseText; } catch { return; }
+      if (typeof snapshot !== 'string' || snapshot.length <= offset) return;
+      const delta = snapshot.slice(offset);
+      offset = snapshot.length;
+      ingest(delta);
+    };
+
+    let response;
+    try {
+      response = await http.request({
+        url: endpoint,
+        method: 'POST',
+        data: payload,
+        responseType: 'text',
+        transformResponse: [(value) => value],
+        headers: {
+          Accept: 'text/event-stream, application/json',
+          'Content-Type': 'application/json',
+          ...(IS_NGROK_BACKEND ? { 'ngrok-skip-browser-warning': 'true' } : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        timeout: 120000,
+        signal,
+        onDownloadProgress,
+      });
+    } catch (failure) {
+      if (signal?.aborted) throw failure;
+      throw new DashboardApiError(
+        failure?.message || 'Streaming connection failed.',
+        'STREAM_INTERRUPTED', 0, endpoint,
+      );
+    }
+
+    // Axios may deliver the last chunk only at request completion.
+    const raw = typeof response.data === 'string' ? response.data : '';
+    if (raw.length > offset) ingest(raw.slice(offset));
+    if (!terminal && buffer.trim()) processEvent(buffer.trim());
+
+    if (response.status === 401 && !retried) {
+      const refreshed = await refreshSessionToken(token);
+      if (refreshed) return requestOnce(refreshed, true);
+      if (token && getStoredToken('access') === token) clearStoredSession();
+    }
+
+    let json = {};
+    const contentType = String(response.headers?.['content-type'] || '');
+    if (contentType.includes('json') || (raw.trim().startsWith('{') && !terminal)) {
+      try { json = JSON.parse(raw); } catch { json = {}; }
+    }
+
+    if (response.status < 200 || response.status >= 300) {
+      throw new DashboardApiError(
+        json?.message || `Streaming request failed (${response.status}).`,
+        json?.code || 'HTTP_ERROR', response.status, endpoint, json?.errors,
+      );
+    }
+
+    // The backend explicitly specifies a 202 JSON processing response. The
+    // caller must retry with exactly the same client_message_id and text.
+    if (response.status === 202) return null;
+
+    if (terminal?.event === 'error') {
+      throw new DashboardApiError(
+        terminal.data?.message || 'The AI could not finish its response.',
+        terminal.data?.code || 'STREAM_ERROR',
+        terminal.data?.http_status || 0, endpoint,
+      );
+    }
+    if (terminal?.event === 'reply') return terminal.data;
+
+    // Older backend deployments may return normal JSON for this endpoint.
+    if (json && (json.data?.reply || json.reply)) {
+      return unwrapResponse(json, response.status, endpoint);
+    }
+    throw new DashboardApiError(
+      'The stream ended before a confirmed reply. Retry the same message safely.',
+      'STREAM_INTERRUPTED', response.status, endpoint,
+    );
+  };
+
+  let token = getStoredToken('access');
+  const expiry = accessTokenExpiry(token);
+  if ((!token || (expiry !== null && expiry <= Date.now())) && getStoredToken('refresh')) {
+    token = await refreshSessionToken(token) || token;
+  }
+  return requestOnce(token);
 }
 
 export function getResourcePath(resource) {
@@ -355,7 +510,7 @@ export async function getCurrentUser() {
 export async function getCurrentWorkspace() {
   return apiRequest(`${API_VERSION}/workspaces/current`);
 }
-
+// new connnected api       
 export async function logoutSession() {
   const refreshToken = getStoredToken('refresh');
   clearStoredSession();

@@ -1234,3 +1234,329 @@
     flex: 1 1 105px;
   }
 }
+
+/* BELLBEE-REMAINING-PREMIUM-BEGIN */
+
+
+/* ==========================================
+   BELLBEE BRAINPAGE PREMIUM
+   APPEND-ONLY — EXISTING CSS FILE
+========================================== */
+.bb2-brain { min-width:0; width:100%; max-width:1380px; margin-left:auto; margin-right:auto; padding-bottom:max(24px,2.5vw); }
+.bb2-brain .bb2-section,
+.bb2-brain .bb2-brain-page-content,
+.bb2-brain .bb2-brain-phase1-panel,
+.bb2-brain .bb2-brain-info,
+.bb2-brain .bb2-brain-row {
+  min-width:0;
+  max-width:100%;
+  border-radius:20px;
+  border-color:rgba(16,55,42,.12);
+  background-image:radial-gradient(ellipse at 92% 7%,rgba(205,189,255,.21),transparent 32%),radial-gradient(ellipse at 7% 94%,rgba(244,201,93,.13),transparent 32%);
+  box-shadow:0 11px 30px rgba(16,55,42,.045);
+}
+.bb2-brain .bb2-main-button {
+  min-height:42px;
+  border-radius:12px;
+  background:#ff7a59;
+  color:#10372a;
+  border-color:#ff7a59;
+  font-size:12px;
+  font-weight:800;
+  transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease;
+}
+
+.bb2-brain :where(button, input, select, textarea, a):focus-visible { outline:3px solid #ff7a59; outline-offset:2px; }
+.bb2-brain :where(input:not([type=checkbox]):not([type=radio]), select, textarea) { max-width:100%; min-width:0; border-radius:11px; }
+.bb2-brain :where(h1,h2,h3,p) { overflow-wrap:anywhere; }
+.bb2-brain :where(.dp-table-wrap,.bb2-table-wrap,.an-chart-scroll,.tp-template-list,.sp-ticket-list) { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+@media(max-width:760px) {
+  .bb2-brain { max-width:100%; min-width:0; padding-bottom:28px; }
+  .bb2-brain :where(.dp-header-actions,.ap-header-actions,.tp-page-actions,.fi-actions) { display:flex; flex-wrap:wrap; gap:9px; max-width:100%; }
+  .bb2-brain :where(.dp-form-grid,.bb2-form-grid,.ba-form-grid) { min-width:0; }
+}
+@media(max-width:440px) {
+  .bb2-brain :where(.dp-header-actions>button,.tp-page-actions>button) { flex:1 1 130px; }
+}
+@media(prefers-reduced-motion:reduce) { .bb2-brain :where(button,a) { transition:none!important; } }
+
+.bb2-brain .bb2-main-button:not(:disabled):hover { background:#ff8b6f; color:#10372a; transform:translateY(-2px); box-shadow:0 11px 23px rgba(255,122,89,.19); }
+
+.bb2-brain .bb2-main-button:not(:disabled):hover { background:#ff8b6f; color:#10372a; }
+.bb2-brain .bb2-brain-page-content { padding:clamp(15px,2vw,24px); border-radius:22px; }
+@media(max-width:760px){ .bb2-brain .bb2-brain-page-content { padding:15px; } .bb2-brain .bb2-brain-tabs { max-width:100%; overflow-x:auto; } }
+/* AI Brain: Phase 2–6 integration additions. No new CSS file. */
+.bb2-knowledge-explorer,.bb2-brain-review,.bb2-brain-advanced-proposals{display:grid;gap:14px;min-width:0}
+.bb2-brain-explorer-controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.bb2-brain-explorer-controls .bb2-search{flex:1 1 240px;min-width:180px}
+.bb2-brain-explorer-controls .bb2-control{width:auto;min-width:130px;max-width:100%}
+.bb2-brain-explorer-list{display:grid;gap:8px;max-height:360px;overflow-y:auto}
+.bb2-brain-explorer-item{width:100%;display:flex;gap:12px;justify-content:space-between;align-items:center;padding:13px 15px;background:#fffaf0;border:1px solid rgba(16,55,42,.12);border-radius:13px;color:#10372a;text-align:left;cursor:pointer}
+.bb2-brain-explorer-item:hover{border-color:#ff7a59}
+.bb2-brain-explorer-item>span{display:grid;gap:5px;min-width:0}
+.bb2-brain-explorer-item strong{font-size:12px;overflow-wrap:anywhere}
+.bb2-brain-explorer-item small{font-size:11px;color:#6e8176}
+.bb2-ready,.bb2-not-ready{font-size:10px;font-weight:800;white-space:nowrap;padding:7px 9px;border-radius:99px;background:#e0f3e7;color:#205d3b}
+.bb2-not-ready{background:#fff0d2;color:#805b2e}
+.bb2-brain-advanced-card{min-width:0;overflow:hidden;padding:16px;border:1px solid rgba(16,55,42,.13);border-radius:16px;background:#fffaf0;white-space:pre-wrap;overflow-wrap:anywhere}
+.bb2-brain-advanced-card h3{margin:0 0 9px;font-size:16px;color:#10372a}
+.bb2-brain-advanced-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.bb2-brain-review details,.bb2-brain-advanced-card details{margin:9px 0;padding:10px;border:1px solid rgba(16,55,42,.12);border-radius:12px;background:#f8f2e7}
+.bb2-brain-review summary,.bb2-brain-advanced-card summary{cursor:pointer;font-weight:800;font-size:12px;color:#10372a}
+.bb2-brain-json,.bb2-brain-proposal-preview pre{max-width:100%;max-height:240px;overflow:auto;font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;padding:10px;border-radius:9px;background:#f6efe3;color:#10372a}
+.bb2-brain-proposal-preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bb2-brain-proposal-preview>div{min-width:0}
+.bb2-brain-review .bb2-field{display:grid;gap:8px;font-size:12px;font-weight:800}
+.bb2-brain-evidence{display:grid;gap:8px;font-size:12px;color:#10372a}
+.bb2-brain-evidence p{overflow-wrap:anywhere}
+@media(max-width:760px){.bb2-brain-proposal-preview{grid-template-columns:1fr}.bb2-brain-explorer-controls>.bb2-control{flex:1 1 140px}.bb2-brain-advanced-card{padding:12px}}
+
+/* AI Brain advanced sessions and multi-proposal approval — existing file only */
+.bb2-brain-session-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 12px;
+}
+.bb2-brain-session-toolbar .bb2-soft-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.bb2-brain-batch-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(16, 55, 42, 0.12);
+  border-radius: 14px;
+  background: #f7f1e7;
+}
+.bb2-brain-select-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #10372a;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.bb2-brain-select-label input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  accent-color: #10372a;
+  cursor: pointer;
+}
+.bb2-brain-batch-toolbar .bb2-main-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.bb2-brain-advanced-card > .bb2-brain-select-label {
+  margin-bottom: 10px;
+}
+@media (max-width: 600px) {
+  .bb2-brain-batch-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .bb2-brain-batch-toolbar .bb2-main-button {
+    width: 100%;
+  }
+  .bb2-brain-session-toolbar .bb2-soft-button {
+    max-width: 100%;
+  }
+}
+/* ==========================================================
+   BELLBEE AI BRAIN — DOCUMENT STATUS + PROPOSAL LAYOUT FIX
+   Append-only: existing Bellbee palette and page structure.
+   ========================================================== */
+
+/* The former sticky assistant was painted above proposal cards while the
+   column scrolled. Keep both the chat and its approvals in normal flow. */
+.bb2-brain .bb2-overview-columns {
+  align-items: start;
+}
+.bb2-brain .bb2-brain-phase1-panel {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  align-self: start;
+  overflow: visible;
+}
+.bb2-brain .bb2-chat-assistant {
+  position: relative;
+  top: auto;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  height: clamp(400px, calc(100dvh - 170px), 620px);
+  min-height: 400px;
+  z-index: auto;
+}
+.bb2-brain .bb2-chat-assistant .bb2-chat-messages {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+.bb2-brain .bb2-brain-advanced-proposals {
+  position: relative;
+  z-index: auto;
+  display: grid;
+  align-content: start;
+  gap: 13px;
+  min-width: 0;
+  margin: 0;
+  padding-bottom: 12px;
+}
+.bb2-brain .bb2-brain-advanced-proposals .bb2-brain-advanced-card {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.bb2-brain .bb2-brain-advanced-proposals .bb2-brain-advanced-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  position: relative;
+}
+
+/* The document form, uploaded documents, and edit form share the left column;
+   the processing help card stays in the right column on desktop. */
+.bb2-brain .bb2-brain-doc-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  max-width: 100%;
+}
+.bb2-brain .bb2-brain-doc-main > .bb2-knowledge-form,
+.bb2-brain .bb2-brain-doc-main > .bb2-brain-doc-edit {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+}
+.bb2-brain .bb2-brain-document-library {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(16, 55, 42, .12);
+  border-radius: 14px;
+  background: var(--db-white, #fffaf0);
+}
+.bb2-brain .bb2-brain-document-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+.bb2-brain .bb2-brain-document-toolbar strong {
+  color: var(--db-green, #10372a);
+  font-size: 12px;
+}
+.bb2-brain .bb2-brain-document-toolbar .bb2-soft-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.bb2-brain .bb2-brain-document-library .bb2-brain-document-row:last-child {
+  border-bottom: 0;
+}
+.bb2-brain .bb2-brain-review-hint {
+  padding: 11px 13px;
+  margin: 0;
+  border-radius: 11px;
+  background: #f3ede1;
+  border: 1px solid rgba(16, 55, 42, .13);
+  color: #10372a;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+@media (max-width: 1000px) {
+  .bb2-brain .bb2-chat-assistant {
+    position: relative;
+    top: auto;
+    height: min(500px, max(370px, 65dvh));
+    min-height: 370px;
+  }
+}
+@media (max-width: 600px) {
+  .bb2-brain .bb2-chat-assistant {
+    height: min(490px, max(355px, 65dvh));
+    min-height: 355px;
+  }
+  .bb2-brain .bb2-brain-document-library {
+    padding: 12px;
+  }
+  .bb2-brain .bb2-brain-advanced-proposals .bb2-brain-advanced-actions > button {
+    flex: 1 1 125px;
+  }
+}
+
+/* Brain Assistant: completed proposals are collapsible, and do not crowd the chat. */
+.bb2-brain-proposal-history {
+  margin-top: 16px;
+  border-top: 1px solid var(--db-border);
+  padding-top: 12px;
+}
+.bb2-brain-proposal-history > summary {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.5;
+  color: var(--db-green);
+  padding: 7px 0;
+}
+.bb2-brain-proposal-history > .bb2-brain-advanced-card {
+  margin-top: 9px;
+}
+
+/* ===== Sorbet/Bellbee AI Brain: crawler v3 additions (existing CSS file) ===== */
+.bb2-brain .bb2-brain-website-details {min-width:0; display:grid; gap:14px;}
+.bb2-brain .bb2-crawler-insights {min-width:0; display:grid; gap:12px; padding:16px; border:1px solid rgba(16,55,42,.14); border-radius:14px; background:#fffaf0;}
+.bb2-brain .bb2-crawler-section-heading {display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+.bb2-brain .bb2-crawler-section-heading h3 {font-size:14px; color:#10372a; margin:0;}
+.bb2-brain .bb2-crawler-processing {display:flex; align-items:center; gap:8px; color:#745a23; font-size:11px; font-weight:700;}
+.bb2-brain .bb2-crawler-metrics {display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:8px; width:100%;}
+.bb2-brain .bb2-crawler-stat {min-width:0; display:flex; flex-direction:column; gap:5px; padding:11px; border:1px solid rgba(16,55,42,.1); border-radius:10px; background:#f3ede1;}
+.bb2-brain .bb2-crawler-stat strong {font-size:15px; line-height:1.4; color:#10372a; overflow-wrap:anywhere;}
+.bb2-brain .bb2-crawler-stat small {font-size:10px; color:#557265;}
+.bb2-brain .bb2-crawler-coverage {min-width:0; display:grid; gap:12px;}
+.bb2-brain .bb2-crawler-two-col {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
+.bb2-brain .bb2-crawler-detail-card {min-width:0; padding:12px; background:#fffaf0; border:1px solid rgba(16,55,42,.15); border-radius:11px;}
+.bb2-brain .bb2-crawler-detail-card h4,.bb2-brain .bb2-crawler-warning-group h4 {font-size:12px; margin:0 0 9px; color:#10372a;}
+.bb2-brain .bb2-crawler-detail-card p,.bb2-brain .bb2-crawler-warning-group p {font-size:11px; color:#355848; line-height:1.65; overflow-wrap:anywhere;}
+.bb2-brain .bb2-crawler-alert,.bb2-brain .bb2-crawler-warning-group {min-width:0; padding:12px 13px; background:#fff3da; border:1px solid #e6c993; color:#714d19; border-radius:11px; font-size:11px; line-height:1.6; overflow-wrap:anywhere;}
+.bb2-brain .bb2-crawler-alert p {margin:5px 0 0;}
+.bb2-brain .bb2-crawler-conflict {margin-top:10px; padding:10px 12px; border-radius:10px; background:#fffaf0; border:1px solid #e6c993;}
+.bb2-brain .bb2-crawler-conflict strong {display:block; color:#714d19; font-size:11px;}
+.bb2-brain .bb2-crawler-review-block {min-width:0; padding:10px; border-radius:9px; background:#fffaf0; border:1px solid rgba(16,55,42,.11); margin-top:8px;}
+.bb2-brain .bb2-crawler-review-block p {white-space:pre-wrap; overflow-wrap:anywhere;}
+.bb2-brain .bb2-crawler-review-block pre {overflow:auto; max-width:100%; white-space:pre-wrap; overflow-wrap:anywhere; font-size:11px;}
+.bb2-brain .bb2-crawler-held-blocks {margin-top:12px; padding:10px; border:1px solid #dfba87; border-radius:10px; background:#fff0d7;}
+.bb2-brain .bb2-crawler-held-blocks>strong {color:#8f4e21; font-size:11px;}
+.bb2-brain .bb2-crawler-source-label,.bb2-brain .bb2-crawler-held-label {font-size:10px; font-weight:750; color:#426354;}
+.bb2-brain .bb2-crawler-held-label {color:#ae553d;}
+.bb2-brain .bb2-crawler-imported {display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin:7px 0; font-size:10px;}
+.bb2-brain .bb2-crawler-badge {display:inline-flex; align-items:center; gap:5px; padding:4px 8px; background:#f4c95d; color:#10372a; border-radius:100px; font-weight:750; font-size:10px;}
+.bb2-brain .bb2-crawler-coverage a,.bb2-brain .bb2-crawler-imported a,.bb2-brain .bb2-crawler-insights a {color:#10372a; font-weight:700; text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere;}
+@media (max-width:750px) {
+ .bb2-brain .bb2-crawler-two-col {grid-template-columns:1fr;}
+ .bb2-brain .bb2-crawler-section-heading .bb2-soft-button {flex:1 1 135px;}
+ .bb2-brain .bb2-crawler-metrics {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .bb2-brain .bb2-crawler-insights {padding:12px;}
+}

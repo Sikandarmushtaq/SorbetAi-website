@@ -31,7 +31,7 @@ const footerGroups = [
       { label: 'AI Assistant', to: '/ai-assistant' },
       { label: 'AI Brain', to: '/ai-brain' },
       { label: 'Human handoff', to: '/human-handoff' },
-      { label: 'Android app', to: '/android-app' },
+      // { label: 'Android app', to: '/android-app' },
       { label: 'Pricing', to: '/pricing' },
     ],
   },

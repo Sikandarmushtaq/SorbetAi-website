@@ -815,3 +815,22 @@
     gap: 8px;
   }
 }
+
+/* BELLBEE-REMAINING-PREMIUM-BEGIN */
+
+
+/* Bellbee WhatsApp premium — merged into original WhatsAppConnectionPage.css */
+.wac-page { max-width:1060px; width:100%; min-width:0; margin:0 auto; padding-bottom:35px; }
+.wac-page-header h1 { font-size:clamp(30px,3.3vw,43px); letter-spacing:-1.3px; color:#10372a; }
+.wac-page-header p { font-size:13px; line-height:1.7; color:#64786a; }
+.wac-page :is(.wac-meta-card,.wac-qr-card,.wac-connected-panel,.wac-security-note,.wac-official,.wac-config-note) { position:relative; isolation:isolate; overflow:hidden; min-width:0; border:1px solid rgba(16,55,42,.11); border-radius:22px; background:radial-gradient(circle at 92% 7%,rgba(205,189,255,.23),transparent 29%),radial-gradient(circle at 6% 94%,rgba(244,201,93,.14),transparent 27%),#fffaf0; box-shadow:0 12px 29px rgba(16,55,42,.05); }
+.wac-page :is(.wac-meta-card,.wac-qr-card,.wac-connected-panel)::after { content:""; position:absolute; right:-47px; bottom:-58px; width:135px; height:135px; border-radius:56% 44% 61% 39%/43% 59% 41% 57%; background:rgba(255,122,89,.10); z-index:-1; pointer-events:none; }
+.wac-page :is(.wac-primary-button,.wac-generate-button) { min-height:45px; background:#ff7a59; color:#10372a; border:1px solid #ff7a59; border-radius:13px; font-size:12px; font-weight:850; transition:transform .2s,box-shadow .2s; }
+.wac-page :is(.wac-primary-button,.wac-generate-button):not(:disabled):hover { background:#ff8b6f; transform:translateY(-2px); box-shadow:0 12px 24px rgba(255,122,89,.2); }
+.wac-page :is(.wac-secondary-button,.wac-refresh-status,.wac-back-button) { border-radius:12px; min-height:39px; font-size:12px; }
+.wac-page :is(button,input,select):focus-visible { outline:3px solid #ff7a59; outline-offset:2px; }
+.wac-page :is(.wac-method-grid,.wac-meta-intro-grid,.wac-connected-grid) { min-width:0; }
+.wac-page :is(.wac-meta-card,.wac-qr-card,.wac-connected-panel) p { overflow-wrap:anywhere; }
+@media(max-width:760px) { .wac-page { width:100%; padding-bottom:24px; } .wac-page :is(.wac-meta-card,.wac-qr-card,.wac-connected-panel) { padding:clamp(15px,3vw,22px); } .wac-page .wac-meta-actions { flex-wrap:wrap; } }
+@media(max-width:460px) { .wac-page :is(.wac-meta-actions,.wac-method-grid,.wac-meta-intro-grid,.wac-connected-grid) { grid-template-columns:1fr; } .wac-page :is(.wac-primary-button,.wac-secondary-button,.wac-generate-button) { max-width:100%; } }
+@media(prefers-reduced-motion:reduce) { .wac-page button { transition:none!important; } }

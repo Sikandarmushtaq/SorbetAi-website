@@ -911,3 +911,20 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+/* ===========================================================
+   SEARCH OVERLAY FIX: keep background its original cream tone.
+   Transparent click-catcher still closes search on outside click.
+   Search panel stays above the header.
+   =========================================================== */
+.bellbee-dashboard .db-search-backdrop {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.bellbee-dashboard .db-search-overlay {
+  background: #fffaf0 !important;
+  color: #10372a;
+  box-shadow: 0 18px 45px rgba(16, 55, 42, .16);
+}

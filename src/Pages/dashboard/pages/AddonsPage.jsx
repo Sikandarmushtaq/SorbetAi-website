@@ -1,10 +1,11 @@
 import './Addonspage.css';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, CircleAlert, MessageCircle, Puzzle, Store, Truck, X } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Puzzle, Store, Truck } from 'lucide-react';
 import { billingApi } from '../../../services/dashboard/billing.api.js';
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
 import { Modal } from '../../../components/dashboard/common/DashboardUI';
+import { useDashboardToast } from '../../../components/dashboard/common/DashboardToastProvider';
 
 // Visual catalog only. Backend billing determines the actual active state and checkout price.
 const ADDONS = [
@@ -59,17 +60,9 @@ export default function AddonsPage() {
   const [busyId, setBusyId] = useState('');
   const [selected, setSelected] = useState(null);
   const [dialogMode, setDialogMode] = useState('cancel');
-  const [toast, setToast] = useState(null);
-  const toastCounter = useRef(0);
-
+  const toast = useDashboardToast();
   const notify = useCallback((message, type = 'error') => {
-    setToast({ message, type, key: ++toastCounter.current });
-  }, []);
-
-  useEffect(() => {
-    if (!toast) return undefined;
-    const timer = window.setTimeout(() => setToast((current) => current?.key === toast.key ? null : current), 5500);
-    return () => window.clearTimeout(timer);
+    toast[type]?.(message);
   }, [toast]);
 
   const reloadAddons = useCallback(async () => {
@@ -258,14 +251,6 @@ export default function AddonsPage() {
         </section>
       </div>
 
-      {toast && (
-        <div role={toast.type === 'error' ? 'alert' : 'status'}
-          className={`dp-addon-toast dp-addon-toast-${toast.type}`}>
-          {toast.type === 'success' ? <CheckCircle2 size={19} /> : <CircleAlert size={19} />}
-          <span>{toast.message}</span>
-          <button type="button" onClick={() => setToast(null)} aria-label="Dismiss notification"><X size={17} /></button>
-        </div>
-      )}
 
       {selected && (
         <Modal

@@ -108,3 +108,72 @@
 }
 
 }
+
+/* ============================================================
+   GLOBAL FIX FOR CUSTOM POPUPS THAT DO NOT USE shared <Modal>.
+   Keep the opened page's overlay ABOVE the sticky header/side nav.
+   Normal pages are unchanged when no popup is open.
+   ============================================================ */
+.bellbee-dashboard .db-page-content:has(
+  .sp-modal-backdrop,
+  .ap-modal-backdrop,
+  .tp-backdrop,
+  .dp-modal-backdrop,
+  .dp-suggestions-modal-overlay
+) {
+  position: relative;
+  z-index: 10000 !important;
+}
+
+.bellbee-dashboard .db-page-content:has(
+  .sp-modal-backdrop,
+  .ap-modal-backdrop,
+  .tp-backdrop
+) :is(.sp-modal-backdrop, .ap-modal-backdrop, .tp-backdrop) {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 20000 !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px;
+}
+
+.bellbee-dashboard :is(
+  .sp-modal,
+  .ap-modal,
+  .tp-dialog
+) {
+  min-height: 0;
+  max-height: min(80dvh, 700px) !important;
+  margin: auto;
+  border-radius: 18px;
+}
+
+.bellbee-dashboard.bb-user-premium .sp-modal {
+  width: min(100%, 500px);
+}
+
+.bellbee-dashboard.bb-user-premium .tp-dialog {
+  width: min(100%, 620px);
+}
+
+@media (max-width: 760px) {
+  .bellbee-dashboard .db-page-content:has(
+    .sp-modal-backdrop,
+    .ap-modal-backdrop,
+    .tp-backdrop
+  ) :is(.sp-modal-backdrop, .ap-modal-backdrop, .tp-backdrop) {
+    align-items: flex-end;
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+  }
+
+  .bellbee-dashboard :is(
+    .sp-modal,
+    .ap-modal,
+    .tp-dialog
+  ) {
+    width: 100%;
+    max-height: 88dvh !important;
+    border-radius: 18px;
+  }
+}

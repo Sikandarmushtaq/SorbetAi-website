@@ -564,7 +564,7 @@ export default function ProfilePage() {
       setPasswordOpen(false);
       showNotice('Your password has been changed.');
     } catch (error) {
-      showNotice(error.message);
+      showNotice(error.message, 'error');
     } finally {
       setSaving((old) => ({
         ...old,
@@ -597,7 +597,7 @@ export default function ProfilePage() {
         'Sign-out request completed. You may need to sign in again.'
       );
     } catch (error) {
-      showNotice(error.message);
+      showNotice(error.message, 'error');
     } finally {
       setSaving((old) => ({
         ...old,
@@ -645,7 +645,7 @@ export default function ProfilePage() {
           : 'Notifications disabled.'
       );
     } catch (error) {
-      showNotice(error.message);
+      showNotice(error.message, 'error');
     } finally {
       setSaving((old) => ({
         ...old,
@@ -696,7 +696,7 @@ export default function ProfilePage() {
         'Deletion request submitted for identity verification.'
       );
     } catch (error) {
-      showNotice(error.message);
+      showNotice(error.message, 'error');
     } finally {
       setSaving((old) => ({
         ...old,

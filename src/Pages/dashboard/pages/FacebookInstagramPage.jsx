@@ -22,6 +22,7 @@ import {
 import { socialConnectionsApi } from '../../../services/dashboard/social-connections.api.js';
 
 import { useFreePlan } from '../../../components/dashboard/common/FreePlanContext';
+import { useDashboardToast } from '../../../components/dashboard/common/DashboardToastProvider';
 
 import {
   useNotice,
@@ -235,6 +236,7 @@ export default function FacebookInstagramPage() {
   } = useFreePlan();
 
   const { showNotice, Notice } = useNotice();
+  const toast = useDashboardToast();
 
   const [connections, setConnections] = useState({
     facebook: null,
@@ -253,7 +255,7 @@ export default function FacebookInstagramPage() {
      LOAD REAL CONNECTION INFORMATION
   ========================================= */
 
-  const loadConnections = useCallback(async () => {
+  const loadConnections = useCallback(async (notify = false) => {
     setLoading(true);
     setError('');
 
@@ -262,6 +264,7 @@ export default function FacebookInstagramPage() {
         'Facebook & Instagram API is not configured. Set REACT_APP_API_SOCIAL_CONNECTIONS_PATH.'
       );
       setLoading(false);
+      if (notify) toast.warning('Social channels unavailable', 'Configure the existing Social Connections API path.');
       return;
     }
 
@@ -273,15 +276,17 @@ export default function FacebookInstagramPage() {
       const addonStatus = getAddonStatus(response);
 
       setAddonActive(addonStatus);
+      if (notify) toast.success('Social channels refreshed', 'Latest connection statuses loaded.');
     } catch (requestError) {
       setError(
         requestError?.message ||
         'Unable to load Facebook and Instagram connection status.'
       );
+      if (notify) toast.error('Could not refresh social channels', requestError?.message || 'Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [configured]);
+  }, [configured, toast]);
 
   useEffect(() => {
     loadConnections();
@@ -340,11 +345,15 @@ export default function FacebookInstagramPage() {
     }
 
     setConnecting(true);
+    const pendingId = toast.loading('Starting social connection', 'Checking add-on and requesting Meta authorization…');
 
     try {
       const active = await ensureAddonActive();
 
-      if (!active) return;
+      if (!active) {
+        toast.update(pendingId, 'warning', 'Social add-on is not active', 'Activation is required before connecting.');
+        return;
+      }
 
       // A single Facebook authorization flow can request
       // permissions for Facebook Pages and linked Instagram
@@ -359,21 +368,17 @@ export default function FacebookInstagramPage() {
       const redirect = getAuthorizationUrl(response);
 
       if (redirect) {
-        window.location.assign(validateRedirect(redirect));
+        const secureUrl = validateRedirect(redirect);
+        toast.update(pendingId, 'info', 'Opening Meta authorization', 'Finish setup on Meta. Connection is not yet confirmed.');
+        window.location.assign(secureUrl);
         return;
       }
 
-      showNotice(
-        response?.message ||
-        'Connection request received. Complete authorization with Facebook.'
-      );
+      toast.update(pendingId, 'info', 'Connection request submitted', response?.message || 'Complete authorization with Facebook and refresh status.');
 
       await loadConnections();
     } catch (requestError) {
-      showNotice(
-        requestError?.message ||
-        'Unable to start Facebook connection.'
-      );
+      toast.update(pendingId, 'error', 'Facebook connection failed', requestError?.message || 'Please try again.');
     } finally {
       setConnecting(false);
     }
@@ -433,7 +438,7 @@ export default function FacebookInstagramPage() {
           {configured && (
             <button
               type="button"
-              onClick={loadConnections}
+              onClick={() => loadConnections(true)}
               disabled={loading}
             >
               <RefreshCw size={14} />
@@ -588,7 +593,7 @@ export default function FacebookInstagramPage() {
             <button
               type="button"
               className="fi-refresh-button"
-              onClick={loadConnections}
+              onClick={() => loadConnections(true)}
               disabled={loading}
             >
               <RefreshCw size={15} />
