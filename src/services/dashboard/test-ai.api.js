@@ -1,6 +1,7 @@
+import { requiredApiPath } from '../apiConfig';
 import { apiRequest, apiStreamRequest } from '../apiClient';
 
-const BASE = '/api/v1/workspaces/current/ai-brain/test-ai';
+const BASE = requiredApiPath(process.env.REACT_APP_API_TEST_AI_PATH, 'REACT_APP_API_TEST_AI_PATH');
 const id = (value) => encodeURIComponent(String(value));
 
 // JSON variants are used in UI: a checked reply is returned as reply.content.

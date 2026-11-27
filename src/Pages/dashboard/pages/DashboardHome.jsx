@@ -342,6 +342,7 @@ export default function DashboardHome() {
   const [, setWorkspace] = useState(null);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const [isSavingStep, setIsSavingStep] = useState(false);
@@ -412,6 +413,7 @@ export default function DashboardHome() {
     }
 
     setIsLoading(false);
+    setHasLoadedOnce(true);
   }, []);
 
   useEffect(() => {
@@ -642,6 +644,10 @@ export default function DashboardHome() {
   /* ========================================
      PAGE UI
   ======================================== */
+
+  if (isLoading && !hasLoadedOnce) {
+    return <DashboardHomeSkeleton />;
+  }
 
   return (
     <div className="dp-dashboard-home">
@@ -982,6 +988,26 @@ export default function DashboardHome() {
           <ArrowRight size={14} />
         </button>
       </section>
+    </div>
+  );
+}
+function DashboardHomeSkeleton() {
+  return (
+    <div className="dp-dashboard-home dp-home-skeleton" role="status" aria-label="Loading dashboard">
+      <div className="dp-home-skeleton-line" style={{ width:'180px', height:'30px' }} />
+      <div className="dp-home-skeleton-line" style={{ width:'240px' }} />
+      <div className="dp-home-skeleton-panel">
+        <div className="dp-home-skeleton-line" style={{ width:'35%', height:'18px' }} />
+        <div className="dp-home-skeleton-line" style={{ width:'80%' }} />
+        <div className="dp-home-skeleton-line" style={{ width:'60%' }} />
+      </div>
+      <div className="dp-home-skeleton-stats">
+        {[0,1,2,3].map((index) => <div className="dp-home-skeleton-panel" key={index}>
+          <div className="dp-home-skeleton-line" style={{ width:'65%' }} />
+          <div className="dp-home-skeleton-line" style={{ width:'50%', height:'24px' }} />
+        </div>)}
+      </div>
+      <span className="dp-sr-only">Loading dashboard data</span>
     </div>
   );
 }

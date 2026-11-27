@@ -1,13 +1,7 @@
-/**
- * LOCAL, FICTIONAL ADMIN DESIGN DATA.
- * This module is ONLY used by the admin hook when:
- *   NODE_ENV === 'development' && REACT_APP_ADMIN_UI_PREVIEW === 'true'
- * Nothing in this file comes from the backend; no user records are read or saved.
- */
+/** Fictional design fixtures only. Preview access is permanently disabled in every environment. */
 
-export const isAdminPreviewEnabled =
-  process.env.NODE_ENV === 'development' &&
-  process.env.REACT_APP_ADMIN_UI_PREVIEW === 'true';
+// Permanently disabled: real auth/me superadmin sessions only.
+export const isAdminPreviewEnabled = false;
 
 const users = [
   {

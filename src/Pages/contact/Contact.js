@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 
 import "./Contact.css";
+import { API_ORIGIN } from "../../services/apiConfig";
+import { countries, normalizePhone, isPhoneValid } from "../verifyemail/signin/CountrySelect";
 
 import CTA from "../../components/landing/CTA";
 
@@ -28,13 +30,27 @@ import Footer from "../../components/Footer";
 
 gsap.registerPlugin(useGSAP);
 
-const API_BASE = (
-  process.env.REACT_APP_API_BASE_URL ||
-  process.env.REACT_APP_API_URL ||
-  "http://127.0.0.1:8000"
-)
-  .replace(/\/+$/, "")
-  .replace(/\/api\/v1$/, "");
+const API_BASE = API_ORIGIN;
+const publicContactHttp = axios.create({ timeout: 20000, withCredentials: false });
+const CONTACT_EMAIL = (process.env.REACT_APP_BELLBEE_CONTACT_EMAIL || "").trim();
+const CONTACT_PHONE = (process.env.REACT_APP_BELLBEE_CONTACT_PHONE || "").trim();
+const CONTACT_ADDRESS = (process.env.REACT_APP_BELLBEE_CONTACT_ADDRESS || "").trim();
+const CONTACT_MAP_URL = (process.env.REACT_APP_BELLBEE_CONTACT_MAP_URL || "").trim();
+const EMPTY_VALUES = { name: "", email: "", country: "", phone: "", message: "" };
+const FORM_FIELDS = ["name", "email", "phone", "message"];
+
+function fieldErrors(errors) {
+  const result = {};
+  const entries = Array.isArray(errors)
+    ? errors.map((entry) => [entry?.field ?? entry?.loc?.at(-1), entry?.message ?? entry?.msg])
+    : Object.entries(errors || {});
+  for (const [field, value] of entries) {
+    if (FORM_FIELDS.includes(field) && value) {
+      result[field] = Array.isArray(value) ? value.join(" ") : String(value);
+    }
+  }
+  return result;
+}
 
 const CONTACT_PATH = (
   process.env.REACT_APP_API_CONTACT_SUBMIT_PATH ||
@@ -44,12 +60,10 @@ const CONTACT_PATH = (
 export default function Contact() {
   const pageRef = useRef(null);
 
-  const [values, setValues] =
-    useState({
-      name: "",
-      email: "",
-      message: "",
-    });
+  const [values, setValues] = useState(EMPTY_VALUES);
+  const requestInFlight = useRef(false);
+  const cooldowns = useRef([]);
+  const country = countries.find((item) => item.code === values.country);
 
   const [errors, setErrors] =
     useState({});
@@ -152,6 +166,7 @@ export default function Contact() {
     setErrors((current) => ({
       ...current,
       [name]: "",
+      ...(name === "country" ? { phone: "" } : {}),
     }));
 
     setNotice(null);
@@ -159,161 +174,78 @@ export default function Contact() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (requestInFlight.current) return;
 
-    if (sending) {
-      return;
-    }
-
+    const rawPhone = values.phone.trim();
+    const national = country ? normalizePhone(rawPhone, country.dialCode) : "";
+    const phone = country ? `${country.dialCode}${national}` : "";
     const payload = {
-      name:
-        values.name.trim(),
-
-      email:
-        values.email.trim(),
-
-      message:
-        values.message.trim(),
+      name: values.name.trim(),
+      email: values.email.trim().toLowerCase(),
+      phone,
+      message: values.message.trim() || null,
     };
-
     const nextErrors = {};
-
-    if (payload.name.length < 2) {
-      nextErrors.name =
-        "Please enter your name.";
+    if (payload.name.length < 3 || payload.name.length > 80 || /\p{N}/u.test(payload.name)) {
+      nextErrors.name = "Enter a name of 3–80 characters without numbers.";
     }
-
-    if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        payload.email
-      )
-    ) {
-      nextErrors.email =
-        "Enter a valid email address.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+      nextErrors.email = "Enter a valid email address.";
     }
-
-    if (
-      payload.message.length < 10
-    ) {
-      nextErrors.message =
-        "Please enter at least 10 characters.";
+    if (!country) nextErrors.country = "Select your country.";
+    if (!country || !/^[\d\s().-]+$/.test(rawPhone) || !isPhoneValid(national, country.dialCode) || !/^\+[1-9]\d{6,14}$/.test(phone)) {
+      nextErrors.phone = "Enter a valid local phone number without the country code.";
     }
-
-    if (
-      payload.message.length > 5000
-    ) {
-      nextErrors.message =
-        "Message must be 5000 characters or fewer.";
+    if ((payload.message || "").length > 2000) {
+      nextErrors.message = "Message must be 2,000 characters or fewer.";
     }
-
-    if (
-      Object.keys(nextErrors).length
-    ) {
+    if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
-
-      setNotice({
-        type: "error",
-        text:
-          "Please correct the highlighted fields.",
-      });
-
+      setNotice({ type: "error", text: "Please correct the highlighted fields." });
       return;
     }
-
-    if (
-      !CONTACT_PATH ||
-      !CONTACT_PATH.startsWith("/") ||
-      CONTACT_PATH.startsWith("//")
-    ) {
-      setNotice({
-        type: "error",
-
-        text:
-          "Contact form is not connected yet. Please email info@bellbee.ai directly.",
-      });
-
+    if (!/^\/(?!\/)/.test(CONTACT_PATH) || /[\\?#\s]/.test(CONTACT_PATH)) {
+      setNotice({ type: "error", text: "Contact form is not configured." });
       return;
     }
-
+    const now = Date.now();
+    cooldowns.current = cooldowns.current.filter((entry) => entry.until > now);
+    const blocked = cooldowns.current.find((entry) => entry.email === payload.email || entry.phone === payload.phone);
+    if (blocked) {
+      setNotice({ type: "error", text: `Please wait ${Math.ceil((blocked.until - now) / 60000)} minutes before submitting again.` });
+      return;
+    }
+    requestInFlight.current = true;
     setSending(true);
+    setErrors({});
     setNotice(null);
-
     try {
-      await axios.post(
-        `${API_BASE}${CONTACT_PATH}`,
+      const response = await publicContactHttp.post(`${API_BASE}${CONTACT_PATH}`, payload, {
+        headers: { "Content-Type": "application/json", Authorization: null },
 
-        payload,
-
-        {
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          timeout: 20000,
-        }
-      );
-
-      setValues({
-        name: "",
-        email: "",
-        message: "",
       });
-
-      setErrors({});
-
-      setNotice({
-        type: "success",
-
-        text:
-          "Your message has been received. Our team will get back to you.",
-      });
+      if (response.status !== 201 || response.data?.success !== true || response.data?.code !== "CONTACT_201") {
+        setNotice({ type: "error", text: "The server did not confirm submission." });
+        return;
+      }
+      setValues(EMPTY_VALUES);
+      setNotice({ type: "success", text: response.data.message || "Message submitted successfully." });
     } catch (failure) {
-      const details =
-        failure?.response?.data;
-
-      setNotice({
-        type: "error",
-
-        text:
-          typeof details?.message ===
-          "string"
-            ? details.message
-            : "Could not submit your message. Please try again or email info@bellbee.ai.",
-      });
-
-      const backendErrors =
-        details?.errors;
-
-      if (
-        backendErrors &&
-        typeof backendErrors === "object"
-      ) {
-        setErrors((current) => ({
-          ...current,
-
-          ...Object.fromEntries(
-            Object.entries(
-              backendErrors
-            )
-              .filter(([name]) =>
-                [
-                  "name",
-                  "email",
-                  "message",
-                ].includes(name)
-              )
-              .map(
-                ([name, value]) => [
-                  name,
-                  Array.isArray(value)
-                    ? value.join(" ")
-                    : String(value),
-                ]
-              )
-          ),
-        }));
+      const details = failure?.response?.data;
+      if (failure?.response?.status === 429 && details?.code === "CONTACT_429_COOLDOWN") {
+        const retry = Number(failure.response.headers?.["retry-after"]);
+        const seconds = Number.isFinite(retry) && retry > 0 ? retry : Number(details.data?.wait_time_seconds);
+        if (Number.isFinite(seconds) && seconds > 0) {
+          cooldowns.current.push({ email: payload.email, phone: payload.phone, until: Date.now() + seconds * 1000 });
+        }
+        const wait = details.data?.wait_time || (Number.isFinite(seconds) && seconds > 0 ? `${Math.ceil(seconds / 60)} minutes` : "");
+        setNotice({ type: "error", text: `${details.message || "A recent submission already exists."}${wait ? ` Please wait ${wait} before submitting again.` : ""}` });
+      } else {
+        setErrors(fieldErrors(details?.errors ?? details?.detail));
+        setNotice({ type: "error", text: typeof details?.message === "string" ? details.message : "Could not submit your message. Please try again." });
       }
     } finally {
+      requestInFlight.current = false;
       setSending(false);
     }
   }
@@ -340,8 +272,8 @@ export default function Contact() {
               Have a question about Bellbee Ai,
               or want to know if it's right for
               your business? Fill in the form
-              below and our team typically
-              replies within a few hours.
+              below and our team aims to
+              respond within 24 hours.
             </p>
           </div>
 
@@ -416,7 +348,7 @@ export default function Contact() {
             <div className="contact-info-list">
               <a
                 className="contact-info-card"
-                href="https://www.google.com/maps/search/?api=1&query=Office+LG+08%2C+Queen+Plaza%2C+Durand+Road%2C+Lahore%2C+Pakistan"
+                href={CONTACT_MAP_URL || undefined}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -430,10 +362,7 @@ export default function Contact() {
                   </small>
 
                   <strong>
-                    Office LG 08,
-                    Queen Plaza,
-                    Durand Road,
-                    Lahore, Pakistan
+                    {CONTACT_ADDRESS}
                   </strong>
                 </span>
 
@@ -445,7 +374,7 @@ export default function Contact() {
 
               <a
                 className="contact-info-card"
-                href="tel:+923094468949"
+                href={CONTACT_PHONE ? `tel:${CONTACT_PHONE}` : undefined}
               >
                 <span className="contact-info-icon">
                   <Phone size={20} />
@@ -457,7 +386,7 @@ export default function Contact() {
                   </small>
 
                   <strong>
-                    +92 309 4468949
+                    {CONTACT_PHONE}
                   </strong>
                 </span>
 
@@ -469,7 +398,7 @@ export default function Contact() {
 
               <a
                 className="contact-info-card"
-                href="mailto:info@bellbee.ai"
+                href={CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}` : undefined}
               >
                 <span className="contact-info-icon">
                   <Mail size={20} />
@@ -481,7 +410,7 @@ export default function Contact() {
                   </small>
 
                   <strong>
-                    info@bellbee.ai
+                    {CONTACT_EMAIL}
                   </strong>
                 </span>
 
@@ -537,7 +466,7 @@ export default function Contact() {
                   onChange={changeField}
                   placeholder="Enter your name"
                   autoComplete="name"
-                  maxLength={120}
+                  maxLength={80}
                   aria-invalid={Boolean(
                     errors.name
                   )}
@@ -577,29 +506,27 @@ export default function Contact() {
                 )}
               </label>
 
+              <div className="contact-field">
+                <label htmlFor="contact-country">Country / calling code</label>
+                <select id="contact-country" name="country" value={values.country} onChange={changeField} aria-invalid={Boolean(errors.country)} required>
+                  <option value="">Select country</option>
+                  {countries.map((item) => <option key={item.code} value={item.code}>{item.name} ({item.dialCode})</option>)}
+                </select>
+                {errors.country && <small className="contact-field-error">{errors.country}</small>}
+              </div>
               <label className="contact-field">
-                <span>
-                  Message
-                </span>
-
-                <textarea
-                  name="message"
-                  rows="5"
-                  value={values.message}
-                  onChange={changeField}
-                  placeholder="Tell us how we can help..."
-                  maxLength={5000}
-                  aria-invalid={Boolean(
-                    errors.message
-                  )}
-                  required
-                />
-
-                {errors.message && (
-                  <small className="contact-field-error">
-                    {errors.message}
-                  </small>
-                )}
+                <span>Your Phone</span>
+                <div className="contact-phone-input">
+                  <span>{country?.dialCode || "—"}</span>
+                  <input type="tel" name="phone" value={values.phone} onChange={changeField} placeholder="Local phone number" autoComplete="tel-national" aria-invalid={Boolean(errors.phone)} required />
+                </div>
+                {errors.phone && <small className="contact-field-error">{errors.phone}</small>}
+              </label>
+              <label className="contact-field">
+                <span>Message (optional)</span>
+                <textarea name="message" rows="5" value={values.message} onChange={changeField} placeholder="Tell us how we can help..." maxLength={2000} aria-invalid={Boolean(errors.message)} />
+                <small className="contact-character-count">{values.message.length}/2000</small>
+                {errors.message && <small className="contact-field-error">{errors.message}</small>}
               </label>
 
               <button

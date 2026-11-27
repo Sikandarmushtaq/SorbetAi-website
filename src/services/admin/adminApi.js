@@ -9,8 +9,7 @@ import {
   from workspace endpoints.
 
   All admin requests use the existing
-  Axios API client with authentication
-  and token refresh.
+  authenticated Axios API client.
 */
 
 const PATHS = {
@@ -96,10 +95,7 @@ export const isAdminEndpointConfigured = (
 
 function buildPath(
   key,
-  {
-    id,
-    query,
-  } = {}
+  { id, query } = {}
 ) {
   let path = PATHS[key]?.trim();
 
@@ -107,10 +103,7 @@ function buildPath(
     throw missing(key);
   }
 
-  if (
-    id !== undefined &&
-    id !== null
-  ) {
+  if (id !== undefined && id !== null) {
     const safeId = encodeURIComponent(
       String(id)
     );
@@ -173,12 +166,11 @@ export const adminApi = {
     isAdminEndpointConfigured,
 
   getIdentity: () =>
-    apiRequest(buildPath("identity")),
+    apiRequest(
+      buildPath("identity")
+    ),
 
-  list: (
-    key,
-    query = {}
-  ) =>
+  list: (key, query = {}) =>
     apiRequest(
       buildPath(key, { query })
     ),
@@ -188,43 +180,107 @@ export const adminApi = {
       buildPath(key, { id })
     ),
 
-  getUserPart: (
-    key,
-    userId
-  ) =>
+  getUserPart: (key, userId) =>
     apiRequest(
       buildPath(key, {
         id: userId,
       })
     ),
 
-  // Expected backend contract:
-  // PATCH /admin/contact-messages/:id
-  // Body: { is_read: true/false }
-  markContactMessage: (
-    id,
-    isRead
-  ) =>
-    apiRequest(
-      buildPath(
-        "contactMessages",
-        { id }
-      ),
+  /*
+    CONTACT INBOX
 
+    Uses the existing environment path.
+    Supports optional search, is_read,
+    page and page_size query parameters.
+
+    Without pagination parameters,
+    the backend returns the full list.
+  */
+
+  async listContactMessages(query = {}) {
+    const data = await apiRequest(
+      buildPath("contactMessages", {
+        query,
+      }),
+      {
+        expectedStatus: 200,
+        requireSuccess: true,
+      }
+    );
+
+    if (
+      !Array.isArray(data?.messages) ||
+      !data.messages.every(
+        (row) =>
+          typeof row?.id === "string" &&
+          typeof row.is_read === "boolean"
+      ) ||
+      !Number.isInteger(data.total) ||
+      data.total < 0 ||
+      !Number.isInteger(data.unread_count) ||
+      data.unread_count < 0 ||
+      data.unread_count > data.total
+    ) {
+      throw new DashboardApiError(
+        "Invalid contact inbox response.",
+        "INVALID_CONTACT_RESPONSE"
+      );
+    }
+
+    return data;
+  },
+
+  /*
+    MARK READ / UNREAD
+
+    Backend requires a strict boolean.
+    Do not generate read_at on frontend.
+    Return the actual updated backend record.
+  */
+
+  async markContactMessage(id, isRead) {
+    if (
+      id == null ||
+      typeof isRead !== "boolean"
+    ) {
+      throw new DashboardApiError(
+        "A message ID and boolean read status are required.",
+        "INVALID_CONTACT_UPDATE"
+      );
+    }
+
+    const data = await apiRequest(
+      buildPath("contactMessages", {
+        id,
+      }),
       {
         method: "PATCH",
 
         body: {
-          is_read:
-            Boolean(isRead),
+          is_read: isRead,
         },
+
+        expectedStatus: 200,
+        requireSuccess: true,
       }
-    ),
+    );
+
+    if (
+      String(data?.id) !== String(id) ||
+      data?.is_read !== isRead
+    ) {
+      throw new DashboardApiError(
+        "The server did not confirm the updated message status.",
+        "INVALID_CONTACT_RESPONSE"
+      );
+    }
+
+    return data;
+  },
 };
 
-export function isPlatformAdmin(
-  identity
-) {
+export function isPlatformAdmin(identity) {
   const value =
     identity?.admin ??
     identity?.user ??

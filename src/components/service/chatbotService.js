@@ -4,13 +4,13 @@ const API_BASE_URL = (
   process.env.REACT_APP_CHATBOT_API_URL || ''
 ).replace(/\/$/, '');
 
-export const isChatbotApiConfigured = Boolean(API_BASE_URL);
-
 const API_ENDPOINTS = {
-  start: '/api/chat/start',
-  message: '/api/chat/message',
-  end: '/api/chat/end',
+  start: process.env.REACT_APP_CHATBOT_START_PATH,
+  message: process.env.REACT_APP_CHATBOT_MESSAGE_PATH,
+  end: process.env.REACT_APP_CHATBOT_END_PATH,
 };
+
+export const isChatbotApiConfigured = Boolean(API_BASE_URL && Object.values(API_ENDPOINTS).every(path => typeof path === 'string' && /^\/(?!\/)/.test(path)));
 
 // Handles all chatbot HTTP requests.
 const chatbotHttp = axios.create({ baseURL: API_BASE_URL });

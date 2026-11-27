@@ -8,6 +8,9 @@ import {
   useState,
 } from "react";
 
+import { AUTH_PATHS } from "../services/apiConfig";
+import { isPlatformSuperadmin } from "../services/auth.api";
+
 import {
   accessTokenExpiry,
   clearStoredSession,
@@ -77,9 +80,7 @@ function isPermanentlyRejectedSession(error) {
   // token has expired or is invalid.
   if (
     status === 400 &&
-    /\/api\/v1\/auth\/refresh(?:\?|$)/.test(
-      endpoint
-    )
+    endpoint.split("?")[0] === AUTH_PATHS.refresh
   ) {
     return true;
   }
@@ -148,7 +149,7 @@ export function AuthProvider({ children }) {
       const validation = (async () => {
         try {
           // Existing Axios API:
-          // GET /api/v1/auth/me
+          // GET the configured AUTH_PATHS.me endpoint
           //
           // apiClient.js automatically refreshes
           // an expired access token when possible.
@@ -164,9 +165,13 @@ export function AuthProvider({ children }) {
 
           // Authentication was not confirmed.
           if (
-            !currentUser ||
+            !currentUser?.id ||
+            currentUser.is_verified !== true ||
             !getStoredToken("access")
           ) {
+            if (getStoredToken("access") || getStoredToken("refresh")) {
+              clearStoredSession();
+            }
             setSession(signedOut);
             return null;
           }
@@ -389,13 +394,14 @@ export function AuthProvider({ children }) {
     error,
   } = session;
 
-  const needsOnboarding =
+  const needsOnboarding = !isPlatformSuperadmin(user) && (
     user?.is_onboarded === false ||
     (
       user?.is_onboarded == null &&
       user?.phone === null &&
       user?.workspaces?.length === 0
-    );
+    )
+  );
 
   return (
     <AuthContext.Provider
@@ -406,7 +412,7 @@ export function AuthProvider({ children }) {
 
         sessionError: error,
 
-        isAuthenticated: Boolean(user),
+        isAuthenticated: Boolean(user?.id && user.is_verified === true && session.accessToken && !isLoading && !error),
 
         needsOnboarding,
 

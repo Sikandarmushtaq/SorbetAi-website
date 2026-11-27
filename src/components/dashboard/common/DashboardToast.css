@@ -1,10 +1,10 @@
 
 .bb-user-toast-stack {
   position: fixed;
-  z-index: 12000;
+  z-index: 2147483000;
   top: 86px;
   right: 20px;
-  width: min(400px, calc(100vw - 24px));
+  width: min(360px, calc(100vw - 24px));
 
   display: grid;
   gap: 11px;
@@ -199,3 +199,8 @@
     animation: none;
   }
 }
+
+/* Prevent verbose API text from obscuring modal controls. */
+.bb-user-toast-text { max-width: 100%; }
+.bb-user-toast-text strong, .bb-user-toast-text p { overflow-wrap: break-word; }
+.bb-user-toast-error .bb-user-toast-text strong { font-size: 12.5px; }

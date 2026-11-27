@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react';
 
 import GoogleButton from '../../../components/auth/GoogleButton';
 import { useAuth } from '../../../context/AuthContext';
-import { authApi, authErrorMessage } from '../../../services/auth.api';
+import { authApi, authErrorMessage, dashboardDestination } from '../../../services/auth.api';
 import './SignIn.css';
 
 gsap.registerPlugin(useGSAP);
@@ -48,7 +48,10 @@ export default function SignIn() {
     const address = email.trim().toLowerCase();
     try {
       const result = await authApi.signIn(address, password);
-      await saveSession(result.tokens ?? result);
+      const confirmedUser = await saveSession(result.tokens ?? result);
+      // Never redirect using a local isAdmin flag. Verify role with /auth/me.
+      if (!confirmedUser) throw new Error('Unable to verify your session. Please try again.');
+      navigate(dashboardDestination(location.state, confirmedUser, result.goto), { replace: true });
     } catch (error) {
       if (error.code === 'AUTH_403_EMAIL_NOT_VERIFIED') {
         window.localStorage.setItem('bellbee_pending_verification_email', address);

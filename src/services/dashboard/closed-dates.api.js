@@ -1,8 +1,8 @@
+import { requiredApiPath } from '../apiConfig';
 
 import { apiRequest } from '../apiClient';
 
-const SPECIAL_HOURS_PATH =
-  '/api/v1/workspaces/current/ai-brain/special-hours';
+const SPECIAL_HOURS_PATH = requiredApiPath(process.env.REACT_APP_API_CLOSED_DATES_PATH, 'REACT_APP_API_CLOSED_DATES_PATH');
 
 export const closedDatesApi = {
   isConfigured: () => true,

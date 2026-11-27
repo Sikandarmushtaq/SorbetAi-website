@@ -1,7 +1,8 @@
+import { requiredApiPath } from '../apiConfig';
 import { apiRequest } from '../apiClient';
 
 // Phase 7 / section 18F: real saved customer requests, NOT Leads and NOT Test AI.
-const BASE = (process.env.REACT_APP_API_REQUESTS_PATH || '/api/v1/workspaces/current/requests').replace(/\/+$/, '');
+const BASE = requiredApiPath(process.env.REACT_APP_API_REQUESTS_PATH, 'REACT_APP_API_REQUESTS_PATH');
 const id = (value) => encodeURIComponent(String(value));
 const withQuery = (url, params = {}) => {
   const query = new URLSearchParams();

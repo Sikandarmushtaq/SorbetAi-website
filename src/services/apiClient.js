@@ -1,11 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = (
-  process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'
-).replace(/\/+$/, '');
-
-const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1$/, '');
-const API_VERSION = '/api/v1';
+import { API_BASE_URL, API_ORIGIN, AUTH_PATHS, CURRENT_WORKSPACE_PATH, PUBLIC_AUTH_PATHS } from './apiConfig';
 
 // ngrok free endpoints may return a browser warning instead of JSON.
 // This header is added only for ngrok hosts, not for other production origins.
@@ -144,7 +139,7 @@ export function hasAccessToken() {
 }
 
 function isPublicAuthEndpoint(path) {
-  return /\/api\/v1\/auth\/(signup|login|google|verify-email|resend-verification|refresh|logout|password\/forgot|password\/reset)$/.test(path);
+  return PUBLIC_AUTH_PATHS.has(path);
 }
 
 function readResponse(response) {
@@ -210,7 +205,7 @@ async function refreshSessionToken(rejectedAccessToken = '') {
     // Another tab may have rotated or cleared the session while we waited.
     if (getStoredToken('refresh') !== refreshToken) return getStoredToken('access');
 
-    const endpoint = `${API_VERSION}/auth/refresh`;
+    const endpoint = AUTH_PATHS.refresh;
     const data = await performRequest(endpoint, {
       method: 'POST',
       body: { refresh_token: refreshToken },
@@ -233,7 +228,10 @@ async function refreshSessionToken(rejectedAccessToken = '') {
 }
 
 async function performRequest(path, options, tokenOverride, hasRetried) {
-  const endpoint = path.startsWith('/') ? path : `/${path}`;
+  if (typeof path !== 'string' || !/^\/(?!\/)/.test(path) || path.includes('\\')) {
+    throw new DashboardApiError('Invalid API endpoint.', 'ENDPOINT_INVALID');
+  }
+  const endpoint = path;
   const method = String(options.method || 'GET').toUpperCase();
   const headers = new Headers(options.headers || {});
   const usesCustomAuthorization = headers.has('Authorization');
@@ -274,7 +272,12 @@ async function performRequest(path, options, tokenOverride, hasRetried) {
     );
   }
 
-  if (response.status === 401 && !isPublicAuthEndpoint(endpoint) && !usesCustomAuthorization) {
+  // A revoked backend session cannot be fixed by refreshing. Avoid accidental
+  // reuse of rotated refresh tokens (which the backend treats as suspicious).
+  const revoked = payload?.code === 'AUTH_401_SESSION_REVOKED';
+  if (revoked && !options.preserveSessionOnFailure) clearStoredSession();
+  if (response.status === 401 && !revoked && !options.preserveSessionOnFailure &&
+      !isPublicAuthEndpoint(endpoint) && !usesCustomAuthorization) {
     const newAccessToken = hasRetried ? '' : await refreshSessionToken(token);
     if (newAccessToken) return performRequest(path, options, newAccessToken, true);
     if (token && getStoredToken('access') === token) clearStoredSession();
@@ -290,6 +293,12 @@ async function performRequest(path, options, tokenOverride, hasRetried) {
     );
   }
 
+  if (options.expectedStatus && response.status !== options.expectedStatus) {
+    throw new DashboardApiError('The server did not confirm the expected response.', 'UNEXPECTED_RESPONSE', response.status, endpoint);
+  }
+  if (options.requireSuccess && payload?.success !== true) {
+    throw new DashboardApiError('The server did not confirm success.', 'SUCCESS_NOT_CONFIRMED', response.status, endpoint);
+  }
   return unwrapResponse(payload, response.status, endpoint);
 }
 
@@ -308,7 +317,10 @@ export async function apiRequest(path, options = {}) {
  */
 export async function apiStreamRequest(path, { body, onProgress, signal } = {}) {
   if (!path) throw new DashboardApiError('An API endpoint is required.', 'ENDPOINT_REQUIRED');
-  const endpoint = path.startsWith('/') ? path : `/${path}`;
+  if (typeof path !== 'string' || !/^\/(?!\/)/.test(path) || path.includes('\\')) {
+    throw new DashboardApiError('Invalid API endpoint.', 'ENDPOINT_INVALID');
+  }
+  const endpoint = path;
   const payload = JSON.stringify(body || {});
 
   const requestOnce = async (token, retried = false) => {
@@ -389,16 +401,20 @@ export async function apiStreamRequest(path, { body, onProgress, signal } = {}) 
     if (raw.length > offset) ingest(raw.slice(offset));
     if (!terminal && buffer.trim()) processEvent(buffer.trim());
 
-    if (response.status === 401 && !retried) {
-      const refreshed = await refreshSessionToken(token);
-      if (refreshed) return requestOnce(refreshed, true);
-      if (token && getStoredToken('access') === token) clearStoredSession();
-    }
-
     let json = {};
     const contentType = String(response.headers?.['content-type'] || '');
     if (contentType.includes('json') || (raw.trim().startsWith('{') && !terminal)) {
       try { json = JSON.parse(raw); } catch { json = {}; }
+    }
+
+    if (response.status === 401) {
+      if (json?.code === 'AUTH_401_SESSION_REVOKED') {
+        if (getStoredToken('access') === token) clearStoredSession();
+      } else if (!retried) {
+        const refreshed = await refreshSessionToken(token);
+        if (refreshed) return requestOnce(refreshed, true);
+        if (token && getStoredToken('access') === token) clearStoredSession();
+      }
     }
 
     if (response.status < 200 || response.status >= 300) {
@@ -499,7 +515,7 @@ export async function getCurrentUser() {
       return null;
     }
   }
-  const response = await apiRequest(`${API_VERSION}/auth/me`);
+  const response = await apiRequest(AUTH_PATHS.me);
   const user = response?.user ?? response;
   if (!user?.id) {
     throw new DashboardApiError('The backend did not return a valid user profile.', 'USER_MISSING');
@@ -508,17 +524,40 @@ export async function getCurrentUser() {
 }
 
 export async function getCurrentWorkspace() {
-  return apiRequest(`${API_VERSION}/workspaces/current`);
+  return apiRequest(CURRENT_WORKSPACE_PATH);
 }
-// new connnected api       
+
+// API v0.7: logout requires a Bearer ACCESS token and no body.
+// Keep credentials until the backend confirms HTTP 200 + success:true.
+let pendingLogout = null;
 export async function logoutSession() {
-  const refreshToken = getStoredToken('refresh');
-  clearStoredSession();
-  if (refreshToken) {
-    await apiRequest(`${API_VERSION}/auth/logout`, {
+  if (pendingLogout) return pendingLogout;
+  pendingLogout = (async () => {
+    let token = getStoredToken('access');
+    const refreshToken = getStoredToken('refresh');
+    if (!token && !refreshToken) {
+      clearStoredSession();
+      return;
+    }
+    const expiry = accessTokenExpiry(token);
+    if (!token || (expiry !== null && expiry <= Date.now())) {
+      token = await refreshSessionToken(token);
+      if (!token) {
+        throw new DashboardApiError('Session could not be refreshed. Please try again.', 'LOGOUT_REFRESH_FAILED');
+      }
+    }
+    await apiRequest(AUTH_PATHS.logout, {
       method: 'POST',
-      body: { refresh_token: refreshToken },
+      expectedStatus: 200,
+      requireSuccess: true,
+      preserveSessionOnFailure: true,
     });
+    clearStoredSession();
+  })();
+  try {
+    await pendingLogout;
+  } finally {
+    pendingLogout = null;
   }
 }
 

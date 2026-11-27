@@ -1,7 +1,8 @@
+import { requiredApiPath } from '../apiConfig';
 import { apiRequest } from '../apiClient';
 
 // Phase 7 / section 18E: workspace-scoped Request Types, NOT the Leads API.
-const BASE = (process.env.REACT_APP_API_REQUEST_TYPES_PATH || '/api/v1/workspaces/current/ai-brain/request-types').replace(/\/+$/, '');
+const BASE = requiredApiPath(process.env.REACT_APP_API_REQUEST_TYPES_PATH, 'REACT_APP_API_REQUEST_TYPES_PATH');
 const encode = (id) => encodeURIComponent(String(id));
 const queryString = (params = {}) => {
   const query = new URLSearchParams();

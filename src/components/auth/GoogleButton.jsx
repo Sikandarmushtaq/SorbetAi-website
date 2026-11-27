@@ -4,9 +4,8 @@ import { authApi } from '../../services/auth.api';
 import { readJwtPayload } from '../../services/apiClient';
 import './GoogleButton.css';
 
-const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID
-  || '99651564944-tvufomf1gr0jbjbh9fhurcdes5qpg3ok.apps.googleusercontent.com';
-const scriptUrl = 'https://accounts.google.com/gsi/client';
+const clientId = String(process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
+const scriptUrl = String(process.env.REACT_APP_GOOGLE_SCRIPT_URL || '').trim();
 let loadingScript;
 let initializedGoogle;
 let activeCredentialHandler;
@@ -22,6 +21,7 @@ function initializeGoogle(google) {
 }
 
 function loadGoogle() {
+  if (!clientId || !scriptUrl) return Promise.reject(new Error('Google Sign-In is not configured.'));
   if (window.google?.accounts?.id) return Promise.resolve(window.google.accounts.id);
   if (!loadingScript) {
     loadingScript = new Promise((resolve, reject) => {

@@ -128,7 +128,7 @@ export default function Onboarding() {
           </button>
         </form>
         <button type="button" className="profile-setup-signout" disabled={isSubmitting}
-          onClick={() => signOut().catch(() => {})}>
+          onClick={() => signOut().catch((error) => setMessage(authErrorMessage(error)))}>
           Sign out
         </button>
       </section>

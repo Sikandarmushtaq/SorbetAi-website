@@ -68,7 +68,7 @@
 }
 
 .db-main {
-  min-height: 100vh; margin-left: 100px; padding: 0 27px 42px 8px; transition: margin-left .28s ease;
+  min-height: 100vh; margin-left: 100px; padding: 0 27px 42px 8px; transition: margin-left .14s ease-out;
 }
 
 .db-page-content {

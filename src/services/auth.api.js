@@ -1,23 +1,24 @@
 import { apiRequest } from './apiClient';
+import { AUTH_PATHS } from './apiConfig';
 
 function post(path, body) {
-  return apiRequest(`/api/v1/auth/${path}`, { method: 'POST', body });
+  return apiRequest(path, { method: 'POST', body });
 }
 
 export const authApi = {
-  signIn: (email, password) => post('login', { email, password }),
-  signUp: (details) => post('signup', details),
-  signInWithGoogle: (token) => post('google', { token }),
-  completeOnboarding: (details) => post('google/onboard', details),
-  verifyEmail: (token) => post('verify-email', { token }),
-  resendVerification: (email) => post('resend-verification', { email }),
-  forgotPassword: (email) => post('password/forgot', { email }),
-  updateProfile: (body) => apiRequest('/api/v1/auth/me', { method: 'PATCH', body }),
-  changePassword: (currentPassword, newPassword) => post('password/change', {
+  signIn: (email, password) => post(AUTH_PATHS.login, { email, password }),
+  signUp: (details) => post(AUTH_PATHS.signup, details),
+  signInWithGoogle: (token) => post(AUTH_PATHS.google, { token }),
+  completeOnboarding: (details) => post(AUTH_PATHS.googleOnboard, details),
+  verifyEmail: (token) => post(AUTH_PATHS.verifyEmail, { token }),
+  resendVerification: (email) => post(AUTH_PATHS.resendVerification, { email }),
+  forgotPassword: (email) => post(AUTH_PATHS.forgotPassword, { email }),
+  updateProfile: (body) => apiRequest(AUTH_PATHS.me, { method: 'PATCH', body }),
+  changePassword: (currentPassword, newPassword) => post(AUTH_PATHS.changePassword, {
     current_password: currentPassword,
     new_password: newPassword,
   }),
-  resetPassword: (token, newPassword) => post('password/reset', { token, new_password: newPassword }),
+  resetPassword: (token, newPassword) => post(AUTH_PATHS.resetPassword, { token, new_password: newPassword }),
 };
 
 export function authErrorMessage(error) {
@@ -27,7 +28,16 @@ export function authErrorMessage(error) {
   return error.message;
 }
 
-export function dashboardDestination(state) {
+export function isPlatformSuperadmin(user) {
+  return user?.is_superadmin === true || user?.role === 'superadmin';
+}
+
+// Only the authenticated backend role determines which dashboard opens.
+export function dashboardDestination(state, user = null, goto = '') {
+  if (isPlatformSuperadmin(user) || (goto === 'admin' && isPlatformSuperadmin(user))) {
+    const from = state?.from;
+    return /^\/admin(?:\/|$)/.test(from?.pathname || '') ? from : '/admin';
+  }
   const target = state?.from;
-  return /^\/dashboard(?:\/|$)/.test(target?.pathname) ? target : '/dashboard';
+  return /^\/dashboard(?:\/|$)/.test(target?.pathname || '') ? target : '/dashboard';
 }

@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 
 import "./DashboardToast.css";
+import { createPortal } from "react-dom";
+import { friendlyDashboardError } from "./dashboardFormErrors";
 
 const ToastContext = createContext(null);
 
@@ -65,6 +67,7 @@ export function DashboardToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const idRef = useRef(0);
   const timers = useRef(new Map());
+  const recentNotifications = useRef(new Map());
 
   const dismiss = useCallback((id) => {
     clearTimeout(timers.current.get(id));
@@ -77,7 +80,16 @@ export function DashboardToastProvider({ children }) {
 
   const push = useCallback(
     (type, title, detail = "", duration) => {
+      const displayTitle = type === 'error' || type === 'warning'
+        ? friendlyDashboardError(title) : String(title || '');
+      const displayDetail = detail && (type === 'error' || type === 'warning')
+        ? friendlyDashboardError(detail) : String(detail || '');
+      const signature = `${type}|${displayTitle}|${displayDetail}`;
+      const previous = recentNotifications.current.get(signature);
+      if (previous && Date.now() - previous.created < 2000) return previous.id;
       const id = ++idRef.current;
+      recentNotifications.current.set(signature, { id, created: Date.now() });
+      if (recentNotifications.current.size > 25) recentNotifications.current.clear();
 
       const timeout =
         duration ??
@@ -93,8 +105,8 @@ export function DashboardToastProvider({ children }) {
           {
             id,
             type,
-            title: String(title || ""),
-            detail: String(detail || ""),
+            title: displayTitle,
+            detail: displayDetail,
             timeout,
           },
         ].slice(-5)
@@ -221,10 +233,7 @@ export function DashboardToastProvider({ children }) {
     [push, update, dismiss]
   );
 
-  return (
-    <ToastContext.Provider value={toast}>
-      {children}
-
+  const stack = (
       <div
         className="bb-user-toast-stack"
         aria-label="Dashboard notifications"
@@ -286,6 +295,12 @@ export function DashboardToastProvider({ children }) {
           );
         })}
       </div>
+  );
+
+  return (
+    <ToastContext.Provider value={toast}>
+      {children}
+      {typeof document !== 'undefined' ? createPortal(stack, document.body) : stack}
     </ToastContext.Provider>
   );
 }

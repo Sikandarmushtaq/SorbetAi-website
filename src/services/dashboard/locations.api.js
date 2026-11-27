@@ -1,8 +1,8 @@
+import { requiredApiPath } from '../apiConfig';
 
 import { apiRequest } from '../apiClient';
 
-const LOCATIONS_PATH =
-  '/api/v1/workspaces/current/ai-brain/locations';
+const LOCATIONS_PATH = requiredApiPath(process.env.REACT_APP_API_LOCATIONS_PATH, 'REACT_APP_API_LOCATIONS_PATH');
 
 export const locationsApi = {
   isConfigured: () => true,

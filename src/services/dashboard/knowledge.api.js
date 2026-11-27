@@ -1,6 +1,7 @@
+import { requiredApiPath } from '../apiConfig';
 import { apiRequest } from '../apiClient';
 
-const BASE = '/api/v1/workspaces/current/ai-brain/knowledge';
+const BASE = requiredApiPath(process.env.REACT_APP_API_KNOWLEDGE_PATH, 'REACT_APP_API_KNOWLEDGE_PATH');
 const SECTIONS = {
   FAQs: 'faqs', Promotions: 'promotions', Documents: 'documents',
   Website: 'website', 'Chat Training': 'chat-training',

@@ -1,4 +1,3 @@
-
 /* ==========================================
    BELLBEE DASHBOARD HOME
    Screenshot-inspired design
@@ -70,7 +69,7 @@
 
   background: var(--db-white);
 
-  box-shadow: 0 2px 8px rgba(16, 55, 42, .025);
+  box-shadow: 0 2px 8px rgba(16, 55, 42, 0.025);
 }
 
 /* ==========================================
@@ -173,10 +172,10 @@
   margin: 0 0 8px;
   padding: 15px;
 
-  border: 1px solid rgba(255, 122, 89, .35);
+  border: 1px solid rgba(255, 122, 89, 0.35);
   border-radius: 13px;
 
-  background: rgba(255, 122, 89, .065);
+  background: rgba(255, 122, 89, 0.065);
 }
 
 .dp-next-step-main {
@@ -201,7 +200,7 @@
   background: var(--db-white);
   color: var(--db-coral);
 
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .dp-next-step-copy {
@@ -217,7 +216,7 @@
   color: var(--db-coral);
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: .3px;
+  letter-spacing: 0.3px;
 }
 
 .dp-dashboard-home .dp-next-step-copy h3 {
@@ -251,8 +250,7 @@
   min-width: 150px;
 }
 
-.dp-dashboard-home .dp-next-step-actions
-.dp-primary-button {
+.dp-dashboard-home .dp-next-step-actions .dp-primary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -270,9 +268,8 @@
   font-weight: 800;
 }
 
-.dp-dashboard-home .dp-next-step-actions
-.dp-primary-button:hover {
-  filter: brightness(.96);
+.dp-dashboard-home .dp-next-step-actions .dp-primary-button:hover {
+  filter: brightness(0.96);
 }
 
 .dp-next-step-time {
@@ -442,7 +439,7 @@
 }
 
 .dp-dashboard-home .dp-setup-step:hover:not(:disabled) {
-  background: rgba(255, 122, 89, .035);
+  background: rgba(255, 122, 89, 0.035);
 }
 
 .dp-step-status {
@@ -474,11 +471,10 @@
   line-height: 1.5;
 }
 
-.dp-dashboard-home .dp-setup-step.completed
-.dp-step-content strong {
+.dp-dashboard-home .dp-setup-step.completed .dp-step-content strong {
   color: var(--db-muted);
   text-decoration: line-through;
-  opacity: .75;
+  opacity: 0.75;
 }
 
 .dp-dashboard-home .dp-step-time {
@@ -544,10 +540,10 @@
   margin-top: 23px;
   padding: 19px 20px;
 
-  border: 1px solid rgba(255, 122, 89, .35);
+  border: 1px solid rgba(255, 122, 89, 0.35);
   border-radius: 13px;
 
-  background: rgba(255, 122, 89, .065);
+  background: rgba(255, 122, 89, 0.065);
 }
 
 .dp-dashboard-home .dp-early-bird-icon {
@@ -565,7 +561,7 @@
   background: var(--db-white);
   color: var(--db-coral);
 
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .055);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.055);
 }
 
 .dp-early-bird-copy {
@@ -659,8 +655,8 @@
   font-weight: 650;
 
   transition:
-    border-color .2s ease,
-    background .2s ease;
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .dp-home-quick-links button:hover {
@@ -690,8 +686,7 @@
   }
 
   .dp-dashboard-home .dp-stats-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -747,8 +742,7 @@
     padding-left: 55px;
   }
 
-  .dp-dashboard-home .dp-next-step-actions
-  .dp-primary-button {
+  .dp-dashboard-home .dp-next-step-actions .dp-primary-button {
     min-width: 112px;
   }
 
@@ -776,8 +770,7 @@
 
   .dp-home-quick-links {
     display: grid;
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .dp-home-quick-links button {
@@ -852,8 +845,7 @@
   }
 
   .dp-dashboard-home .dp-stats-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .dp-home-quick-links {
@@ -863,53 +855,198 @@
 
 /* BELLBEE-REMAINING-PREMIUM-BEGIN */
 
-
 /* ==========================================
    BELLBEE DASHBOARDHOME PREMIUM
    APPEND-ONLY — EXISTING CSS FILE
 ========================================== */
-.dp-dashboard-home { min-width:0; width:100%; max-width:1380px; margin-left:auto; margin-right:auto; padding-bottom:max(24px,2.5vw); }
+.dp-dashboard-home {
+  min-width: 0;
+  width: 100%;
+  max-width: 1380px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: max(24px, 2.5vw);
+}
 .dp-dashboard-home .dp-onboarding-card,
 .dp-dashboard-home .dp-early-bird-banner,
 .dp-dashboard-home .dp-home-activity-section,
 .dp-dashboard-home .dp-next-step-card {
-  min-width:0;
-  max-width:100%;
-  border-radius:20px;
-  border-color:rgba(16,55,42,.12);
-  background-image:radial-gradient(ellipse at 92% 7%,rgba(205,189,255,.21),transparent 32%),radial-gradient(ellipse at 7% 94%,rgba(244,201,93,.13),transparent 32%);
-  box-shadow:0 11px 30px rgba(16,55,42,.045);
+  min-width: 0;
+  max-width: 100%;
+  border-radius: 20px;
+  border-color: rgba(16, 55, 42, 0.12);
+  background-image:
+    radial-gradient(
+      ellipse at 92% 7%,
+      rgba(205, 189, 255, 0.21),
+      transparent 32%
+    ),
+    radial-gradient(
+      ellipse at 7% 94%,
+      rgba(244, 201, 93, 0.13),
+      transparent 32%
+    );
+  box-shadow: 0 11px 30px rgba(16, 55, 42, 0.045);
 }
 .dp-dashboard-home .dp-primary-button {
-  min-height:42px;
-  border-radius:12px;
-  background:#ff7a59;
-  color:#10372a;
-  border-color:#ff7a59;
-  font-size:12px;
-  font-weight:800;
-  transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease;
+  min-height: 42px;
+  border-radius: 12px;
+  background: #ff7a59;
+  color: #10372a;
+  border-color: #ff7a59;
+  font-size: 12px;
+  font-weight: 800;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.dp-dashboard-home :where(button, input, select, textarea, a):focus-visible { outline:3px solid #ff7a59; outline-offset:2px; }
-.dp-dashboard-home :where(input:not([type=checkbox]):not([type=radio]), select, textarea) { max-width:100%; min-width:0; border-radius:11px; }
-.dp-dashboard-home :where(h1,h2,h3,p) { overflow-wrap:anywhere; }
-.dp-dashboard-home :where(.dp-table-wrap,.bb2-table-wrap,.an-chart-scroll,.tp-template-list,.sp-ticket-list) { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-@media(max-width:760px) {
-  .dp-dashboard-home { max-width:100%; min-width:0; padding-bottom:28px; }
-  .dp-dashboard-home :where(.dp-header-actions,.ap-header-actions,.tp-page-actions,.fi-actions) { display:flex; flex-wrap:wrap; gap:9px; max-width:100%; }
-  .dp-dashboard-home :where(.dp-form-grid,.bb2-form-grid,.ba-form-grid) { min-width:0; }
+.dp-dashboard-home :where(button, input, select, textarea, a):focus-visible {
+  outline: 3px solid #ff7a59;
+  outline-offset: 2px;
 }
-@media(max-width:440px) {
-  .dp-dashboard-home :where(.dp-header-actions>button,.tp-page-actions>button) { flex:1 1 130px; }
+.dp-dashboard-home
+  :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  max-width: 100%;
+  min-width: 0;
+  border-radius: 11px;
 }
-@media(prefers-reduced-motion:reduce) { .dp-dashboard-home :where(button,a) { transition:none!important; } }
+.dp-dashboard-home :where(h1, h2, h3, p) {
+  overflow-wrap: anywhere;
+}
+.dp-dashboard-home
+  :where(
+    .dp-table-wrap,
+    .bb2-table-wrap,
+    .an-chart-scroll,
+    .tp-template-list,
+    .sp-ticket-list
+  ) {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 760px) {
+  .dp-dashboard-home {
+    max-width: 100%;
+    min-width: 0;
+    padding-bottom: 28px;
+  }
+  .dp-dashboard-home
+    :where(
+      .dp-header-actions,
+      .ap-header-actions,
+      .tp-page-actions,
+      .fi-actions
+    ) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    max-width: 100%;
+  }
+  .dp-dashboard-home :where(.dp-form-grid, .bb2-form-grid, .ba-form-grid) {
+    min-width: 0;
+  }
+}
+@media (max-width: 440px) {
+  .dp-dashboard-home
+    :where(.dp-header-actions > button, .tp-page-actions > button) {
+    flex: 1 1 130px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dp-dashboard-home :where(button, a) {
+    transition: none !important;
+  }
+}
 
-.dp-dashboard-home .dp-primary-button:not(:disabled):hover { background:#ff8b6f; color:#10372a; transform:translateY(-2px); box-shadow:0 11px 23px rgba(255,122,89,.19); }
+.dp-dashboard-home .dp-primary-button:not(:disabled):hover {
+  background: #ff8b6f;
+  color: #10372a;
+  transform: translateY(-2px);
+  box-shadow: 0 11px 23px rgba(255, 122, 89, 0.19);
+}
 
 /* Compress setup without hiding real onboarding data. */
-.dp-dashboard-home .dp-onboarding-card { padding:clamp(16px,2.2vw,24px); border-radius:22px; }
-.dp-dashboard-home .dp-onboarding-content { min-width:0; }
-.dp-dashboard-home .dp-next-step-card { padding:clamp(14px,2vw,22px); border-radius:17px; }
-.dp-dashboard-home .dp-home-quick-links { gap:12px; }
-@media(max-width:760px) { .dp-dashboard-home .dp-onboarding-top { flex-wrap:wrap; } .dp-dashboard-home .dp-setup-list { grid-template-columns:1fr; } }
+.dp-dashboard-home .dp-onboarding-card {
+  padding: clamp(16px, 2.2vw, 24px);
+  border-radius: 22px;
+}
+.dp-dashboard-home .dp-onboarding-content {
+  min-width: 0;
+}
+.dp-dashboard-home .dp-next-step-card {
+  padding: clamp(14px, 2vw, 22px);
+  border-radius: 17px;
+}
+.dp-dashboard-home .dp-home-quick-links {
+  gap: 12px;
+}
+@media (max-width: 760px) {
+  .dp-dashboard-home .dp-onboarding-top {
+    flex-wrap: wrap;
+  }
+  .dp-dashboard-home .dp-setup-list {
+    grid-template-columns: 1fr;
+  }
+}
+/* Initial API loading only. Content stays visible during later refreshes. */
+.dp-home-skeleton {
+  display: grid;
+  gap: 15px;
+  padding: 10px 0;
+}
+.dp-home-skeleton-line {
+  display: block;
+  height: 12px;
+  max-width: 100%;
+  border-radius: 8px;
+  background: #e0e3d9;
+  animation: dpSkeletonPulse 1.5s ease-in-out infinite;
+}
+.dp-home-skeleton-panel {
+  display: grid;
+  align-content: start;
+  gap: 15px;
+  min-height: 105px;
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px solid rgba(16, 55, 42, 0.1);
+  background: #fffaf0;
+}
+.dp-home-skeleton-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+}
+.dp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@keyframes dpSkeletonPulse {
+  50% {
+    opacity: 0.48;
+  }
+}
+@media (max-width: 850px) {
+  .dp-home-skeleton-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .dp-home-skeleton-stats {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dp-home-skeleton-line {
+    animation: none;
+  }
+}

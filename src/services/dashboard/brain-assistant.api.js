@@ -1,6 +1,7 @@
+import { requiredApiPath } from '../apiConfig';
 import { apiRequest, apiStreamRequest } from '../apiClient';
 
-const BASE = '/api/v1/workspaces/current/ai-brain/assistant';
+const BASE = requiredApiPath(process.env.REACT_APP_API_BRAIN_ASSISTANT_PATH, 'REACT_APP_API_BRAIN_ASSISTANT_PATH');
 const id = (value) => encodeURIComponent(String(value));
 
 // All responses are unwrapped from {success,code,message,data} by apiRequest.

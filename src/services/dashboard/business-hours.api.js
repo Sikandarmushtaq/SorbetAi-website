@@ -1,8 +1,8 @@
+import { requiredApiPath } from '../apiConfig';
 
 import { apiRequest } from '../apiClient';
 
-const HOURS_PATH =
-  '/api/v1/workspaces/current/ai-brain/hours';
+const HOURS_PATH = requiredApiPath(process.env.REACT_APP_API_BUSINESS_HOURS_PATH, 'REACT_APP_API_BUSINESS_HOURS_PATH');
 
 export const businessHoursApi = {
   isConfigured: () => true,

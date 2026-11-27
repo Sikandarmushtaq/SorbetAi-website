@@ -1,8 +1,9 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { isPlatformSuperadmin } from '../../services/auth.api';
 
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, isLoading, needsOnboarding, sessionError, refreshUser } = useAuth();
+  const { user, isAuthenticated, isLoading, needsOnboarding, sessionError, refreshUser } = useAuth();
   const location = useLocation();
 
   if (isLoading || sessionError) {
@@ -20,8 +21,12 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user?.id || user.is_verified !== true) {
     return <Navigate to="/signin" replace state={{ from: location }} />;
+  }
+
+  if (isPlatformSuperadmin(user)) {
+    return <Navigate to="/admin" replace />;
   }
 
   if (needsOnboarding && location.pathname !== '/onboarding') {

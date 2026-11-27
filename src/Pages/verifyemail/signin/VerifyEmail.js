@@ -26,7 +26,7 @@ export default function VerifyEmail() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { saveSession } = useAuth();
+  const { saveSession, user } = useAuth();
   const returnTo = dashboardDestination(location.state);
 
   const searchParams = new URLSearchParams(location.search);
@@ -71,16 +71,14 @@ export default function VerifyEmail() {
 
       try {
         const result = await authApi.verifyEmail(verificationToken);
-        await saveSession(result.tokens);
-        if (result.user?.email) setVerifiedEmail(result.user.email);
+        const confirmedUser = await saveSession(result.tokens);
+        if (!confirmedUser) throw new Error('Unable to verify your session. Please sign in again.');
+        if (confirmedUser.email) setVerifiedEmail(confirmedUser.email);
         window.localStorage.removeItem('bellbee_pending_verification_email');
         setStatus('success');
-        navigate(returnTo, { replace: true });
+        navigate(dashboardDestination(location.state, confirmedUser, result.goto) || returnTo, { replace: true });
       } catch (error) {
-        console.error('[Bellbee Email Verification]', {
-          endpoint: '/api/v1/auth/verify-email',
-          message: error.message,
-        });
+        // API error logging intentionally disabled for privacy.
 
         setErrorMessage(
           authErrorMessage(error) || 'Something went wrong. Please try again.'
@@ -91,7 +89,7 @@ export default function VerifyEmail() {
     };
 
     verifyEmail();
-  }, [verificationToken, saveSession, navigate, returnTo]);
+   }, [verificationToken, saveSession, navigate, returnTo, location.state]);
 
   // Requests a fresh verification link from the backend.
   const handleResend = async () => {
@@ -107,10 +105,7 @@ export default function VerifyEmail() {
         'If this email has an unverified account, a new verification link has been sent. Please check your inbox.'
       );
     } catch (error) {
-      console.error('[Bellbee Resend Verification]', {
-        endpoint: '/api/v1/auth/resend-verification',
-        message: error.message,
-      });
+      // API error logging intentionally disabled for privacy.
 
       setErrorMessage(
         authErrorMessage(error) || 'Unable to resend the verification email.'
@@ -122,7 +117,7 @@ export default function VerifyEmail() {
 
   // Opens the dashboard after successful email verification.
   const handleContinue = () => {
-    navigate('/dashboard', { replace: true });
+    navigate(dashboardDestination(location.state, user), { replace: true });
   };
 
   const userEmail = verifiedEmail || email;

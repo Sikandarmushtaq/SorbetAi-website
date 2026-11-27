@@ -17,6 +17,7 @@ export default function GuestRoute({
 }) {
   const {
     isAuthenticated,
+    user,
     isLoading,
     needsOnboarding,
     sessionError,
@@ -79,7 +80,7 @@ export default function GuestRoute({
   // Don't show the Sign In form again.
   if (isAuthenticated) {
     const target =
-      dashboardDestination(state);
+      dashboardDestination(state, user);
 
     return (
       <Navigate

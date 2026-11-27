@@ -1,15 +1,23 @@
 import './Sidebar.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, MessageSquare, Pin, PinOff, X } from 'lucide-react';
 import { navigationGroups } from './navigation';
 
 // Renders route navigation and supports hover-expand, pinning, and mobile full-screen navigation.
 export default function Sidebar({ mobileOpen, onClose }) {
-  const [isPinned, setIsPinned] = useState(false);
+  const [isPinned, setIsPinned] = useState(() => {
+    try { return window.localStorage.getItem('bellbee_sidebar_pinned') !== 'false'; }
+    catch { return true; }
+  });
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
   const expanded = mobileOpen || isPinned || isHovered;
+
+  useEffect(() => {
+    try { window.localStorage.setItem('bellbee_sidebar_pinned', String(isPinned)); }
+    catch { /* Storage may be unavailable. */ }
+  }, [isPinned]);
 
   const routeFor = (id) => id ? `/dashboard/${id}` : '/dashboard';
 
@@ -39,9 +47,14 @@ export default function Sidebar({ mobileOpen, onClose }) {
             className={`db-pin-button ${isPinned ? 'active' : ''}`}
             onClick={() => setIsPinned((current) => !current)}
             aria-label={isPinned ? 'Unpin sidebar' : 'Pin sidebar'}
-            title={isPinned ? 'Unpin sidebar' : 'Pin sidebar'}
+            title={isPinned ? 'Unpin: collapse when you move away' : 'Pin: keep navigation open'}
+            aria-describedby="db-sidebar-pin-hint"
           >
             {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
+            <span className="db-pin-tooltip" id="db-sidebar-pin-hint" role="tooltip">
+              <strong>{isPinned ? 'Unpin sidebar' : 'Pin sidebar'}</strong>
+              <small>{isPinned ? 'Collapse when you move away' : 'Keep the menu open'}</small>
+            </span>
           </button>
         ) : null}
       </div>

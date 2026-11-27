@@ -1,8 +1,8 @@
+import { requiredApiPath } from '../apiConfig';
 
 import { apiRequest } from '../apiClient';
 
-const STAFF_PATH =
-  '/api/v1/workspaces/current/ai-brain/staff';
+const STAFF_PATH = requiredApiPath(process.env.REACT_APP_API_STAFF_PATH, 'REACT_APP_API_STAFF_PATH');
 
 export const staffApi = {
   isConfigured: () => true,

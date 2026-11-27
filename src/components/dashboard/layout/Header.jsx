@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { allDashboardItems } from './navigation';
 import { useAuth } from '../../../context/AuthContext';
+import { useOptionalDashboardToast } from '../common/DashboardToastProvider';
 const searchLinkDefinitions = [
   {
     id: 'customers',
@@ -91,6 +92,8 @@ export default function Header() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const toast = useOptionalDashboardToast();
+  const [loggingOut, setLoggingOut] = useState(false);
   const [failedAvatar, setFailedAvatar] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -284,10 +287,18 @@ export default function Header() {
     navigate('/dashboard');
   };
 
-  const handleLogout = () => {
-    signOut().catch(() => {
-      // Local sign-out still takes effect when the backend cannot be reached.
-    });
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await signOut(); // HTTP 200 + success:true, then local tokens are cleared.
+      setProfileOpen(false);
+      navigate('/signin', { replace: true });
+    } catch (error) {
+      toast?.error('Could not sign out', error?.message || 'Please try again.');
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   const fullName = getUserName(user);
@@ -551,8 +562,9 @@ export default function Header() {
                 type="button"
                 className="db-signout-button"
                 onClick={handleLogout}
+                disabled={loggingOut}
               >
-                <LogOut size={16} /> Sign out
+                <LogOut size={16} /> {loggingOut ? 'Signing out…' : 'Sign out'}
               </button>
             </div>
           )}
